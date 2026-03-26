@@ -22,7 +22,7 @@ export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: Ap
       is_paginate: 'true',
       companyid: (params?.companyid || 1).toString(),
       page: (params?.page || 1).toString(),
-      size: (params?.size || 50).toString(),
+      size: (params?.size || 15).toString(),
     });
     
     if (params?.warehouseid) {
@@ -56,7 +56,6 @@ export const handleCreateItem = (itemData: Partial<ItemDTO>, productId: number =
     dispatch(itemLoadStart());
     const response = await api.post(`${API_ENDPOINTS.MASTERS.ITEMS.CREATE}?product_id=${productId}`, itemData);
     if (response.data.status) {
-      dispatch(handleFetchAllItems());
       return true;
     } else {
       dispatch(itemLoadFailure(response.data.message || "Failed to process item"));
@@ -73,7 +72,6 @@ export const handleDeleteItem = (id: number) => async (dispatch: AppDispatch) =>
     dispatch(itemLoadStart());
     const response = await api.delete(`${API_ENDPOINTS.MASTERS.ITEMS.DELETE}?product_id=${id}`);
     if (response.data.status) {
-      dispatch(handleFetchAllItems());
       return true;
     } else {
       dispatch(itemLoadFailure(response.data.message || "Failed to delete item"));
@@ -90,7 +88,6 @@ export const handleRefreshItems = () => async (dispatch: AppDispatch) => {
     dispatch(itemLoadStart());
     const response = await api.get(API_ENDPOINTS.MASTERS.ITEMS.REFRESH);
     if (response.data.status) {
-      dispatch(handleFetchAllItems());
       return true;
     } else {
       dispatch(itemLoadFailure(response.data.message || "Failed to refresh items"));

@@ -454,19 +454,19 @@ export const LocationMaster: React.FC = () => {
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-10 w-10 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                className="h-10 w-10 text-slate-400 hover:text-white hover:bg-orange-500 rounded-xl transition-all shadow-sm border border-white/10"
                 onClick={openEdit}
               >
-                <Pencil className="icon-sm" />
+                <Pencil className="h-4 w-4" />
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-10 w-10 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl transition-all"
+                    className="h-10 w-10 text-rose-400 hover:text-white hover:bg-rose-600 rounded-xl transition-all shadow-sm border border-white/10"
                   >
-                    <Trash2 className="icon-sm" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">

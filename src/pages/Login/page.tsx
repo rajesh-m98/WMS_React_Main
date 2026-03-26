@@ -88,12 +88,8 @@ export const Login = () => {
             <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center mb-4 lg:hidden mx-auto">
               <Warehouse className="icon-lg text-white" />
             </div>
-            <h1 className="heading-section">
-              {config.form.title}
-            </h1>
-            <p className="body-main mt-1">
-              {config.form.subtitle}
-            </p>
+            <h1 className="heading-section">{config.form.title}</h1>
+            <p className="body-main mt-1">{config.form.subtitle}</p>
           </div>
 
           <Card className="border-0 shadow-2xl shadow-blue-900/30 rounded-3xl overflow-hidden bg-white">
@@ -104,10 +100,7 @@ export const Login = () => {
                 className="space-y-6"
               >
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="username"
-                    className="caption-small ml-1"
-                  >
+                  <Label htmlFor="username" className="caption-small ml-1">
                     {config.form.usernameLabel}
                   </Label>
                   <div className="relative">
@@ -198,7 +191,7 @@ export const Login = () => {
             </CardContent>
           </Card>
 
-          <p className="text-center caption-small tracking-[0.2em] pt-4">
+          <p className="text-center caption-small  pt-4">
             {config.form.footerText}
           </p>
         </div>

@@ -4,12 +4,9 @@ import { SonnerToaster, Toaster, TooltipProvider } from "@/components/ui";
 import { AppLayout } from "@/components/AppLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Dashboard } from "./pages/Dashboard/page";
+import { ActivityLog } from "./pages/ActivityLog";
 import InwardRequest from "./pages/InwardRequest";
 import OutwardRequest from "./pages/OutwardRequest";
-import InwardPickList from "./pages/InwardPickList";
-import OutwardPickList from "./pages/OutwardPickList";
-import InwardHistory from "./pages/InwardHistory";
-import OutwardHistory from "./pages/OutwardHistory";
 import TaskDetail from "./pages/TaskDetail";
 import { UserManagement } from "./pages/UserManagement/page";
 import UserCreate from "./pages/UserManagement/Create";
@@ -41,6 +38,7 @@ const App = () => (
                 <AppLayout>
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/activity-logs" element={<ActivityLog />} />
                     <Route
                       path="/transactions/InwardRequest"
                       element={<InwardRequest />}
@@ -50,27 +48,7 @@ const App = () => (
                       element={<OutwardRequest />}
                     />
                     <Route
-                      path="/transactions/picklist/inward"
-                      element={<InwardPickList />}
-                    />
-                    <Route
-                      path="/transactions/picklist/outward"
-                      element={<OutwardPickList />}
-                    />
-                    <Route
-                      path="/transactions/putaway-inward"
-                      element={<InwardHistory />}
-                    />
-                    <Route
-                      path="/transactions/putaway-inward/:id"
-                      element={<TaskDetail />}
-                    />
-                    <Route
-                      path="/transactions/putaway-outward"
-                      element={<OutwardHistory />}
-                    />
-                    <Route
-                      path="/transactions/putaway-outward/:id"
+                      path="/transactions/tasks/:id"
                       element={<TaskDetail />}
                     />
                     <Route path="/masters/users" element={<UserManagement />} />

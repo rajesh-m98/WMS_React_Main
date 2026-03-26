@@ -37,9 +37,9 @@ import {
 } from "@/components/ui";
 import { useAppDispatch } from "@/app/store";
 import {
-  fetchInwardRequests,
-  fetchOutwardRequests,
-} from "@/app/store/requestSlice";
+  handleFetchInwardRequests,
+  handleFetchOutwardRequests,
+} from "@/app/manager/requestManager";
 import {
   fetchInwardPickLists,
   fetchOutwardPickLists,
@@ -92,26 +92,8 @@ export function AppSidebar() {
 
       // Transactions
       case "/transactions/InwardRequest":
-        dispatch(
-          fetchInwardRequests({ ...params, from_date: "", to_date: "" }),
-        );
         break;
       case "/transactions/OutwardRequest":
-        dispatch(
-          fetchOutwardRequests({ ...params, from_date: "", to_date: "" }),
-        );
-        break;
-      case "/transactions/picklist/inward":
-        dispatch(fetchInwardPickLists(params));
-        break;
-      case "/transactions/picklist/outward":
-        dispatch(fetchOutwardPickLists(params));
-        break;
-      case "/transactions/putaway-inward":
-        dispatch(fetchInwardHistory({ page: 1, size: 10 }));
-        break;
-      case "/transactions/putaway-outward":
-        dispatch(fetchOutwardHistory({ page: 1, size: 10 }));
         break;
       default:
         break;
@@ -155,11 +137,7 @@ export function AppSidebar() {
           <Box className="w-5 h-5 text-white stroke-[2.5]" />
         </div>
         <div className="flex flex-col">
-          <h1
-            className="heading-main !text-2xl"
-          >
-            WMS
-          </h1>
+          <h1 className="heading-main !text-2xl">WMS</h1>
         </div>
       </SidebarHeader>
 
@@ -185,9 +163,7 @@ export function AppSidebar() {
                     className={`icon-base shrink-0 ${isItemActive("/dashboard") ? "text-black" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong !text-[15px]">
-                  Dashboard
-                </span>
+                <span className="body-strong !text-[15px]">Dashboard</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -261,12 +237,12 @@ export function AppSidebar() {
               <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
                 <SubMenuItem
                   title="Inward Putaway"
-                  url="/transactions/putaway-inward"
+                  url="/transactions/InwardRequest"
                   icon={History}
                 />
                 <SubMenuItem
                   title="Outward PickList"
-                  url="/transactions/picklist/outward"
+                  url="/transactions/OutwardRequest"
                   icon={ClipboardCheck}
                 />
               </SidebarMenuSub>
@@ -298,9 +274,7 @@ export function AppSidebar() {
                     className={`icon-base shrink-0 ${isItemActive("/activity-logs") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong !text-[15px]">
-                  Activity Logs
-                </span>
+                <span className="body-strong !text-[15px]">Activity Logs</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -31,10 +31,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       return { title: "Add User", description: "Create a new system user" };
     if (path.includes("/masters/users/"))
       return { title: "User Details", description: "View system user details" };
-    if (
-      path.includes("/transactions/putaway-inward/") ||
-      path.includes("/transactions/putaway-outward/")
-    )
+    if (path.includes("/transactions/tasks/"))
       return {
         title: "Task Details",
         description: "Comprehensive View of Execution and Item Audit",
@@ -45,6 +42,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         "/dashboard": {
           title: "Dashboard",
           description: "Overview of warehouse operations and activity",
+        },
+        "/activity-logs": {
+          title: "Activity Logs",
+          description: "Complete system-wide movement history and audit trail",
         },
         "/masters/users": {
           title: "User Master",
@@ -67,28 +68,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           description: "Manage warehouse facilities",
         },
         "/transactions/InwardRequest": {
-          title: "Inward Request",
-          description: "Create and manage inward warehouse requests",
+          title: "Inward Putaway",
+          description: "Monitor and manage pending inward warehouse documents",
         },
         "/transactions/OutwardRequest": {
-          title: "Outward Request",
-          description: "Create and manage outward warehouse requests",
-        },
-        "/transactions/picklist/inward": {
-          title: "Inward PickList",
-          description: "Manage picklists for inward items",
-        },
-        "/transactions/picklist/outward": {
           title: "Outward PickList",
-          description: "Manage picklists for outward items",
-        },
-        "/transactions/putaway-inward": {
-          title: "Inward History",
-          description: "View history of inward transactions",
-        },
-        "/transactions/putaway-outward": {
-          title: "Outward History",
-          description: "View history of outward transactions",
+          description: "Track and manage outward shipment and picking queues",
         },
       };
     return (
@@ -140,9 +125,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <p className="caption-small !text-slate-400 mb-0.5">
                       Account Status
                     </p>
-                    <p className="body-strong !text-sm">
-                      {userEmail}
-                    </p>
+                    <p className="body-strong !text-sm">{userEmail}</p>
                   </div>
                   <DropdownMenuItem
                     className="gap-3 py-2.5 px-3 rounded-xl cursor-pointer text-slate-600 hover:text-blue-600 hover:bg-blue-50 focus:bg-blue-50 transition-colors"

@@ -199,7 +199,7 @@ export const HSTMaster = () => {
                         ? config.strings.dialogs.form.editTitle
                         : config.strings.dialogs.form.addTitle}
                     </DialogTitle>
-                    <p className="text-slate-400 text-center text-[10px] font-black uppercase tracking-[0.2em] pt-2 italic">
+                    <p className="text-slate-400 text-center text-[10px] font-black uppercase  pt-2 italic">
                       {editingId
                         ? "Modify existing device parameters"
                         : "Provision a new handheld terminal"}
@@ -443,14 +443,14 @@ export const HSTMaster = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex justify-end gap-2">
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => handleEdit(d)}
                         >
-                          <Pencil className="icon-sm" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
 
                         <AlertDialog>
@@ -458,9 +458,9 @@ export const HSTMaster = () => {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 text-rose-600 hover:bg-rose-50"
+                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             >
-                              <Trash2 className="icon-sm" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">

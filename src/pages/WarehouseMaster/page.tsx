@@ -413,36 +413,36 @@ export const WarehouseMaster = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-1 group-hover:translate-x-0">
+                      <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => {
                             setViewingWarehouse(wh);
                           }}
                         >
-                          <Eye className="icon-sm" />
+                          <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-amber-600 hover:bg-amber-50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => {
                             setEditingWarehouse(wh);
                             setIsFormOpen(true);
                           }}
                         >
-                          <Pencil className="icon-sm" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-rose-500 hover:bg-rose-50"
+                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             >
-                              <Trash2 className="icon-sm" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">

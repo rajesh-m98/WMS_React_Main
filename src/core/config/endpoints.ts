@@ -37,7 +37,15 @@ export const API_ENDPOINTS = {
     },
   },
   TRANSACTIONS: {
-    INWARD_REQUEST: 'transactions/inward_request',
-    OUTWARD_REQUEST: 'transactions/outward_request',
+    INWARD: {
+      GET_ALL: 'inward_router/get_all_inward',
+    },
+    OUTWARD: {
+      GET_ALL: 'outward/get_all_outward',
+    },
+    TASKS: {
+      GET_BY_ID: 'picklist/get_picklist',
+      GET_ITEMS: 'picklist/get_all_picklist',
+    }
   }
 };

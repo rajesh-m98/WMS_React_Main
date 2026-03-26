@@ -24,8 +24,7 @@
       "subtitle": "Real-time execution status",
       "metrics": {
         "inward": "Inward Summary",
-        "outward": "Outward Summary",
-        "load": "Warehouse Load"
+        "outward": "Outward Summary"
       },
       "kpi": {
         "noChange": "No Changes",

@@ -122,13 +122,13 @@
   }
 
   .heading-sub {
-    @apply text-sm font-black text-slate-500 uppercase tracking-[0.2em];
+    @apply text-sm font-black text-slate-500 uppercase;
     font-family: var(--font-sans);
   }
 
   /* Table Specific Styles */
   .table-header-font {
-    @apply text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] whitespace-nowrap;
+    @apply text-[11px] font-black text-slate-600 uppercase  whitespace-nowrap;
     font-family: var(--font-sans);
   }
 
@@ -158,7 +158,12 @@
   }
 
   .caption-small {
-    @apply text-[10px] font-black uppercase text-slate-500 tracking-[0.15em];
+    @apply text-[10px] font-black uppercase text-slate-500;
+    font-family: var(--font-sans);
+  }
+
+  .caption-medium {
+    @apply text-[12px] font-black uppercase text-slate-500 ;
     font-family: var(--font-sans);
   }
 
@@ -203,11 +208,11 @@
     background: linear-gradient(135deg, hsl(270, 60%, 50%) 0%, hsl(280, 70%, 60%) 100%);
   }
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
   .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
   @keyframes heartbeat {
     0% { transform: scale(1); opacity: 1; }
@@ -225,3 +230,6 @@
     animation: pulse-soft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
+
+
+

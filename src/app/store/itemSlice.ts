@@ -32,11 +32,16 @@ const itemSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    clearItems: (state) => {
+      state.data = [];
+      state.totalCount = 0;
+      state.error = null;
+    },
   },
 });
 
 export const { 
-  itemLoadStart, itemLoadSuccess, itemLoadFailure 
+  itemLoadStart, itemLoadSuccess, itemLoadFailure, clearItems
 } = itemSlice.actions;
 
 export default itemSlice.reducer;

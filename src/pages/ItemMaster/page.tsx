@@ -104,13 +104,21 @@ export const ItemMaster = () => {
     dispatch(
       handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
     );
+    return () => {
+      dispatch({ type: "item/clearItems" }); // Reset core state on navigate out
+    };
   }, [dispatch, page, debouncedSearch]);
 
   const handleSync = async () => {
     setIsRefreshing(true);
-    await dispatch(handleRefreshItems());
+    const success = await dispatch(handleRefreshItems());
+    if (success) {
+      dispatch(
+        handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
+      );
+      toast.success(config.strings.syncSuccess);
+    }
     setIsRefreshing(false);
-    toast.success(config.strings.syncSuccess);
   };
 
   const handleOpenDialog = (item: ItemDTO | null = null) => {
@@ -150,6 +158,10 @@ export const ItemMaster = () => {
     if (success) {
       toast.success(editingItem ? "Item updated" : "Item created");
       setIsDialogOpen(false);
+      // Trigger a smart refetch on the current page to keep context
+      dispatch(
+        handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
+      );
     }
   };
 
@@ -157,6 +169,10 @@ export const ItemMaster = () => {
     const success = await dispatch(handleDeleteItem(id));
     if (success) {
       toast.success("Item removed successfully");
+      // Trigger a smart refetch on the current page to keep context
+      dispatch(
+        handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
+      );
     }
   };
 
@@ -309,23 +325,23 @@ export const ItemMaster = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right pr-8 py-5">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
+                        <div className="flex items-center justify-end gap-2 transition-all">
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 rounded-2xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300"
+                            className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             onClick={() => handleOpenDialog(item)}
                           >
-                            <Edit2 className="icon-sm" />
+                            <Edit2 className="h-4 w-4" />
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all duration-300"
+                                className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                               >
-                                <Trash2 className="icon-sm" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
@@ -609,7 +625,7 @@ export const ItemMaster = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="text-[10px] font-black text-slate-400 uppercase  ml-1">
                       {config.strings.dialog.batch}
                     </Label>
                     <Input
@@ -621,7 +637,7 @@ export const ItemMaster = () => {
                     />
                   </div>
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="text-[10px] font-black text-slate-400 uppercase  ml-1">
                       {config.strings.dialog.serial}
                     </Label>
                     <Input

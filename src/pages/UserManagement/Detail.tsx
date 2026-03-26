@@ -41,7 +41,7 @@ const UserDetail = () => {
     return (
       <div className="p-20 flex flex-col items-center justify-center gap-4 text-slate-500 font-medium">
         <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
-        <p className="uppercase tracking-[0.2em] text-[10px] font-black">
+        <p className="uppercase  text-[10px] font-black">
           Fetching user profile...
         </p>
       </div>
@@ -72,9 +72,7 @@ const UserDetail = () => {
             <ChevronLeft className="h-5 w-5 text-slate-600" />
           </Button>
           <div>
-            <h2 className="heading-section !text-2xl">
-              {strings.title}
-            </h2>
+            <h2 className="heading-section !text-2xl">{strings.title}</h2>
             <p className="caption-small !text-slate-400 italic">
               ID: {user.userid}
             </p>
@@ -102,9 +100,7 @@ const UserDetail = () => {
                 <p className="caption-small !text-slate-400">
                   {strings.labels.fullName}
                 </p>
-                <p className="body-strong !text-slate-800">
-                  {user.username}
-                </p>
+                <p className="body-strong !text-slate-800">{user.username}</p>
               </div>
               <div className="space-y-1">
                 <p className="caption-small !text-slate-400">
@@ -181,7 +177,7 @@ const UserDetail = () => {
                 <h3 className="text-2xl font-black tracking-tight mb-2">
                   {user.username}
                 </h3>
-                <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em]">
+                <p className="text-slate-400 text-xs font-black uppercase">
                   {Number(user.role) === 2
                     ? strings.roleAdministrator.toUpperCase()
                     : strings.roleOperator.toUpperCase()}
@@ -213,14 +209,14 @@ const UserDetail = () => {
         <div className="lg:col-span-2">
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
-              <CardTitle className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+              <CardTitle className="text-xs font-black text-slate-500 uppercase  flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> Workplace Details
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                  <p className="text-xs font-black text-slate-400 uppercase">
                     {strings.labels.warehouse}
                   </p>
                   <div className="space-y-1">
@@ -233,7 +229,7 @@ const UserDetail = () => {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                  <p className="text-xs font-black text-slate-400 uppercase">
                     {strings.labels.device}
                   </p>
                   <div className="flex items-center gap-4 pb-6">
@@ -258,7 +254,7 @@ const UserDetail = () => {
         <div className="lg:col-span-1">
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white h-full">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-8">
-              <CardTitle className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+              <CardTitle className="text-xs font-black text-slate-400 uppercase">
                 {strings.quickActions}
               </CardTitle>
             </CardHeader>
@@ -272,7 +268,7 @@ const UserDetail = () => {
                     {strings.actions.permissions}
                   </span>
                 </div>
-                <span className="text-xs font-black text-blue-600 uppercase tracking-[0.1em] group-hover:translate-x-1 transition-transform">
+                <span className="text-xs font-black text-blue-600 uppercase  group-hover:translate-x-1 transition-transform">
                   {strings.actions.view}
                 </span>
               </button>
@@ -285,7 +281,7 @@ const UserDetail = () => {
                     {strings.actions.resetPassword}
                   </span>
                 </div>
-                <span className="text-xs font-black text-blue-600 uppercase tracking-[0.1em] group-hover:translate-x-1 transition-transform">
+                <span className="text-xs font-black text-blue-600 uppercase  group-hover:translate-x-1 transition-transform">
                   {strings.actions.send}
                 </span>
               </button>

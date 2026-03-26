@@ -66,9 +66,7 @@ const UserEdit = () => {
           <ChevronLeft className="h-5 w-5 text-slate-600" />
         </Button>
         <div>
-          <h2 className="heading-section !text-2xl">
-            {strings.title}
-          </h2>
+          <h2 className="heading-section !text-2xl">{strings.title}</h2>
           <p className="caption-small !text-slate-400 italic">
             ID: {formData.userid}
           </p>
@@ -196,7 +194,7 @@ const UserEdit = () => {
           </Button>
           <Button
             type="submit"
-            className="px-12 bg-slate-900 hover:bg-slate-800 rounded-xl shadow-lg shadow-slate-200 body-strong text-white uppercase tracking-[0.15em] text-xs h-11 transition-all active:scale-95"
+            className="px-12 bg-slate-900 hover:bg-slate-800 rounded-xl shadow-lg shadow-slate-200 body-strong text-white uppercase  text-xs h-11 transition-all active:scale-95"
             disabled={loading}
           >
             {loading ? (
