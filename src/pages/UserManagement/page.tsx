@@ -79,15 +79,22 @@ export const UserManagement = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
-    dispatch(handleFetchUsers(1)); // companyid: 1 for now
-  }, [dispatch]);
+    dispatch(
+      handleFetchUsers({
+        companyid: 1,
+        search: debouncedSearch,
+        page: page,
+        size: PAGE_SIZE,
+      }),
+    );
+  }, [dispatch, debouncedSearch, page]);
 
   const handleDelete = async (id: number) => {
     try {
       const response = await api.post("/api/users/delete_user", { id });
       if (response.data.status) {
         toast.success("User deleted successfully");
-        dispatch(handleFetchUsers(1));
+        dispatch(handleFetchUsers({ companyid: 1 }));
       } else {
         toast.error(response.data.message || "Failed to delete user");
       }
@@ -96,35 +103,28 @@ export const UserManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      u.username.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      u.userid.toLowerCase().includes(debouncedSearch.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || u.status.toLowerCase() === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const displayUsers = users; // Now using server-side filtered data
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
       <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-3 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-2/5 shrink-0">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
             <Input
               placeholder={config.strings.searchPlaceholder}
-              className="pl-11 h-12 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-sm font-medium w-full"
+              className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex flex-wrap items-center gap-3 justify-end w-full lg:w-auto">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-500 whitespace-nowrap hidden sm:block">
+              <span className="caption-small whitespace-nowrap hidden sm:block">
                 {config.strings.statusLabel}
               </span>
               <Select defaultValue="all" onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[130px] h-12 rounded-xl bg-slate-50/50 border-slate-200 font-bold text-slate-700">
+                <SelectTrigger className="w-[130px] h-12 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-700">
                   <SelectValue placeholder={config.strings.allUsers} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -140,18 +140,18 @@ export const UserManagement = () => {
             </div>
             <Button
               variant="outline"
-              className="rounded-xl h-12 px-5 font-bold flex items-center gap-2 border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
+              className="rounded-xl h-12 px-5 body-strong flex items-center gap-2 border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
             >
-              <Upload className="h-4 w-4" />{" "}
+              <Upload className="icon-sm" />{" "}
               <span className="hidden sm:inline">
                 {config.strings.importBtn}
               </span>
             </Button>
             <Button
-              className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-6 font-bold flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95"
+              className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-6 body-strong text-white flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95"
               onClick={() => navigate("/masters/users/create")}
             >
-              <UserPlus className="h-4 w-4" /> {config.strings.addUserBtn}
+              <UserPlus className="icon-sm" /> {config.strings.addUserBtn}
             </Button>
           </div>
         </CardContent>
@@ -160,84 +160,82 @@ export const UserManagement = () => {
       <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white relative min-h-[400px]">
         {loading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+            <Loader2 className="icon-xl text-blue-600 animate-spin" />
           </div>
         )}
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
+        <CardContent className="p-0 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
+          <Table className="min-w-[1000px]">
             <TableHeader>
               <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                <TableHead className="font-bold text-slate-900 pl-6 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font pl-6">
                   {config.strings.table.id}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.username}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.contact}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.role}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.device}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.outlet}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.status}
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 h-12 text-right pr-6 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font text-right pr-6">
                   {config.strings.table.actions}
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.length === 0 && !loading ? (
+              {displayUsers.length === 0 && !loading ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="h-60 text-center text-slate-400 font-medium"
-                  >
-                    {users.length === 0 
-                      ? config.strings.noUsersFound 
-                      : config.strings.noResultsFound || "No users match your filters"}
+                  <TableCell colSpan={8} className="h-60 text-center body-main">
+                    {users.length === 0
+                      ? config.strings.noUsersFound
+                      : config.strings.noResultsFound ||
+                        "No users match your filters"}
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((user) => (
+                displayUsers.map((user) => (
                   <TableRow
                     key={user.id}
-                    className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors group"
+                    className="border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-colors group"
                   >
-                    <TableCell className="font-bold text-slate-600 pl-6">
+                    <TableCell className="table-id-font pl-6">
                       {user.userid}
                     </TableCell>
                     <TableCell>
-                      <span className="font-bold text-slate-900 leading-none">
+                      <span className="body-strong leading-none">
                         {user.username}
                       </span>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm font-medium text-slate-600 truncate max-w-[150px]">
+                      <p className="body-main !text-sm truncate max-w-[150px]">
                         {user.email_id || "-"}
                       </p>
-                      <p className="text-[12px] text-slate-500 font-bold">
+                      <p className="caption-small !text-slate-500">
                         {user.mobile_number || "-"}
                       </p>
                     </TableCell>
                     <TableCell>{getRoleBadge(Number(user.role))}</TableCell>
-                    <TableCell className="font-medium text-slate-600">
+                    <TableCell className="body-main">
                       {user.device_id || "None"}
                     </TableCell>
-                    <TableCell className="font-medium text-slate-600">
+                    <TableCell className="body-main">
                       {user.warehouse_id || "None"}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`rounded-lg px-2 py-0.5 border-0 font-bold ${user.status === "Active" ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600"}`}
+                        className={`rounded-lg px-2 py-0.5 border-0 caption-small ${user.status === "Active" ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600"}`}
                       >
                         {user.status}
                       </Badge>
@@ -247,54 +245,59 @@ export const UserManagement = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                          className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
                           onClick={() => navigate(`/masters/users/${user.id}`)}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="icon-sm" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+                          className="h-8 w-8 text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all"
                           onClick={() =>
                             navigate(`/masters/users/${user.id}/edit`)
                           }
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="icon-sm" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                              className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="icon-sm" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-2xl border-0 shadow-2xl">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle className="text-xl font-black text-slate-900">
+                          <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                            <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                              <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                              <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
                                 {config.strings.deleteDialog.title}
                               </AlertDialogTitle>
-                              <AlertDialogDescription className="text-slate-500 font-medium pt-2">
-                                {config.strings.deleteDialog.descriptionTemplate.replace(
-                                  "{username}",
-                                  user.username,
-                                )}
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="pt-4 mt-4 border-t border-slate-100">
-                              <AlertDialogCancel className="rounded-xl border-slate-200 font-bold">
-                                {config.strings.deleteDialog.cancelBtn}
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl px-8"
-                                onClick={() => handleDelete(user.id)}
-                              >
-                                {config.strings.deleteDialog.confirmBtn}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
+                            </div>
+                            <div className="p-10 text-center flex flex-col items-center">
+                              <AlertDialogHeader>
+                                <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
+                                  {config.strings.deleteDialog.descriptionTemplate.replace(
+                                    "{username}",
+                                    user.username,
+                                  )}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <div className="flex gap-4 w-full mt-10">
+                                <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
+                                  {config.strings.deleteDialog.cancelBtn}
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
+                                  onClick={() => handleDelete(user.id)}
+                                >
+                                  {config.strings.deleteDialog.confirmBtn}
+                                </AlertDialogAction>
+                              </div>
+                            </div>
                           </AlertDialogContent>
                         </AlertDialog>
                       </div>
@@ -308,9 +311,9 @@ export const UserManagement = () => {
       </Card>
 
       <div className="flex items-center justify-between px-2 pt-2">
-        <p className="text-sm font-medium text-slate-400 italic">
+        <p className="body-main !text-sm italic">
           {config.strings.totalUsersLabel}{" "}
-          <span className="text-slate-900 font-black tracking-tight">
+          <span className="body-strong !text-slate-900 tracking-tight">
             {totalCount}
           </span>
         </p>
@@ -318,22 +321,22 @@ export const UserManagement = () => {
           <Button
             variant="outline"
             size="sm"
-            className="rounded-xl px-4 font-bold border-slate-200"
+            className="rounded-xl px-4 body-strong border-slate-200"
             disabled={page === 1 || loading}
             onClick={() => setPage((p) => p - 1)}
           >
-            <ChevronLeft className="h-4 w-4 mr-1" />{" "}
+            <ChevronLeft className="icon-sm mr-1" />{" "}
             {config.strings.pagination.prev}
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="rounded-xl px-4 font-bold border-slate-200"
+            className="rounded-xl px-4 body-strong border-slate-200"
             disabled={page * PAGE_SIZE >= totalCount || loading}
             onClick={() => setPage((p) => p + 1)}
           >
             {config.strings.pagination.next}{" "}
-            <ChevronRight className="h-4 w-4 ml-1" />
+            <ChevronRight className="icon-sm ml-1" />
           </Button>
         </div>
       </div>

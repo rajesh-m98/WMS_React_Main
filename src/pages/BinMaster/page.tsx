@@ -29,7 +29,7 @@ import {
   handleCreateOrUpdateBin,
   handleDeleteBin,
   handleExportBins,
-  handleImportBins
+  handleImportBins,
 } from "@/app/manager/binManager";
 import { parseCSV } from "@/core/utils/csvHelper";
 import {
@@ -47,7 +47,7 @@ import {
   selectNode,
   setCreateOpen,
   setEditOpen,
-  clearSelection
+  clearSelection,
 } from "@/app/store/binSlice";
 import config from "./BinConfig.json";
 
@@ -61,12 +61,9 @@ interface LayerConfigData {
 
 export const LocationMaster: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { 
-    columns, 
-    selectedPath, 
-    loading,
-    formStatus 
-  } = useAppSelector((state) => state.bins);
+  const { columns, selectedPath, loading, formStatus } = useAppSelector(
+    (state) => state.bins,
+  );
 
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
@@ -134,10 +131,12 @@ export const LocationMaster: React.FC = () => {
     });
     body[`layer${selectedPath.length}`] = formData.value;
 
-    await dispatch(handleCreateOrUpdateBin({
-      layer_id: activeNode.id,
-      body,
-    }));
+    await dispatch(
+      handleCreateOrUpdateBin({
+        layer_id: activeNode.id,
+        body,
+      }),
+    );
   };
 
   const onDeleteConfirm = async () => {
@@ -164,17 +163,17 @@ export const LocationMaster: React.FC = () => {
       <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-1/2">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
             <Input
               placeholder={config.strings.searchPlaceholder}
-              className="pl-11 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-medium w-full"
+              className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 scrollbar-hide shrink-0">
-            <Dialog 
-              open={formStatus.isCreateOpen} 
+            <Dialog
+              open={formStatus.isCreateOpen}
               onOpenChange={(open) => {
                 dispatch(setCreateOpen(open));
                 if (!open) setFormData({ value: "", barcode: "" });
@@ -182,31 +181,30 @@ export const LocationMaster: React.FC = () => {
             >
               <DialogTrigger asChild>
                 <Button
-                  className="rounded-xl bg-blue-600 hover:bg-blue-700 h-11 px-6 font-bold flex shrink-0 items-center gap-2 shadow-lg shadow-blue-100 transition-all"
+                  className="rounded-xl bg-blue-600 hover:bg-blue-700 h-11 px-6 body-strong flex shrink-0 items-center gap-2 shadow-lg shadow-blue-100 transition-all text-white border-0"
                   disabled={selectedPath.length >= 6}
                 >
-                  <Plus className="h-4 w-4" /> {config.strings.addNodeBtn}
+                  <Plus className="icon-sm" /> {config.strings.addNodeBtn}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
-                <div className="bg-slate-900 p-6 text-white text-center">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-black mx-auto">
-                      {config.strings.createNode.title.replace(
-                        "{level}",
-                        (selectedPath.length + 1).toString(),
-                      )}
-                    </DialogTitle>
-                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] pt-2 italic">
-                      {config.strings.createNode.subtitlePrefix}{" "}
-                      {selectedPath.map((n) => n.value).join(" > ") ||
-                        config.strings.createNode.rootName}
-                    </p>
-                  </DialogHeader>
-                </div>
+                <DialogHeader className="p-8 bg-slate-900 text-white relative overflow-hidden text-center">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl" />
+                  <DialogTitle className="text-xl font-black mx-auto relative z-10 font-display">
+                    {config.strings.createNode.title.replace(
+                      "{level}",
+                      (selectedPath.length + 1).toString(),
+                    )}
+                  </DialogTitle>
+                  <p className="table-header-font !text-slate-400 pt-2 italic relative z-10">
+                    {config.strings.createNode.subtitlePrefix}{" "}
+                    {selectedPath.map((n) => n.value).join(" > ") ||
+                      config.strings.createNode.rootName}
+                  </p>
+                </DialogHeader>
                 <div className="p-6 space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                    <Label className="caption-small uppercase text-slate-400">
                       {config.strings.createNode.valueLabel}
                     </Label>
                     <Input
@@ -219,13 +217,15 @@ export const LocationMaster: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                    <Label className="caption-small uppercase text-slate-400">
                       {config.strings.createNode.barcodeLabel}
                     </Label>
                     <div className="relative">
-                      <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
                       <Input
-                        placeholder={config.strings.createNode.barcodePlaceholder}
+                        placeholder={
+                          config.strings.createNode.barcodePlaceholder
+                        }
                         className="rounded-xl h-11 border-slate-200 pl-10 font-mono"
                         value={formData.barcode}
                         onChange={(e) =>
@@ -237,17 +237,21 @@ export const LocationMaster: React.FC = () => {
                   <div className="flex justify-end gap-3 pt-4">
                     <Button
                       variant="ghost"
-                      className="rounded-xl h-11 px-6 font-black uppercase tracking-widest text-[10px] text-slate-500"
+                      className="rounded-xl h-11 px-6 table-header-font text-slate-500"
                       onClick={() => dispatch(setCreateOpen(false))}
                     >
                       {config.strings.createNode.cancelBtn}
                     </Button>
                     <Button
-                      className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 font-black uppercase tracking-[0.15em] text-xs shadow-lg shadow-blue-100"
+                      className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 body-strong text-white border-0 shadow-lg shadow-blue-100"
                       onClick={handleCreateSubmit}
                       disabled={formStatus.loading}
                     >
-                      {formStatus.loading ? <Loader2 className="animate-spin h-4 w-4" /> : config.strings.createNode.submitBtn}
+                      {formStatus.loading ? (
+                        <Loader2 className="animate-spin icon-sm" />
+                      ) : (
+                        config.strings.createNode.submitBtn
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -255,20 +259,28 @@ export const LocationMaster: React.FC = () => {
             </Dialog>
 
             <div className="flex bg-slate-100/80 rounded-xl p-1 shrink-0">
-              <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".csv" className="hidden" />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".csv"
+                className="hidden"
+              />
               <Button
                 variant="ghost"
-                className="rounded-lg h-9 px-4 font-black uppercase tracking-widest text-[10px] text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
+                className="rounded-lg h-9 px-4 table-header-font text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Upload className="h-4 w-4 text-blue-500" /> {config.strings.importBtn}
+                <Upload className="icon-sm text-blue-500" />{" "}
+                {config.strings.importBtn}
               </Button>
               <Button
                 variant="ghost"
-                className="rounded-lg h-9 px-4 font-black uppercase tracking-widest text-[10px] text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
+                className="rounded-lg h-9 px-4 table-header-font text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
                 onClick={() => dispatch(handleExportBins())}
               >
-                <Download className="h-4 w-4 text-emerald-500" /> {config.strings.exportBtn}
+                <Download className="icon-sm text-emerald-500" />{" "}
+                {config.strings.exportBtn}
               </Button>
             </div>
           </div>
@@ -292,14 +304,14 @@ export const LocationMaster: React.FC = () => {
               >
                 <div className="p-3 bg-white border-b border-slate-100 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                    <span className="table-header-font !text-slate-400">
                       {config.strings.levelCard.prefix} {idx + 1}
                     </span>
-                    <span className="text-[9px] font-bold text-blue-600 uppercase">
+                    <span className="caption-small text-blue-600 !text-[10px] uppercase font-black">
                       {config.strings.levelCard.suffix}
                     </span>
                   </div>
-                  <Badge className="text-[9px] font-bold bg-slate-100 text-slate-500 border-0 uppercase">
+                  <Badge className="caption-small !text-[10px] bg-slate-100 text-slate-500 border-0 uppercase px-2 py-0.5">
                     {column.length} {config.strings.levelCard.items}
                   </Badge>
                 </div>
@@ -316,17 +328,23 @@ export const LocationMaster: React.FC = () => {
                         }`}
                       >
                         <div className="flex flex-col items-start text-left">
-                          <span className={`text-[14px] font-bold leading-tight ${isNodeSelected(node.id) ? "text-white" : "text-slate-800"}`}>
+                          <span
+                            className={`table-cell-bold leading-tight ${isNodeSelected(node.id) ? "!text-white" : "text-slate-800"}`}
+                          >
                             {node.value}
                           </span>
                           {node.barcode && (
-                            <span className={`text-[11px] font-mono mt-1 px-1.5 py-0.5 rounded ${isNodeSelected(node.id) ? "bg-white/20 text-blue-50" : "bg-slate-100 text-slate-500"}`}>
+                            <span
+                              className={`table-id-font mt-1 px-1.5 py-0.5 rounded !text-[10px] ${isNodeSelected(node.id) ? "bg-white/20 !text-blue-50" : "bg-slate-100 !text-slate-500"}`}
+                            >
                               {node.barcode}
                             </span>
                           )}
                         </div>
                         {node.children && node.children.length > 0 && (
-                          <ChevronRight className={`h-5 w-5 shrink-0 transition-transform ${isNodeSelected(node.id) ? "text-white" : "text-slate-300 group-hover:translate-x-1 group-hover:text-blue-500"}`} />
+                          <ChevronRight
+                            className={`h-5 w-5 shrink-0 transition-transform ${isNodeSelected(node.id) ? "text-white" : "text-slate-300 group-hover:translate-x-1 group-hover:text-blue-500"}`}
+                          />
                         )}
                       </button>
                     ))}
@@ -340,7 +358,9 @@ export const LocationMaster: React.FC = () => {
                 <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center text-slate-200">
                   <Layers className="h-10 w-10" />
                 </div>
-                <p className="font-bold uppercase tracking-widest text-[10px]">No hierarchy data available</p>
+                <p className="font-bold uppercase tracking-widest text-[10px]">
+                  No hierarchy data available
+                </p>
               </div>
             )}
           </div>
@@ -350,21 +370,21 @@ export const LocationMaster: React.FC = () => {
       {/* Floating Action Menu */}
       {selectedPath.length > 0 && (
         <div className="fixed bottom-8 right-8 animate-in slide-in-from-bottom-10 flex gap-4 z-50">
-          <Dialog 
-            open={formStatus.isEditOpen} 
+          <Dialog
+            open={formStatus.isEditOpen}
             onOpenChange={(v) => dispatch(setEditOpen(v))}
           >
             <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
-              <div className="bg-blue-600 p-6 text-white text-center">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-black mx-auto">
-                    {config.strings.editNode.title}
-                  </DialogTitle>
-                  <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.2em] pt-2 italic">
-                    {config.strings.editNode.subtitlePrefix} {selectedPath[selectedPath.length - 1]?.id}
-                  </p>
-                </DialogHeader>
-              </div>
+              <DialogHeader className="p-8 bg-blue-600 text-white relative overflow-hidden text-center">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+                <DialogTitle className="text-xl font-black mx-auto relative z-10 font-display">
+                  {config.strings.editNode.title}
+                </DialogTitle>
+                <p className="table-header-font !text-blue-100 pt-2 italic relative z-10">
+                  {config.strings.editNode.subtitlePrefix}{" "}
+                  {selectedPath[selectedPath.length - 1]?.id}
+                </p>
+              </DialogHeader>
               <div className="p-6 space-y-4">
                 <div className="space-y-2">
                   <Label className="text-xs font-black uppercase text-slate-400 tracking-wider font-sans">
@@ -373,7 +393,9 @@ export const LocationMaster: React.FC = () => {
                   <Input
                     className="rounded-xl h-11 border-slate-200 font-bold"
                     value={formData.value}
-                    onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, value: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -384,23 +406,29 @@ export const LocationMaster: React.FC = () => {
                     className="rounded-xl h-11 border-slate-200 font-mono bg-slate-50 cursor-not-allowed opacity-70"
                     value={formData.barcode}
                     disabled={true}
-                    onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, barcode: e.target.value })
+                    }
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
                     variant="ghost"
-                    className="rounded-xl h-11 px-6 font-black uppercase tracking-widest text-[10px] text-slate-500"
+                    className="rounded-xl h-11 px-6 table-header-font text-slate-500"
                     onClick={() => dispatch(setEditOpen(false))}
                   >
                     {config.strings.editNode.cancelBtn}
                   </Button>
                   <Button
-                    className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 font-black uppercase tracking-[0.15em] text-xs shadow-lg shadow-blue-100"
+                    className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 body-strong text-white border-0 shadow-lg shadow-blue-100"
                     onClick={handleEditSubmit}
                     disabled={formStatus.loading}
                   >
-                    {formStatus.loading ? <Loader2 className="animate-spin h-4 w-4" /> : config.strings.editNode.submitBtn}
+                    {formStatus.loading ? (
+                      <Loader2 className="animate-spin icon-sm" />
+                    ) : (
+                      config.strings.editNode.submitBtn
+                    )}
                   </Button>
                 </div>
               </div>
@@ -410,13 +438,13 @@ export const LocationMaster: React.FC = () => {
           <Card className="border-0 shadow-2xl shadow-blue-900/20 rounded-2xl bg-slate-900 text-white p-3 pr-6 flex items-center gap-6 ring-8 ring-white/10">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-blue-400 border border-white/10">
-                <Barcode className="h-5 w-5" />
+                <Barcode className="icon-base" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5 tracking-[0.2em]">
+                <p className="table-header-font !text-slate-500 mb-0.5">
                   {config.strings.activeFocus}
                 </p>
-                <p className="text-sm font-black tracking-tight">
+                <p className="body-strong !text-sm">
                   {selectedPath[selectedPath.length - 1].value}
                 </p>
               </div>
@@ -429,7 +457,7 @@ export const LocationMaster: React.FC = () => {
                 className="h-10 w-10 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                 onClick={openEdit}
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="icon-sm" />
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -438,32 +466,37 @@ export const LocationMaster: React.FC = () => {
                     variant="ghost"
                     className="h-10 w-10 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl transition-all"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="icon-sm" />
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="rounded-2xl border-0 shadow-2xl">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-xl font-black">
+                <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                  <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                    <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                    <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
                       {config.strings.deleteAlert.title}
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-slate-500 font-medium">
-                      {config.strings.deleteAlert.descriptionTemplate.replace(
-                        "{value}",
-                        selectedPath[selectedPath.length - 1].value,
-                      )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter className="pt-4">
-                    <AlertDialogCancel className="rounded-xl font-bold">
-                      {config.strings.deleteAlert.cancelBtn}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-rose-600 hover:bg-rose-700 rounded-xl font-bold px-8 shadow-lg shadow-rose-100"
-                      onClick={onDeleteConfirm}
-                    >
-                      {config.strings.deleteAlert.confirmBtn}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
+                  </div>
+                  <div className="p-10 text-center flex flex-col items-center">
+                    <AlertDialogHeader>
+                      <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto text-center">
+                        {config.strings.deleteAlert.descriptionTemplate.replace(
+                          "{value}",
+                          selectedPath[selectedPath.length - 1].value,
+                        )}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="flex gap-4 w-full mt-10">
+                      <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
+                        {config.strings.deleteAlert.cancelBtn}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all"
+                        onClick={onDeleteConfirm}
+                      >
+                        {config.strings.deleteAlert.confirmBtn}
+                      </AlertDialogAction>
+                    </div>
+                  </div>
                 </AlertDialogContent>
               </AlertDialog>
             </div>

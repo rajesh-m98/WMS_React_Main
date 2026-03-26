@@ -44,6 +44,8 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Plus,
   Edit2,
   Package,
@@ -158,15 +160,19 @@ export const ItemMaster = () => {
     }
   };
 
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const startPage = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const endPage = Math.min(totalPages, Math.max(page + 2, 5));
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="relative w-full md:flex-1">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
             <Input
               placeholder={config.strings.searchPlaceholder}
-              className="pl-14 h-14 rounded-2xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all font-bold text-slate-700 shadow-inner"
+              className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -174,58 +180,60 @@ export const ItemMaster = () => {
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Button
-              className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-black text-white font-black transition-all shadow-lg hover:shadow-slate-200 active:scale-95 flex-1 md:flex-none"
+              className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white body-strong transition-all shadow-lg shadow-blue-100 active:scale-95 flex-1 md:flex-none"
               onClick={() => handleOpenDialog()}
             >
-              <Plus className="h-5 w-5 mr-3" />
+              <Plus className="icon-sm mr-2" />
               {config.strings.dialog.create}
             </Button>
             <Button
               variant="outline"
-              className="h-14 px-6 rounded-2xl border-2 border-slate-100 font-black text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
+              className="h-12 px-5 rounded-xl border border-slate-200 body-strong text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
               onClick={handleSync}
               disabled={isRefreshing}
             >
               <RefreshCw
-                className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`}
+                className={`icon-sm ${isRefreshing ? "animate-spin" : ""}`}
               />
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-2xl rounded-[2.5rem] overflow-hidden bg-white relative">
-        <div className="absolute top-0 left-0 w-2 h-full bg-blue-600 z-10" />
+      <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
         <CardContent className="p-0">
-          <div className="overflow-x-auto scrollbar-premium">
-            <Table>
+          <div className="overflow-x-auto scrollbar-premium scrollbar-thin scrollbar-thumb-slate-200">
+            <Table className="min-w-[1600px]">
               <TableHeader>
-                <TableRow className="bg-slate-50/50 border-b border-slate-100">
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em] h-16 pl-8">
+                <TableRow className="bg-slate-50/50 border-b-2 border-slate-900/10">
+                  <TableHead className="table-header-font pl-4 whitespace-nowrap">
+                    {config.strings.table.id}
+                  </TableHead>
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.code}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.description}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.batch}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.barcode}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.location}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.opening}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.current}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em]">
+                  <TableHead className="table-header-font whitespace-nowrap">
                     {config.strings.table.status}
                   </TableHead>
-                  <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-[0.2em] text-right pr-10">
+                  <TableHead className="table-header-font text-right pr-8 whitespace-nowrap">
                     {config.strings.table.manage}
                   </TableHead>
                 </TableRow>
@@ -233,11 +241,11 @@ export const ItemMaster = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-80 text-center">
+                    <TableCell colSpan={10} className="h-80 text-center">
                       <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                          Loading Repository...
+                        <Loader2 className="icon-xl text-blue-600 animate-spin" />
+                        <p className="caption-small !text-slate-400">
+                          Loading Items...
                         </p>
                       </div>
                     </TableCell>
@@ -245,7 +253,7 @@ export const ItemMaster = () => {
                 ) : items.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={10}
                       className="h-80 text-center text-slate-400 font-bold uppercase tracking-widest"
                     >
                       {config.strings.noItems}
@@ -255,17 +263,15 @@ export const ItemMaster = () => {
                   items.map((item) => (
                     <TableRow
                       key={item.id}
-                      className="group hover:bg-slate-50/80 transition-all border-b border-slate-50"
+                      className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-bold"
                     >
-                      <TableCell className="pl-8 font-black text-slate-900 py-5">
-                        <div className="flex flex-col">
-                          <span>{item.item_code}</span>
-                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
-                            ID: #{item.id}
-                          </span>
-                        </div>
+                      <TableCell className="pl-4 py-5 body-strong">
+                        {item.id}
                       </TableCell>
-                      <TableCell className="font-bold text-slate-600 max-w-[250px] truncate py-5">
+                      <TableCell className="table-cell-font py-5">
+                        {item.item_code}
+                      </TableCell>
+                      <TableCell className="body-strong !text-slate-600 max-w-[280px] py-5 leading-relaxed">
                         {item.item_description}
                       </TableCell>
                       <TableCell className="py-5">
@@ -279,7 +285,7 @@ export const ItemMaster = () => {
                       <TableCell className="py-5">
                         <Badge
                           variant="outline"
-                          className="rounded-lg border-2 border-slate-100 bg-white font-mono text-xs px-2.5 py-1 text-slate-600"
+                          className="rounded-lg border-2 border-slate-100 bg-white table-id-font px-2.5 py-1 text-slate-600"
                         >
                           {item.barcode || "—"}
                         </Badge>
@@ -297,7 +303,7 @@ export const ItemMaster = () => {
                       </TableCell>
                       <TableCell className="py-5">
                         <Badge
-                          className={`rounded-xl px-4 py-1.5 border-0 font-black text-[10px] shadow-sm tracking-widest ${item.active === "Y" ? "bg-emerald-500 text-white" : "bg-slate-400 text-white"}`}
+                          className={`rounded-xl px-4 py-1.5 border-0 caption-small shadow-sm ${item.active === "Y" ? "bg-emerald-500 text-white" : "bg-slate-400 text-white"}`}
                         >
                           {item.active === "Y" ? "ACTIVE" : "INACTIVE"}
                         </Badge>
@@ -310,7 +316,7 @@ export const ItemMaster = () => {
                             className="h-10 w-10 rounded-2xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300"
                             onClick={() => handleOpenDialog(item)}
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <Edit2 className="icon-sm" />
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -319,32 +325,37 @@ export const ItemMaster = () => {
                                 size="icon"
                                 className="h-10 w-10 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all duration-300"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="icon-sm" />
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent className="rounded-3xl border-0 shadow-2xl p-8">
-                              <AlertDialogHeader>
-                                <AlertDialogTitle className="text-2xl font-black text-slate-900 tracking-tight">
+                            <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                              <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                                <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                                <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
                                   {config.strings.deleteDialog.title}
                                 </AlertDialogTitle>
-                                <AlertDialogDescription className="text-slate-500 font-bold pt-4 text-[15px] leading-relaxed">
-                                  {config.strings.deleteDialog.descriptionTemplate.replace(
-                                    "{itemcode}",
-                                    item.item_code,
-                                  )}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter className="pt-8 gap-3">
-                                <AlertDialogCancel className="rounded-2xl border-2 border-slate-100 h-12 font-black px-8">
-                                  {config.strings.deleteDialog.cancelBtn}
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-rose-600 hover:bg-black text-white h-12 rounded-2xl font-black px-8 transition-all"
-                                  onClick={() => handleRemove(item.id)}
-                                >
-                                  {config.strings.deleteDialog.confirmBtn}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
+                              </div>
+                              <div className="p-10 text-center flex flex-col items-center">
+                                <AlertDialogHeader className="flex flex-col items-center">
+                                  <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto text-center">
+                                    {config.strings.deleteDialog.descriptionTemplate.replace(
+                                      "{itemcode}",
+                                      item.item_code,
+                                    )}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="flex gap-4 w-full mt-10">
+                                  <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
+                                    {config.strings.deleteDialog.cancelBtn}
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
+                                    onClick={() => handleRemove(item.id)}
+                                  >
+                                    {config.strings.deleteDialog.confirmBtn}
+                                  </AlertDialogAction>
+                                </div>
+                              </div>
                             </AlertDialogContent>
                           </AlertDialog>
                         </div>
@@ -358,9 +369,6 @@ export const ItemMaster = () => {
 
           <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
-                <Box className="h-6 w-6" />
-              </div>
               <p className="text-sm font-black text-slate-400 uppercase tracking-widest italic">
                 {config.strings.totalCatalog}{" "}
                 <span className="text-slate-900 ml-2 border-b-2 border-blue-500">
@@ -374,14 +382,24 @@ export const ItemMaster = () => {
                 variant="outline"
                 className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
                 disabled={page === 1 || loading}
+                onClick={() => setPage(1)}
+              >
+                <ChevronsLeft className="icon-sm text-slate-600" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === 1 || loading}
                 onClick={() => setPage((p) => p - 1)}
               >
                 <ChevronLeft className="h-6 w-6 text-slate-600" />
               </Button>
               <div className="flex items-center gap-2 px-4">
-                {[...Array(Math.min(5, Math.ceil(totalCount / PAGE_SIZE)))].map(
+                {Array.from(
+                  { length: Math.min(totalPages, endPage - startPage + 1) },
                   (_, i) => {
-                    const p = i + 1;
+                    const p = startPage + i;
+                    if (p <= 0) return null;
                     return (
                       <Button
                         key={p}
@@ -398,10 +416,18 @@ export const ItemMaster = () => {
               <Button
                 variant="outline"
                 className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page * PAGE_SIZE >= totalCount || loading}
+                disabled={page === totalPages || loading}
                 onClick={() => setPage((p) => p + 1)}
               >
                 <ChevronRight className="h-6 w-6 text-slate-600" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === totalPages || loading}
+                onClick={() => setPage(totalPages)}
+              >
+                <ChevronsRight className="icon-sm text-slate-600" />
               </Button>
             </div>
           </div>
@@ -414,7 +440,7 @@ export const ItemMaster = () => {
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl" />
             <DialogTitle className="text-3xl font-black tracking-tighter flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Plus className="h-6 w-6 text-white" />
+                <Plus className="icon-base text-white" />
               </div>
               {editingItem
                 ? config.strings.dialog.edit
@@ -434,7 +460,7 @@ export const ItemMaster = () => {
                 </div>
 
                 <div className="space-y-2.5">
-                  <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  <Label className="caption-small !text-slate-400">
                     {config.strings.dialog.itemCode}
                   </Label>
                   <Input
@@ -443,12 +469,12 @@ export const ItemMaster = () => {
                       setFormData({ ...formData, item_code: e.target.value })
                     }
                     placeholder="E.g. SKU-7402"
-                    className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-bold transition-all"
+                    className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all"
                   />
                 </div>
 
                 <div className="space-y-2.5">
-                  <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  <Label className="caption-small !text-slate-400">
                     {config.strings.dialog.description}
                   </Label>
                   <Input
@@ -460,13 +486,13 @@ export const ItemMaster = () => {
                       })
                     }
                     placeholder="Detailed item name..."
-                    className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-bold transition-all"
+                    className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="caption-small !text-slate-400">
                       {config.strings.dialog.groupCode}
                     </Label>
                     <Input
@@ -474,11 +500,11 @@ export const ItemMaster = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, itmsgrpcod: e.target.value })
                       }
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-black transition-all"
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
                     />
                   </div>
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="caption-small !text-slate-400">
                       {config.strings.dialog.barcode}
                     </Label>
                     <Input
@@ -486,8 +512,8 @@ export const ItemMaster = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, barcode: e.target.value })
                       }
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-mono transition-all disabled:opacity-50"
-                      disabled={!!editingItem} // Barcode usually non-editable
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 font-mono transition-all disabled:opacity-50"
+                      disabled={!!editingItem}
                     />
                   </div>
                 </div>
@@ -504,7 +530,7 @@ export const ItemMaster = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="caption-small !text-slate-400">
                       {config.strings.dialog.uom}
                     </Label>
                     <Input
@@ -512,11 +538,11 @@ export const ItemMaster = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, invntryuom: e.target.value })
                       }
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-bold transition-all"
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all text-center"
                     />
                   </div>
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="caption-small !text-slate-400">
                       {config.strings.dialog.status}
                     </Label>
                     <Input
@@ -528,14 +554,14 @@ export const ItemMaster = () => {
                         })
                       }
                       maxLength={1}
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-black text-center transition-all"
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 text-center transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="caption-small !text-slate-400">
                       {config.strings.table.opening}
                     </Label>
                     <Input
@@ -547,23 +573,35 @@ export const ItemMaster = () => {
                           opening_stock: Number(e.target.value),
                         })
                       }
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-black transition-all"
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
                     />
                   </div>
                   <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    <Label className="caption-small !text-slate-400">
                       {config.strings.table.location}
                     </Label>
-                    <Select 
+                    <Select
                       value={formData.location_mapping}
-                      onValueChange={(val) => setFormData({...formData, location_mapping: val})}
+                      onValueChange={(val) =>
+                        setFormData({ ...formData, location_mapping: val })
+                      }
                     >
-                      <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-bold transition-all">
+                      <SelectTrigger className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all">
                         <SelectValue placeholder="Select Mapping" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-2xl border-0 shadow-2xl p-2 bg-white">
-                        <SelectItem value="Single" className="rounded-xl font-bold py-3">Single Location</SelectItem>
-                        <SelectItem value="Multiple" className="rounded-xl font-bold py-3">Multiple Locations</SelectItem>
+                      <SelectContent className="rounded-xl border-slate-200 shadow-2xl p-2 bg-white">
+                        <SelectItem
+                          value="Single"
+                          className="rounded-xl font-bold py-3"
+                        >
+                          Single Location
+                        </SelectItem>
+                        <SelectItem
+                          value="Multiple"
+                          className="rounded-xl font-bold py-3"
+                        >
+                          Multiple Locations
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

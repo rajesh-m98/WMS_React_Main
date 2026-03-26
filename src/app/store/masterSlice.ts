@@ -24,10 +24,10 @@ const masterSlice = createSlice({
       state.users.loading = true;
       state.users.error = null;
     },
-    userLoadSuccess: (state, action: PayloadAction<UserDTO[]>) => {
+    userLoadSuccess: (state, action: PayloadAction<{ data: UserDTO[]; total?: number }>) => {
       state.users.loading = false;
-      state.users.data = action.payload;
-      state.users.totalCount = action.payload.length;
+      state.users.data = action.payload.data;
+      state.users.totalCount = action.payload.total ?? action.payload.data.length;
     },
     userDetailSuccess: (state, action: PayloadAction<UserDTO>) => {
       state.users.loading = false;

@@ -6,6 +6,11 @@
 
 @layer base {
   :root {
+    /* Fonts */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Outfit', system-ui, sans-serif;
+
+    /* Base Colors & Layout Remaining same ... */
     --background: 210 20% 98%;
     --foreground: 222 47% 11%;
 
@@ -96,11 +101,74 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
+    @apply tracking-tight font-black;
+    font-family: var(--font-display);
   }
+}
+
+@layer components {
+  /* Main Application Headings */
+  .heading-main {
+    @apply text-4xl lg:text-5xl font-black text-slate-900 leading-tight tracking-tighter;
+    font-family: var(--font-display);
+  }
+
+  .heading-section {
+    @apply text-2xl lg:text-3xl font-black text-slate-900 tracking-tight;
+    font-family: var(--font-display);
+  }
+
+  .heading-sub {
+    @apply text-sm font-black text-slate-500 uppercase tracking-[0.2em];
+    font-family: var(--font-sans);
+  }
+
+  /* Table Specific Styles */
+  .table-header-font {
+    @apply text-[11px] font-black text-slate-600 uppercase tracking-[0.2em] whitespace-nowrap;
+    font-family: var(--font-sans);
+  }
+
+  .table-cell-font {
+    @apply text-sm font-bold text-slate-600;
+    font-family: var(--font-sans);
+  }
+
+  .table-cell-bold {
+    @apply text-sm font-black text-slate-900;
+    font-family: var(--font-sans);
+  }
+
+  .table-id-font {
+    @apply text-[12px] font-black text-slate-700 uppercase tracking-widest tabular-nums font-mono;
+  }
+
+  /* Body & General Content */
+  .body-main {
+    @apply text-base font-medium text-slate-600 leading-relaxed;
+    font-family: var(--font-sans);
+  }
+
+  .body-strong {
+    @apply text-base font-bold text-slate-900;
+    font-family: var(--font-sans);
+  }
+
+  .caption-small {
+    @apply text-[10px] font-black uppercase text-slate-500 tracking-[0.15em];
+    font-family: var(--font-sans);
+  }
+
+  /* Icon Size Consistency */
+  .icon-xs { @apply w-3 h-3; }
+  .icon-sm { @apply w-4 h-4; }
+  .icon-base { @apply w-5 h-5; }
+  .icon-lg { @apply w-6 h-6; }
+  .icon-xl { @apply w-8 h-8; }
+  .icon-hero { @apply w-12 h-12; }
 }
 
 @layer utilities {

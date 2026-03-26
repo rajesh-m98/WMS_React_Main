@@ -47,19 +47,16 @@ export const Login = () => {
 
         <div className="relative text-left text-white px-16 max-w-2xl transform transition-all duration-700 hover:translate-x-2">
           <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-8 shadow-2xl shadow-blue-500/20 ring-1 ring-blue-400">
-            <Warehouse className="w-8 h-8 text-white" />
+            <Warehouse className="icon-xl text-white" />
           </div>
-          <h2
-            className="text-6xl font-black mb-6 leading-tight tracking-tighter"
-            style={{ fontFamily: "Outfit, sans-serif" }}
-          >
+          <h2 className="heading-main mb-6 text-white">
             {config.branding.titlePrefix} <br />
             <span className="text-blue-500">
               {config.branding.titleHighlight}
             </span>{" "}
             {config.branding.titleSuffix}
           </h2>
-          <p className="text-xl text-slate-300 font-medium leading-relaxed mb-10">
+          <p className="body-main text-slate-300 mb-10 text-xl">
             {config.branding.subtitle}
           </p>
           <div className="flex items-center gap-6">
@@ -73,7 +70,7 @@ export const Login = () => {
                 </div>
               ))}
             </div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+            <p className="caption-small text-slate-400">
               <span className="text-white">
                 {config.branding.activeNodesLabel}
               </span>{" "}
@@ -89,15 +86,12 @@ export const Login = () => {
         <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="text-center lg:text-left">
             <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center mb-4 lg:hidden mx-auto">
-              <Warehouse className="w-6 h-6 text-white" />
+              <Warehouse className="icon-lg text-white" />
             </div>
-            <h1
-              className="text-3xl font-black text-slate-900 tracking-tight"
-              style={{ fontFamily: "Outfit, sans-serif" }}
-            >
+            <h1 className="heading-section">
               {config.form.title}
             </h1>
-            <p className="text-slate-500 font-medium mt-1">
+            <p className="body-main mt-1">
               {config.form.subtitle}
             </p>
           </div>
@@ -112,7 +106,7 @@ export const Login = () => {
                 <div className="space-y-2">
                   <Label
                     htmlFor="username"
-                    className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1"
+                    className="caption-small ml-1"
                   >
                     {config.form.usernameLabel}
                   </Label>
@@ -140,7 +134,7 @@ export const Login = () => {
                   <Label
                     htmlFor="password"
                     title="Secure Credentials"
-                    className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1"
+                    className="caption-small ml-1"
                   >
                     {config.form.passwordLabel}
                   </Label>
@@ -171,9 +165,9 @@ export const Login = () => {
                       tabIndex={-1}
                     >
                       {loginForm.showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="icon-sm" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="icon-sm" />
                       )}
                     </Button>
                   </div>
@@ -181,8 +175,8 @@ export const Login = () => {
 
                 {error && (
                   <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 flex items-start gap-3 animate-in fade-in zoom-in-95">
-                    <ShieldCheck className="w-4 h-4 text-rose-600 mt-0.5" />
-                    <p className="text-xs font-bold text-rose-700 leading-tight">
+                    <ShieldCheck className="icon-sm text-rose-600 mt-0.5" />
+                    <p className="text-[11px] font-black uppercase text-rose-700 leading-tight tracking-wider">
                       {error}
                     </p>
                   </div>
@@ -194,9 +188,9 @@ export const Login = () => {
                   disabled={loading}
                 >
                   {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    <Loader2 className="icon-base animate-spin mr-2" />
                   ) : (
-                    <LogIn className="w-5 h-5 mr-2 group-hover/btn:translate-x-1 transition-transform" />
+                    <LogIn className="icon-base mr-2 group-hover/btn:translate-x-1 transition-transform" />
                   )}
                   {config.form.submitButton}
                 </Button>
@@ -204,7 +198,7 @@ export const Login = () => {
             </CardContent>
           </Card>
 
-          <p className="text-center text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] pt-4">
+          <p className="text-center caption-small tracking-[0.2em] pt-4">
             {config.form.footerText}
           </p>
         </div>

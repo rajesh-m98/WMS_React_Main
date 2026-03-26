@@ -10,6 +10,7 @@
       "confirmBtn": "Confirm Deletion"
     },
     "table": {
+      "id": "ID",
       "code": "Item Code",
       "description": "Description",
       "batch": "Batch Number",
@@ -41,7 +42,7 @@
       "submitEdit": "Commit Changes"
     },
     "noItems": "No items registered in database",
-    "totalCatalog": "Total repository items:",
+    "totalCatalog": "Total items:",
     "pagination": {
       "prev": "Prev",
       "next": "Next"

@@ -94,40 +94,42 @@ const UserCreate = () => {
           <ChevronLeft className="h-5 w-5 text-slate-600" />
         </Button>
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h2 className="heading-section !text-2xl">
             {strings.title}
           </h2>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">
+          <p className="caption-small !text-slate-400 italic">
             {strings.subtitle.toUpperCase()}
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8" autoComplete="off">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
-              <CardTitle className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                <UserPlus className="h-4 w-4" /> {strings.basicSection}
+              <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
+                <UserPlus className="icon-sm" /> {strings.basicSection}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.userId}</Label>
+                  <Label className="caption-small !text-slate-400">{strings.labels.userId}</Label>
                   <Input 
                     placeholder="e.g. USR006" 
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 font-mono" 
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono" 
                     required 
                     value={formData.userId}
                     onChange={e => setFormData({ ...formData, userId: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.fullName}</Label>
+                  <Label className="caption-small !text-slate-400">{strings.labels.fullName}</Label>
                   <Input 
                     placeholder="John Doe" 
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 font-bold" 
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900" 
                     required 
                     value={formData.fullName}
                     onChange={e => setFormData({ ...formData, fullName: e.target.value })}
@@ -136,20 +138,21 @@ const UserCreate = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.email}</Label>
+                  <Label className="caption-small !text-slate-400">{strings.labels.email}</Label>
                   <Input 
                     type="email" 
+                    autoComplete="off"
                     placeholder="john@example.com" 
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200" 
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900" 
                     required 
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.role}</Label>
+                  <Label className="caption-small !text-slate-400">{strings.labels.role}</Label>
                   <Select value={formData.role} onValueChange={v => setFormData({ ...formData, role: v })}>
-                    <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 font-bold">
+                    <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -162,11 +165,12 @@ const UserCreate = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.password}</Label>
+                <Label className="caption-small !text-slate-400">{strings.labels.password}</Label>
                 <Input 
                   type="password" 
+                  autoComplete="new-password"
                   placeholder="••••••••" 
-                  className="rounded-xl h-11 bg-slate-50/50 border-slate-200" 
+                  className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900" 
                   required 
                   value={formData.password}
                   onChange={e => setFormData({ ...formData, password: e.target.value })}
@@ -177,20 +181,20 @@ const UserCreate = () => {
 
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
-              <CardTitle className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                <Building2 className="h-4 w-4" /> {strings.mappingSection}
+              <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
+                <Building2 className="icon-sm" /> {strings.mappingSection}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                     <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
-                      <Laptop className="h-5 w-5" />
+                      <Laptop className="icon-base" />
                     </div>
                    <div className="flex-1 space-y-2">
-                      <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.device}</Label>
+                      <Label className="caption-small !text-slate-400">{strings.labels.device}</Label>
                       <Select value={formData.device} onValueChange={v => setFormData({ ...formData, device: v })}>
-                        <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200">
+                        <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -204,12 +208,12 @@ const UserCreate = () => {
 
                 <div className="flex items-center gap-4">
                   <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
-                    <Building2 className="h-5 w-5" />
+                    <Building2 className="icon-base" />
                   </div>
                   <div className="flex-1 space-y-2">
-                    <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">{strings.labels.outlet}</Label>
+                    <Label className="caption-small !text-slate-400">{strings.labels.outlet}</Label>
                     <Select value={formData.outlet} onValueChange={v => setFormData({ ...formData, outlet: v })}>
-                      <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 font-bold">
+                      <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -223,8 +227,8 @@ const UserCreate = () => {
               </div>
               
               <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                <p className="text-xs font-black text-slate-900 uppercase tracking-widest">{strings.notes.initTitle}</p>
-                <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                <p className="caption-small !text-slate-900">{strings.notes.initTitle}</p>
+                <p className="body-main !text-sm !text-slate-500 leading-relaxed italic">
                   {strings.notes.initDesc}
                 </p>
               </div>
@@ -234,16 +238,16 @@ const UserCreate = () => {
 
         <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-8">
-            <CardTitle className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">Module Access Permissions</CardTitle>
+            <CardTitle className="caption-small !text-slate-500">Module Access Permissions</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
-              <div className="grid grid-cols-5 bg-slate-50 p-3 font-black text-slate-500 text-[10px] uppercase tracking-[0.2em] border-b border-slate-100">
-                <div className="col-span-1 pl-2">Feature / Module</div>
-                <div className="text-center">View</div>
-                <div className="text-center">Create</div>
-                <div className="text-center">Edit</div>
-                <div className="text-center">Remove</div>
+              <div className="grid grid-cols-5 bg-slate-50 p-4 border-b border-slate-100">
+                <div className="col-span-1 pl-2 body-strong !text-slate-500 uppercase tracking-widest !text-xs">Feature / Module</div>
+                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">View</div>
+                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">Create</div>
+                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">Edit</div>
+                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">Remove</div>
               </div>
               <div className="divide-y divide-slate-50 bg-white">
                 {permissionsList.map((p) => (
@@ -251,7 +255,7 @@ const UserCreate = () => {
                     key={p}
                     className="grid grid-cols-5 p-3 items-center hover:bg-slate-50/50 transition-colors"
                   >
-                    <div className="col-span-1 font-black text-slate-800 text-xs px-2 tracking-tight">
+                    <div className="col-span-1 body-strong !text-sm px-2 !text-slate-800">
                       {p}
                     </div>
                     <div className="flex justify-center">
@@ -294,20 +298,20 @@ const UserCreate = () => {
             type="button"
             variant="ghost"
             onClick={() => navigate("/masters/users")}
-            className="rounded-xl px-10 text-slate-500 font-black uppercase tracking-widest text-xs h-11 hover:bg-slate-100"
+            className="rounded-xl px-10 transition-all body-strong uppercase tracking-widest text-xs h-11 hover:bg-slate-100"
           >
             {strings.discardBtn}
           </Button>
           <Button
             type="submit"
-            className="px-12 bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 font-black uppercase tracking-[0.15em] text-xs h-11 transition-all active:scale-95"
+            className="px-12 bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 body-strong text-white uppercase tracking-[0.15em] text-xs h-11 transition-all active:scale-95"
             disabled={loading}
           >
             {loading ? (
-              <Loader2 className="animate-spin h-4 w-4" />
+              <Loader2 className="animate-spin icon-sm" />
             ) : (
               <>
-                <Save className="w-5 h-5 mr-4" /> {strings.saveBtn}
+                <Save className="icon-base mr-3" /> {strings.saveBtn}
               </>
             )}
           </Button>

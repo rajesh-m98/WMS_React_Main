@@ -133,10 +133,10 @@ export const WarehouseMaster = () => {
       <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white mb-4">
         <CardContent className="p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-2/3 shrink-0">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
             <Input
               placeholder={config.strings.searchPlaceholder}
-              className="pl-11 h-12 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-slate-100 transition-all text-sm font-medium w-full"
+              className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -146,11 +146,11 @@ export const WarehouseMaster = () => {
             <Button
               variant="outline"
               onClick={handleRefresh}
-              className="rounded-xl h-12 px-4 border-slate-200 hover:bg-slate-50 transition-all font-bold group"
+              className="rounded-xl h-12 px-4 border-slate-200 hover:bg-slate-50 transition-all body-strong group"
               disabled={loading}
             >
               <RefreshCw
-                className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
+                className={`icon-sm mr-2 ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
               />
               Sync
             </Button>
@@ -163,8 +163,8 @@ export const WarehouseMaster = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="rounded-xl bg-slate-900 hover:bg-black h-12 px-6 font-bold flex items-center gap-2 shadow-lg shadow-slate-100 transition-all active:scale-95">
-                  <Plus className="h-4 w-4" /> {config.strings.addWarehouseBtn}
+                <Button className="rounded-xl bg-slate-900 hover:bg-black h-12 px-6 body-strong text-white flex items-center gap-2 shadow-lg shadow-slate-100 transition-all active:scale-95">
+                  <Plus className="icon-sm" /> {config.strings.addWarehouseBtn}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-3xl rounded-2xl p-0 overflow-hidden border-0 shadow-2xl animate-in zoom-in-95 max-h-[90vh] flex flex-col">
@@ -173,13 +173,13 @@ export const WarehouseMaster = () => {
                     <Building2 className="h-6 w-6 text-blue-400" />
                   </div>
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-black text-center w-full">
+                    <DialogTitle className="body-strong !text-white !text-xl text-center w-full">
                       {editingWarehouse
                         ? config.strings.form.editTitle
                         : config.strings.form.addTitle}
                     </DialogTitle>
-                    <p className="text-slate-400 text-xs text-center font-bold uppercase tracking-widest pt-1">
-                      {config.strings.form.subtitle}
+                    <p className="caption-small !text-slate-400 !text-center pt-1">
+                      {config.strings.form.subtitle.toUpperCase()}
                     </p>
                   </DialogHeader>
                 </div>
@@ -189,115 +189,115 @@ export const WarehouseMaster = () => {
                     className="grid grid-cols-2 gap-6"
                   >
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.form.codeLabel}
                       </Label>
                       <Input
                         name="warehouse_code"
                         defaultValue={editingWarehouse?.warehouse_code}
                         placeholder={config.strings.form.codePlaceholder}
-                        className="rounded-xl font-bold bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.form.nameLabel}
                       </Label>
                       <Input
                         name="warehouse_name"
                         defaultValue={editingWarehouse?.warehouse_name}
                         placeholder={config.strings.form.namePlaceholder}
-                        className="rounded-xl font-bold bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         Street Address
                       </Label>
                       <Input
                         name="street"
                         defaultValue={editingWarehouse?.street}
                         placeholder="Street details..."
-                        className="rounded-xl bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         City
                       </Label>
                       <Input
                         name="city"
                         defaultValue={editingWarehouse?.city}
                         placeholder="City name..."
-                        className="rounded-xl bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         State
                       </Label>
                       <Input
                         name="state"
                         defaultValue={editingWarehouse?.state}
                         placeholder="State code (e.g. TN)..."
-                        className="rounded-xl bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         Zip Code
                       </Label>
                       <Input
                         name="zipcode"
                         defaultValue={editingWarehouse?.zipcode}
                         placeholder="Postal code..."
-                        className="rounded-xl bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.form.gstLabel}
                       </Label>
                       <Input
                         name="gstnumber"
                         defaultValue={editingWarehouse?.gstnumber}
                         placeholder={config.strings.form.gstPlaceholder}
-                        className="rounded-xl bg-slate-50 border-slate-200 font-mono h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.form.bplLabel} (ID)
                       </Label>
                       <Input
                         name="bplid"
                         defaultValue={editingWarehouse?.bplid}
                         placeholder={config.strings.form.bplPlaceholder}
-                        className="rounded-xl bg-slate-50 border-slate-200 font-mono h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         BPL Name
                       </Label>
                       <Input
                         name="bplname"
                         defaultValue={editingWarehouse?.bplname}
                         placeholder="System BPL Name..."
-                        className="rounded-xl bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         Inactive (Y/N)
                       </Label>
                       <Input
                         name="inactive"
                         defaultValue={editingWarehouse?.inactive || "N"}
                         placeholder="N"
-                        className="rounded-xl bg-slate-50 border-slate-200 h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
 
@@ -305,18 +305,18 @@ export const WarehouseMaster = () => {
                       <Button
                         type="button"
                         variant="ghost"
-                        className="rounded-xl font-bold text-slate-500"
+                        className="rounded-xl body-strong text-slate-500 h-11 px-8"
                         onClick={() => setIsFormOpen(false)}
                       >
                         {config.strings.form.cancelBtn}
                       </Button>
                       <Button
                         type="submit"
-                        className="rounded-xl bg-slate-900 hover:bg-black px-10 font-bold h-11 text-white shadow-lg flex items-center gap-2"
+                        className="rounded-xl bg-slate-900 hover:bg-black px-10 body-strong h-11 text-white shadow-lg flex items-center gap-2"
                         disabled={loadingAction}
                       >
                         {loadingAction && (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="icon-sm animate-spin" />
                         )}
                         {config.strings.form.submitBtn}
                       </Button>
@@ -335,26 +335,26 @@ export const WarehouseMaster = () => {
             <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
           </div>
         )}
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
+        <CardContent className="p-0 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
+          <Table className="min-w-[1200px]">
             <TableHeader>
               <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b">
-                <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-widest h-12 pl-6">
+                <TableHead className="table-header-font pl-6 h-12">
                   {config.strings.table.identification}
                 </TableHead>
-                <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-widest h-12">
+                <TableHead className="table-header-font h-12">
                   {config.strings.table.location}
                 </TableHead>
-                <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-widest h-12">
+                <TableHead className="table-header-font h-12">
                   {config.strings.table.gstBpl}
                 </TableHead>
-                <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-widest h-12">
+                <TableHead className="table-header-font h-12">
                   Address Info
                 </TableHead>
-                <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-widest h-12">
+                <TableHead className="table-header-font h-12">
                   {config.strings.table.status}
                 </TableHead>
-                <TableHead className="font-black text-[11px] text-slate-400 uppercase tracking-widest h-12 text-right pr-6">
+                <TableHead className="table-header-font h-12 text-right pr-6">
                   {config.strings.table.manage}
                 </TableHead>
               </TableRow>
@@ -373,29 +373,29 @@ export const WarehouseMaster = () => {
                 filtered.map((wh: any) => (
                   <TableRow
                     key={wh.id}
-                    className="group hover:bg-slate-50 border-b border-slate-50 transition-all font-bold"
+                    className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all body-strong"
                   >
                     <TableCell className="pl-6 h-16">
-                      <p className="font-black text-slate-900 leading-tight">
+                      <p className="body-strong !text-slate-900 leading-tight">
                         {wh.warehouse_name}
                       </p>
-                      <p className="text-[10px] font-bold text-blue-600 uppercase tracking-tight">
+                      <p className="table-id-font !text-blue-600 !text-[11px] !tracking-normal">
                         ID: {wh.id} | CODE: {wh.warehouse_code}
                       </p>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5 text-slate-600">
-                        <MapPin className="h-3 w-3 text-slate-300" />
-                        <span className="text-xs">
+                        <MapPin className="icon-sm text-slate-300" />
+                        <span className="caption-small">
                           {wh.city || "—"}, {wh.state || "—"}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p className="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">
+                      <p className="caption-small !text-[10px] !text-slate-400 uppercase leading-none mb-1">
                         GST: {wh.gstnumber || "N/A"}
                       </p>
-                      <p className="text-[10px] font-black text-slate-400 uppercase leading-none">
+                      <p className="caption-small !text-[10px] !text-slate-400 uppercase leading-none">
                         BPL: {wh.bplid || "N/A"}
                       </p>
                     </TableCell>
@@ -407,7 +407,7 @@ export const WarehouseMaster = () => {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`rounded-xl px-3 py-1 border-0 font-bold ${wh.inactive === "N" ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700"}`}
+                        className={`rounded-xl px-3 py-1 border-0 body-strong ${wh.inactive === "N" ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700"}`}
                       >
                         {wh.inactive === "N" ? "Active" : "Inactive"}
                       </Badge>
@@ -422,7 +422,7 @@ export const WarehouseMaster = () => {
                             setViewingWarehouse(wh);
                           }}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="icon-sm" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -433,7 +433,7 @@ export const WarehouseMaster = () => {
                             setIsFormOpen(true);
                           }}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="icon-sm" />
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
@@ -442,35 +442,36 @@ export const WarehouseMaster = () => {
                               size="icon"
                               className="h-8 w-8 text-rose-500 hover:bg-rose-50"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="icon-sm" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-2xl border-0 shadow-2xl overflow-hidden p-0">
-                            <div className="bg-rose-600 p-6 text-white text-center">
-                              <AlertDialogHeader>
-                                <AlertDialogTitle className="text-xl font-black mx-auto">
-                                  {config.strings.deleteDialog.title}
-                                </AlertDialogTitle>
-                              </AlertDialogHeader>
+                          <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                            <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                              <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                              <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
+                                {config.strings.deleteDialog.title}
+                              </AlertDialogTitle>
                             </div>
-                            <div className="p-6">
-                              <AlertDialogDescription className="text-slate-600 font-medium text-center py-4">
-                                {config.strings.deleteDialog.descriptionTemplate.replace(
-                                  "{name}",
-                                  wh.warehouse_name,
-                                )}
-                              </AlertDialogDescription>
-                              <AlertDialogFooter className="mt-4 gap-3">
-                                <AlertDialogCancel className="rounded-xl border-slate-200 font-bold flex-1">
+                            <div className="p-10 text-center flex flex-col items-center">
+                              <AlertDialogHeader>
+                                <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
+                                  {config.strings.deleteDialog.descriptionTemplate.replace(
+                                    "{name}",
+                                    wh.warehouse_name,
+                                  )}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <div className="flex gap-4 w-full mt-10">
+                                <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
                                   {config.strings.deleteDialog.cancelBtn}
                                 </AlertDialogCancel>
                                 <AlertDialogAction
-                                  className="bg-rose-600 hover:bg-rose-700 font-bold rounded-xl px-8 flex-1 shadow-lg shadow-rose-100"
+                                  className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
                                   onClick={() => handleDelete(wh.id)}
                                 >
                                   {config.strings.deleteDialog.confirmBtn}
                                 </AlertDialogAction>
-                              </AlertDialogFooter>
+                              </div>
                             </div>
                           </AlertDialogContent>
                         </AlertDialog>

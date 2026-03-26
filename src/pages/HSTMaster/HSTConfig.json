@@ -34,8 +34,8 @@
         "mappingLabel": "Aisle Mapping",
         "mappingPlaceholder": "Mapping type...",
         "cancel": "Cancel",
-        "addConfirm": "Confirm Add",
-        "editConfirm": "Update Device"
+        "addConfirm": "Confirm",
+        "editConfirm": "Update"
       },
       "delete": {
         "title": "Delete Device?",

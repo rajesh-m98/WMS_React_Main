@@ -23,7 +23,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     navigate("/login");
   };
 
-  const userEmail = userData?.email || "admin@wms.com";
+  const userEmail = userData?.email_id || "admin@wms.com";
   const initials = userEmail.charAt(0).toUpperCase();
 
   const getPageInfo = (path: string) => {

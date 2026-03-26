@@ -72,19 +72,19 @@ const UserDetail = () => {
             <ChevronLeft className="h-5 w-5 text-slate-600" />
           </Button>
           <div>
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h2 className="heading-section !text-2xl">
               {strings.title}
             </h2>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">
+            <p className="caption-small !text-slate-400 italic">
               ID: {user.userid}
             </p>
           </div>
         </div>
         <Button
-          className="bg-slate-900 hover:bg-slate-800 rounded-xl px-6 font-bold shadow-lg shadow-slate-200 transition-all active:scale-95"
+          className="bg-slate-900 hover:bg-slate-800 rounded-xl px-6 body-strong shadow-lg shadow-slate-200 transition-all active:scale-95"
           onClick={() => navigate(`/masters/users/${id}/edit`)}
         >
-          <Pencil className="h-4 w-4 mr-2" /> {strings.editBtn}
+          <Pencil className="icon-sm mr-2" /> {strings.editBtn}
         </Button>
       </div>
 
@@ -93,71 +93,71 @@ const UserDetail = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white h-full flex flex-col">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
-              <CardTitle className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                <UserIcon className="h-4 w-4" /> {strings.personalSection}
+              <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
+                <UserIcon className="icon-sm" /> {strings.personalSection}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 flex-1">
               <div className="space-y-1">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                <p className="caption-small !text-slate-400">
                   {strings.labels.fullName}
                 </p>
-                <p className="text-sm font-bold text-slate-800">
+                <p className="body-strong !text-slate-800">
                   {user.username}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                <p className="caption-small !text-slate-400">
                   {strings.labels.email}
                 </p>
-                <p className="text-sm font-bold text-slate-800 flex items-center gap-3 decoration-blue-500/30 underline-offset-4">
-                  <Mail className="h-4 w-4 text-blue-500" />{" "}
+                <p className="body-strong !text-slate-800 flex items-center gap-3 decoration-blue-500/30 underline-offset-4">
+                  <Mail className="icon-sm text-blue-500" />{" "}
                   {user.email_id || "No email provided"}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                <p className="caption-small !text-slate-400">
                   {strings.labels.phone}
                 </p>
-                <p className="text-sm font-bold text-slate-800 flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-indigo-500" />{" "}
+                <p className="body-strong !text-slate-800 flex items-center gap-3">
+                  <Phone className="icon-sm text-indigo-500" />{" "}
                   {user.mobile_number || "No mobile provided"}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                <p className="caption-small !text-slate-400">
                   {strings.labels.role}
                 </p>
                 <div className="flex pt-1">
                   {Number(user.role) === 2 ? (
-                    <Badge className="bg-purple-50 text-purple-700 border-purple-100 px-4 py-1.5 font-black text-[10px] uppercase tracking-wider">
+                    <Badge className="bg-purple-50 text-purple-700 border-purple-100 px-4 py-1.5 caption-small !text-[10px]">
                       Super User
                     </Badge>
                   ) : (
-                    <Badge className="bg-blue-50 text-blue-700 border-blue-100 px-4 py-1.5 font-black text-[10px] uppercase tracking-wider">
+                    <Badge className="bg-blue-50 text-blue-700 border-blue-100 px-4 py-1.5 caption-small !text-[10px]">
                       Operator
                     </Badge>
                   )}
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                <p className="caption-small !text-slate-400">
                   {strings.labels.status}
                 </p>
                 <div className="flex pt-1">
                   <Badge
-                    className={`px-4 py-1.5 font-black text-[10px] uppercase tracking-wider border-0 ${user.status === "Active" ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}
+                    className={`px-4 py-1.5 border-0 caption-small !text-[10px] ${user.status === "Active" ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}
                   >
                     {user.status}
                   </Badge>
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+                <p className="caption-small !text-slate-400">
                   {strings.labels.joined}
                 </p>
-                <p className="text-sm font-bold text-slate-800 flex items-center gap-3">
-                  <Clock className="h-4 w-4 text-slate-400" />{" "}
+                <p className="body-strong !text-slate-800 flex items-center gap-3">
+                  <Clock className="icon-sm text-slate-400" />{" "}
                   {new Date(user.created_at || "").toLocaleDateString()}
                 </p>
               </div>
@@ -189,16 +189,16 @@ const UserDetail = () => {
               </div>
               <div className="w-full pt-8 border-t border-slate-800 space-y-5">
                 <div className="flex justify-between items-center px-4">
-                  <span className="text-xs text-slate-500 font-black uppercase tracking-[0.15em]">
+                  <span className="caption-small !text-slate-500">
                     {strings.labels.identity}
                   </span>
-                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-3 py-1 text-[9px] font-black tracking-widest uppercase">
+                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-3 py-1 caption-small !text-[9px]">
                     VERIFIED
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center px-4">
-                  <Clock className="w-4 h-4 text-slate-500" />
-                  <span className="text-xs text-slate-400 font-black uppercase tracking-wider">
+                  <Clock className="icon-sm text-slate-500" />
+                  <span className="caption-small !text-slate-400 !tracking-wider">
                     {strings.labels.updated.toUpperCase()}:{" "}
                     {new Date(user.updated_at || "").toLocaleDateString()}
                   </span>

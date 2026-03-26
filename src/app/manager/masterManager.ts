@@ -22,12 +22,34 @@ interface PaginatedResponse<T> {
   };
 }
 
-export const handleFetchUsers = (companyid: number = 1) => async (dispatch: AppDispatch) => {
+export const handleFetchUsers = (params?: FetchParams) => async (dispatch: AppDispatch) => {
   try {
     dispatch(userLoadStart());
-    const response = await api.get<{ status: boolean; data: UserDTO[] }>(`${API_ENDPOINTS.MASTERS.USERS}?companyid=${companyid}`);
+    
+    const queryParams = new URLSearchParams({
+      companyid: (params?.companyid || 1).toString(),
+    });
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.size) queryParams.append('size', params.size.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    
+    // Some endpoints use is_paginate for totalCount and items structure
+    queryParams.append('is_paginate', 'true');
+
+    const response = await api.get<{ status: boolean; data: { items: UserDTO[]; total: number } | UserDTO[] }>(
+      `${API_ENDPOINTS.MASTERS.USERS}?${queryParams.toString()}`
+    );
+
     if (response.data.status) {
-      dispatch(userLoadSuccess(response.data.data || []));
+      if (Array.isArray(response.data.data)) {
+        dispatch(userLoadSuccess({ data: response.data.data }));
+      } else {
+        dispatch(userLoadSuccess({ 
+          data: response.data.data.items, 
+          total: response.data.data.total 
+        }));
+      }
     } else {
       dispatch(userLoadFailure("Failed to retrieve users"));
     }
@@ -58,7 +80,7 @@ export const handleCreateUser = (userData: any) => async (dispatch: AppDispatch)
     const response = await api.post(`${API_ENDPOINTS.MASTERS.CREATE_USER}?user_id=1`, userData);
     if (response.data.status) {
       // Refresh user list
-      dispatch(handleFetchUsers(1));
+      dispatch(handleFetchUsers({ companyid: 1 }));
       return true;
     } else {
       dispatch(userLoadFailure(response.data.message || "Failed to create user"));

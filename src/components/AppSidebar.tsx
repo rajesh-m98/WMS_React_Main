@@ -75,7 +75,7 @@ export function AppSidebar() {
 
       // Masters
       case "/masters/users":
-        dispatch(handleFetchUsers(1));
+        dispatch(handleFetchUsers({ companyid: 1 }));
         break;
       case "/masters/hst":
         dispatch(handleFetchAllHST(1));
@@ -140,7 +140,7 @@ export function AppSidebar() {
           onClick={() => handleSidebarClick(url)}
         >
           <Icon
-            className={`h-4 w-4 shrink-0 transition-colors ${isItemActive(url) ? "text-white" : "text-slate-400 group-hover:text-blue-600"}`}
+            className={`icon-sm shrink-0 transition-colors ${isItemActive(url) ? "text-white" : "text-slate-400 group-hover:text-blue-600"}`}
           />
           <div className="whitespace-nowrap relative z-10">{title}</div>
         </NavLink>
@@ -156,8 +156,7 @@ export function AppSidebar() {
         </div>
         <div className="flex flex-col">
           <h1
-            className="text-xl font-black text-slate-900 tracking-tighter leading-none"
-            style={{ fontFamily: "Outfit, sans-serif" }}
+            className="heading-main !text-2xl"
           >
             WMS
           </h1>
@@ -183,10 +182,10 @@ export function AppSidebar() {
                   className={`p-1.5 rounded-xl transition-colors ${isItemActive("/dashboard") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
                 >
                   <Home
-                    className={`h-5 w-5 shrink-0 ${isItemActive("/dashboard") ? "text-black" : "text-slate-500 group-hover:text-blue-600"}`}
+                    className={`icon-base shrink-0 ${isItemActive("/dashboard") ? "text-black" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="text-[15px] font-bold tracking-tight">
+                <span className="body-strong !text-[15px]">
                   Dashboard
                 </span>
               </NavLink>
@@ -201,13 +200,13 @@ export function AppSidebar() {
               <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-3.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
                 <div className="flex items-center gap-3.5">
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
-                    <Settings className="h-5 w-5 text-slate-500 group-hover/btn:text-blue-600" />
+                    <Settings className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
                   </div>
-                  <span className="text-[15px] font-bold text-slate-800 tracking-tight">
+                  <span className="body-strong !text-[15px] !text-slate-800">
                     Masters
                   </span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
+                <ChevronDown className="icon-sm text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
               </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
@@ -249,13 +248,13 @@ export function AppSidebar() {
               <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-3.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
                 <div className="flex items-center gap-3.5">
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
-                    <ArrowLeftRight className="h-5 w-5 text-slate-500 group-hover/btn:text-blue-600" />
+                    <ArrowLeftRight className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
                   </div>
-                  <span className="text-[15px] font-bold text-slate-800 tracking-tight">
+                  <span className="body-strong !text-[15px] !text-slate-800">
                     Transactions
                   </span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
+                <ChevronDown className="icon-sm text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
               </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
@@ -296,10 +295,10 @@ export function AppSidebar() {
                   className={`p-1.5 rounded-xl transition-colors ${isItemActive("/activity-logs") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
                 >
                   <Activity
-                    className={`h-5 w-5 shrink-0 ${isItemActive("/activity-logs") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
+                    className={`icon-base shrink-0 ${isItemActive("/activity-logs") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="text-[15px] font-bold tracking-tight">
+                <span className="body-strong !text-[15px]">
                   Activity Logs
                 </span>
               </NavLink>

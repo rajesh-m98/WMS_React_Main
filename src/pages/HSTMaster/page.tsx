@@ -50,11 +50,11 @@ import {
 } from "@/components/ui";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { 
-  handleFetchAllHST, 
-  handleCreateHST, 
+import {
+  handleFetchAllHST,
+  handleCreateHST,
   handleDeleteHST,
-  handleFetchHSTTypes 
+  handleFetchHSTTypes,
 } from "@/app/manager/hstManager";
 import config from "./HSTConfig.json";
 
@@ -72,12 +72,16 @@ interface DeviceForm {
 
 export const HSTMaster = () => {
   const dispatch = useAppDispatch();
-  const { data: devices, loading, types } = useAppSelector((state) => state.hst);
-  
+  const {
+    data: devices,
+    loading,
+    types,
+  } = useAppSelector((state) => state.hst);
+
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
-  
+
   const [formData, setFormData] = useState<DeviceForm>({
     device_id: "",
     device_name: "",
@@ -151,11 +155,13 @@ export const HSTMaster = () => {
     }
   };
 
-  const filteredDevices = devices.filter(d => 
-    d.device_id.toLowerCase().includes(search.toLowerCase()) ||
-    d.device_serial_number.toLowerCase().includes(search.toLowerCase()) ||
-    (d.device_name && d.device_name.toLowerCase().includes(search.toLowerCase())) ||
-    d.device_type.toLowerCase().includes(search.toLowerCase())
+  const filteredDevices = devices.filter(
+    (d) =>
+      d.device_id.toLowerCase().includes(search.toLowerCase()) ||
+      d.device_serial_number.toLowerCase().includes(search.toLowerCase()) ||
+      (d.device_name &&
+        d.device_name.toLowerCase().includes(search.toLowerCase())) ||
+      d.device_type.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -163,10 +169,10 @@ export const HSTMaster = () => {
       <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white mb-4">
         <CardContent className="p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-2/3 shrink-0">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
             <Input
               placeholder={config.strings.searchPlaceholder}
-              className="pl-11 h-12 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-sm font-medium w-full"
+              className="pl-11 h-12 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -181,105 +187,144 @@ export const HSTMaster = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-6 font-bold flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95">
-                  <Plus className="h-4 w-4" /> {config.strings.addDeviceBtn}
+                <Button className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-6 body-strong text-white flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95">
+                  <Plus className="icon-sm" /> {config.strings.addDeviceBtn}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
-                 <div className="bg-slate-900 p-6 text-white text-center">
+                <div className="bg-slate-900 p-6 text-white text-center">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-black mx-auto">
                       {editingId
                         ? config.strings.dialogs.form.editTitle
                         : config.strings.dialogs.form.addTitle}
                     </DialogTitle>
-                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] pt-2 italic">
-                       {editingId ? "Modify existing device parameters" : "Provision a new handheld terminal"}
+                    <p className="text-slate-400 text-center text-[10px] font-black uppercase tracking-[0.2em] pt-2 italic">
+                      {editingId
+                        ? "Modify existing device parameters"
+                        : "Provision a new handheld terminal"}
                     </p>
                   </DialogHeader>
                 </div>
                 <div className="p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.dialogs.form.idLabel}
                       </Label>
                       <Input
                         value={formData.device_id}
-                        onChange={e => setFormData({ ...formData, device_id: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            device_id: e.target.value,
+                          })
+                        }
                         placeholder={config.strings.dialogs.form.idPlaceholder}
-                        className="rounded-xl border-slate-200 font-bold h-11"
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                    <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.dialogs.form.nameLabel}
                       </Label>
                       <Input
                         value={formData.device_name}
-                        onChange={e => setFormData({ ...formData, device_name: e.target.value })}
-                        placeholder={config.strings.dialogs.form.namePlaceholder}
-                        className="rounded-xl border-slate-200 font-bold h-11"
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            device_name: e.target.value,
+                          })
+                        }
+                        placeholder={
+                          config.strings.dialogs.form.namePlaceholder
+                        }
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                       <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.dialogs.form.brandLabel}
                       </Label>
                       <Input
                         value={formData.brand_name}
-                        onChange={e => setFormData({ ...formData, brand_name: e.target.value })}
-                        placeholder={config.strings.dialogs.form.brandPlaceholder}
-                        className="rounded-xl border-slate-200 font-bold h-11"
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            brand_name: e.target.value,
+                          })
+                        }
+                        placeholder={
+                          config.strings.dialogs.form.brandPlaceholder
+                        }
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.dialogs.form.serialLabel}
                       </Label>
                       <Input
                         value={formData.device_serial_number}
-                        onChange={e => setFormData({ ...formData, device_serial_number: e.target.value })}
-                        placeholder={config.strings.dialogs.form.serialPlaceholder}
-                        className="rounded-xl border-slate-200 font-mono h-11"
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            device_serial_number: e.target.value,
+                          })
+                        }
+                        placeholder={
+                          config.strings.dialogs.form.serialPlaceholder
+                        }
+                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         Device Type
                       </Label>
-                      <Select 
-                        value={formData.device_type} 
-                        onValueChange={v => setFormData({ ...formData, device_type: v })}
+                      <Select
+                        value={formData.device_type}
+                        onValueChange={(v) =>
+                          setFormData({ ...formData, device_type: v })
+                        }
                       >
-                        <SelectTrigger className="rounded-xl border-slate-200 h-11 font-bold">
+                        <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
                           <SelectValue placeholder="Select Type" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
                           {types.map((t: any) => (
-                            <SelectItem key={t.device_type} value={t.device_type}>{t.device_type}</SelectItem>
+                            <SelectItem
+                              key={t.device_type}
+                              value={t.device_type}
+                            >
+                              {t.device_type}
+                            </SelectItem>
                           ))}
                           {types.length === 0 && (
                             <>
                               <SelectItem value="Urovo">Urovo</SelectItem>
                               <SelectItem value="Zebra">Zebra</SelectItem>
-                              <SelectItem value="Honeywell">Honeywell</SelectItem>
+                              <SelectItem value="Honeywell">
+                                Honeywell
+                              </SelectItem>
                             </>
                           )}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                      <Label className="caption-small !text-slate-400">
                         {config.strings.dialogs.form.mappingLabel}
                       </Label>
-                      <Select 
-                        value={formData.aisle_mapping} 
-                        onValueChange={v => setFormData({ ...formData, aisle_mapping: v })}
+                      <Select
+                        value={formData.aisle_mapping}
+                        onValueChange={(v) =>
+                          setFormData({ ...formData, aisle_mapping: v })
+                        }
                       >
-                        <SelectTrigger className="rounded-xl border-slate-200 h-11 font-bold">
+                        <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
                           <SelectValue placeholder="Select Mapping" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -292,18 +337,22 @@ export const HSTMaster = () => {
                   <div className="flex justify-end gap-3 pt-4">
                     <Button
                       variant="ghost"
-                      className="rounded-xl h-11 px-6 font-black uppercase tracking-widest text-[10px] text-slate-500"
+                      className="rounded-xl h-11 px-6 body-strong text-slate-500"
                       onClick={() => setOpen(false)}
                     >
                       {config.strings.dialogs.form.cancel}
                     </Button>
                     <Button
-                      className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 font-black uppercase tracking-[0.15em] text-xs shadow-lg shadow-blue-100"
+                      className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 body-strong text-white shadow-lg shadow-blue-100 h-11"
                       onClick={handleSubmit}
                       disabled={loading}
                     >
-                      {loading ? <Loader2 className="animate-spin h-4 w-4" /> : (
-                        editingId ? config.strings.dialogs.form.editConfirm : config.strings.dialogs.form.addConfirm
+                      {loading ? (
+                        <Loader2 className="animate-spin icon-sm" />
+                      ) : editingId ? (
+                        config.strings.dialogs.form.editConfirm
+                      ) : (
+                        config.strings.dialogs.form.addConfirm
                       )}
                     </Button>
                   </div>
@@ -320,32 +369,30 @@ export const HSTMaster = () => {
             <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
           </div>
         )}
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
+        <CardContent className="p-0 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
+          <Table className="min-w-[1200px]">
             <TableHeader>
               <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                <TableHead className="font-black text-slate-900 pl-6 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font pl-6">
                   {config.strings.table.deviceId}
                 </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 uppercase text-[11px] tracking-wider text-nowrap">
+                <TableHead className="table-header-font text-nowrap">
                   {config.strings.table.deviceName}
                 </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 uppercase text-[11px] tracking-wider text-nowrap">
+                <TableHead className="table-header-font text-nowrap">
                   {config.strings.table.brandName}
                 </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 uppercase text-[11px] tracking-wider">
-                  Type
-                </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">Type</TableHead>
+                <TableHead className="table-header-font text-left">
                   {config.strings.table.serialNo}
                 </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 uppercase text-[11px] tracking-wider text-nowrap">
+                <TableHead className="table-header-font text-nowrap">
                   {config.strings.table.mapping}
                 </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font">
                   {config.strings.table.status}
                 </TableHead>
-                <TableHead className="font-black text-slate-900 h-12 text-right pr-6 uppercase text-[11px] tracking-wider">
+                <TableHead className="table-header-font text-right pr-6">
                   {config.strings.table.actions}
                 </TableHead>
               </TableRow>
@@ -364,37 +411,33 @@ export const HSTMaster = () => {
                 filteredDevices.map((d: any) => (
                   <TableRow
                     key={d.id}
-                    className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors group"
+                    className="border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-colors group"
                   >
-                    <TableCell className="font-black text-slate-900 pl-6">
+                    <TableCell className="table-id-font pl-6">
                       {d.device_id}
                     </TableCell>
-                    <TableCell className="text-slate-700 font-bold">
-                       {d.device_name || "-"}
+                    <TableCell className="table-cell-font !text-slate-700">
+                      {d.device_name || "-"}
                     </TableCell>
-                    <TableCell className="text-slate-700 font-bold">
-                       {d.brand_name || "-"}
+                    <TableCell className="table-cell-font !text-slate-700">
+                      {d.brand_name || "-"}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
-                          <Smartphone className="h-4 w-4 text-blue-600" />
-                        </div>
-                        <span className="text-slate-700 font-bold">
-                          {d.device_type}
-                        </span>
+                        <Smartphone className="icon-sm text-blue-600" />
+                        <span className="table-cell-bold">{d.device_type}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-slate-500 font-bold text-xs bg-slate-50/50 px-2 rounded w-fit">
+                    <TableCell className="font-mono table-cell-font text-left">
                       {d.device_serial_number || "-"}
                     </TableCell>
-                    <TableCell className="text-slate-700 font-bold">
-                       {d.aisle_mapping || "Single"}
+                    <TableCell className="table-cell-font !text-slate-700">
+                      {d.aisle_mapping || "Single"}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`rounded-lg px-2 py-0.5 border-0 font-bold ${d.device_status === 0 ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"}`}
+                        className={`rounded-lg px-2 py-0.5 border-0 caption-small ${d.device_status === 0 ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"}`}
                       >
                         {d.device_status === 0 ? "Available" : "Assigned"}
                       </Badge>
@@ -407,7 +450,7 @@ export const HSTMaster = () => {
                           className="h-8 w-8 text-blue-600 hover:bg-blue-50"
                           onClick={() => handleEdit(d)}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="icon-sm" />
                         </Button>
 
                         <AlertDialog>
@@ -417,30 +460,31 @@ export const HSTMaster = () => {
                               variant="ghost"
                               className="h-8 w-8 text-rose-600 hover:bg-rose-50"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="icon-sm" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-2xl border-0 shadow-2xl overflow-hidden p-0">
-                             <div className="bg-rose-600 p-6 text-white text-center">
-                              <AlertDialogHeader>
-                                <AlertDialogTitle className="text-xl font-black mx-auto">
-                                  {config.strings.dialogs.delete.title}
-                                </AlertDialogTitle>
-                              </AlertDialogHeader>
+                          <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                            <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                              <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                              <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
+                                {config.strings.dialogs.delete.title}
+                              </AlertDialogTitle>
                             </div>
-                            <div className="p-6">
-                              <AlertDialogDescription className="text-slate-600 font-medium text-center py-4">
-                                {config.strings.dialogs.delete.descriptionTemplate.replace(
-                                  "{id}",
-                                  d.device_id,
-                                )}
-                              </AlertDialogDescription>
-                              <AlertDialogFooter className="mt-4 gap-3">
-                                <AlertDialogCancel className="rounded-xl border-slate-200 font-bold flex-1">
+                            <div className="p-10 text-center flex flex-col items-center">
+                              <AlertDialogHeader>
+                                <AlertDialogDescription className="body-strong text-slate-500 text-[15px] leading-relaxed text-center mx-auto">
+                                  {config.strings.dialogs.delete.descriptionTemplate.replace(
+                                    "{id}",
+                                    d.device_id,
+                                  )}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter className="mt-8 gap-3 w-full">
+                                <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-11 text-slate-600">
                                   {config.strings.dialogs.delete.cancel}
                                 </AlertDialogCancel>
                                 <AlertDialogAction
-                                  className="bg-rose-600 hover:bg-rose-700 rounded-xl px-8 font-bold flex-1 shadow-lg shadow-rose-100"
+                                  className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-8 flex-1 h-11 text-white shadow-lg shadow-rose-100 transition-all"
                                   onClick={() => handleDelete(d.id)}
                                 >
                                   {config.strings.dialogs.delete.confirm}

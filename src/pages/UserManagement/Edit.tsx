@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
-import { ChevronLeft, Save, ShieldCheck } from "lucide-react";
+import { ChevronLeft, Save, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import config from "./UserConfig.json";
 
@@ -66,10 +66,10 @@ const UserEdit = () => {
           <ChevronLeft className="h-5 w-5 text-slate-600" />
         </Button>
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h2 className="heading-section !text-2xl">
             {strings.title}
           </h2>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">
+          <p className="caption-small !text-slate-400 italic">
             ID: {formData.userid}
           </p>
         </div>
@@ -78,16 +78,16 @@ const UserEdit = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-8">
-            <CardTitle className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+            <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <ShieldCheck className="icon-sm text-blue-600" />
               </div>
               {strings.accountSection}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 pt-6 px-8 pb-8">
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+              <Label className="caption-small !text-slate-400">
                 {config.strings.create.labels.userId}
               </Label>
               <Input
@@ -95,13 +95,13 @@ const UserEdit = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, userid: e.target.value })
                 }
-                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-mono text-sm"
+                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-mono body-strong !text-slate-900"
                 placeholder="e.g. USR001"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+              <Label className="caption-small !text-slate-400">
                 {config.strings.create.labels.fullName}
               </Label>
               <Input
@@ -109,13 +109,13 @@ const UserEdit = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, username: e.target.value })
                 }
-                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-slate-700"
+                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900"
                 placeholder="Full billing name"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+              <Label className="caption-small !text-slate-400">
                 {config.strings.create.labels.email}
               </Label>
               <Input
@@ -124,13 +124,13 @@ const UserEdit = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, email_id: e.target.value })
                 }
-                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
+                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900"
                 placeholder="email@company.com"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+              <Label className="caption-small !text-slate-400">
                 {config.strings.detail.labels.phone}
               </Label>
               <Input
@@ -138,20 +138,20 @@ const UserEdit = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, mobile_number: e.target.value })
                 }
-                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
+                className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900"
                 placeholder="Primary contact"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+              <Label className="caption-small !text-slate-400">
                 {config.strings.create.labels.role}
               </Label>
               <Select
                 value={formData.role}
                 onValueChange={(v) => setFormData({ ...formData, role: v })}
               >
-                <SelectTrigger className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold">
+                <SelectTrigger className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-slate-200 shadow-xl">
@@ -161,7 +161,7 @@ const UserEdit = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-400 uppercase tracking-[0.15em]">
+              <Label className="caption-small !text-slate-400">
                 {config.strings.detail.labels.warehouse}
               </Label>
               <Select
@@ -170,7 +170,7 @@ const UserEdit = () => {
                   setFormData({ ...formData, warehouse: v })
                 }
               >
-                <SelectTrigger className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold">
+                <SelectTrigger className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-slate-200 shadow-xl">
@@ -190,20 +190,20 @@ const UserEdit = () => {
             type="button"
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="rounded-xl px-10 text-slate-500 font-black uppercase tracking-widest text-xs hover:bg-slate-100 h-11"
+            className="rounded-xl px-10 body-strong uppercase tracking-widest text-xs hover:bg-slate-100 h-11"
           >
             {strings.cancelBtn}
           </Button>
           <Button
             type="submit"
-            className="px-12 bg-slate-900 hover:bg-slate-800 rounded-xl shadow-lg shadow-slate-200 font-black uppercase tracking-[0.15em] text-xs h-11 transition-all active:scale-95"
+            className="px-12 bg-slate-900 hover:bg-slate-800 rounded-xl shadow-lg shadow-slate-200 body-strong text-white uppercase tracking-[0.15em] text-xs h-11 transition-all active:scale-95"
             disabled={loading}
           >
             {loading ? (
-              "Updating..."
+              <Loader2 className="animate-spin icon-sm" />
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" /> {strings.saveBtn}
+                <Save className="icon-sm mr-2" /> {strings.saveBtn}
               </>
             )}
           </Button>
