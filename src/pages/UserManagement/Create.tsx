@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { Checkbox } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import {
   ChevronLeft,
   Save,
@@ -56,11 +57,63 @@ const UserCreate = () => {
     setSelectedPermissions((prev) => {
       const current = prev[module] || [];
       if (checked) {
+        if (current.includes(action)) return prev;
         return { ...prev, [module]: [...current, action] };
       } else {
+        if (!current.includes(action)) return prev;
         return { ...prev, [module]: current.filter((a) => a !== action) };
       }
     });
+  };
+
+  const toggleColumn = (action: string) => {
+    const allSelectedInColumn = permissionsList.every((p) =>
+      (selectedPermissions[p] || []).includes(action),
+    );
+
+    setSelectedPermissions((prev) => {
+      const next = { ...prev };
+      permissionsList.forEach((p) => {
+        const current = next[p] || [];
+        if (allSelectedInColumn) {
+          next[p] = current.filter((a) => a !== action);
+        } else {
+          if (!current.includes(action)) {
+            next[p] = [...current, action];
+          }
+        }
+      });
+      return next;
+    });
+  };
+
+  const toggleRow = (module: string) => {
+    const actions = ["view", "create", "edit", "delete"];
+    const allSelectedInRow = actions.every((a) =>
+      (selectedPermissions[module] || []).includes(a),
+    );
+
+    setSelectedPermissions((prev) => ({
+      ...prev,
+      [module]: allSelectedInRow ? [] : actions,
+    }));
+  };
+
+  const toggleAll = () => {
+    const actions = ["view", "create", "edit", "delete"];
+    const isEverythingSelected = permissionsList.every((p) =>
+      actions.every((a) => (selectedPermissions[p] || []).includes(a)),
+    );
+
+    if (isEverythingSelected) {
+      setSelectedPermissions({});
+    } else {
+      const all: Record<string, string[]> = {};
+      permissionsList.forEach((p) => {
+        all[p] = actions;
+      });
+      setSelectedPermissions(all);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -298,22 +351,42 @@ const UserCreate = () => {
           </CardHeader>
           <CardContent className="p-6">
             <div className="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
-              <div className="grid grid-cols-5 bg-slate-50 p-4 border-b border-slate-100">
-                <div className="col-span-1 pl-2 body-strong !text-slate-500 uppercase tracking-widest !text-xs">
-                  Feature / Module
+              <div className="grid grid-cols-5 bg-slate-50 p-4 border-b border-slate-100 items-center">
+                <div className="col-span-1 pl-4 flex items-center gap-3">
+                  <Checkbox
+                    id="all-permissions"
+                    className="h-5 w-5 border-slate-400"
+                    checked={
+                      permissionsList.length > 0 &&
+                      permissionsList.every((p) =>
+                        ["view", "create", "edit", "delete"].every((a) =>
+                          (selectedPermissions[p] || []).includes(a),
+                        ),
+                      )
+                    }
+                    onCheckedChange={toggleAll}
+                  />
+                  <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px]">
+                    Module
+                  </span>
                 </div>
-                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">
-                  View
-                </div>
-                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">
-                  Create
-                </div>
-                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">
-                  Edit
-                </div>
-                <div className="text-center body-strong !text-slate-500 uppercase tracking-widest !text-xs">
-                  Remove
-                </div>
+                {/* Each action column uses a fixed-width container for consistent checkbox centering */}
+                {["view", "create", "edit", "delete"].map((action) => (
+                  <div key={action} className="flex justify-center">
+                    <div className="flex items-center gap-2.5 w-24">
+                      <Checkbox
+                        className="h-5 w-5 border-slate-400"
+                        checked={permissionsList.every((p) =>
+                          (selectedPermissions[p] || []).includes(action),
+                        )}
+                        onCheckedChange={() => toggleColumn(action)}
+                      />
+                      <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px]">
+                        {action === "delete" ? "Remove" : action}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="divide-y divide-slate-50 bg-white">
                 {permissionsList.map((p) => (
@@ -321,45 +394,47 @@ const UserCreate = () => {
                     key={p}
                     className="grid grid-cols-5 p-3 items-center hover:bg-slate-50/50 transition-colors"
                   >
-                    <div className="col-span-1 body-strong !text-sm px-2 !text-slate-800">
-                      {p}
-                    </div>
-                    <div className="flex justify-center">
+                    <div className="col-span-1 flex items-center gap-3 pl-4">
                       <Checkbox
-                        id={`${p}-view`}
-                        className="h-5 w-5 rounded-md border-slate-200 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                        onCheckedChange={(checked) =>
-                          handlePermissionChange(p, "view", !!checked)
-                        }
+                        id={`row-${p}`}
+                        className="h-5 w-5 border-slate-400"
+                        checked={["view", "create", "edit", "delete"].every(
+                          (a) => (selectedPermissions[p] || []).includes(a),
+                        )}
+                        onCheckedChange={() => toggleRow(p)}
                       />
+                      <span className="body-strong !text-sm !text-slate-800">
+                        {p}
+                      </span>
                     </div>
-                    <div className="flex justify-center">
-                      <Checkbox
-                        id={`${p}-add`}
-                        className="h-5 w-5 rounded-md border-slate-200 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
-                        onCheckedChange={(checked) =>
-                          handlePermissionChange(p, "create", !!checked)
-                        }
-                      />
-                    </div>
-                    <div className="flex justify-center">
-                      <Checkbox
-                        id={`${p}-edit`}
-                        className="h-5 w-5 rounded-md border-slate-200 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
-                        onCheckedChange={(checked) =>
-                          handlePermissionChange(p, "edit", !!checked)
-                        }
-                      />
-                    </div>
-                    <div className="flex justify-center">
-                      <Checkbox
-                        id={`${p}-delete`}
-                        className="h-5 w-5 rounded-md border-slate-200 data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500"
-                        onCheckedChange={(checked) =>
-                          handlePermissionChange(p, "delete", !!checked)
-                        }
-                      />
-                    </div>
+                    {["view", "create", "edit", "delete"].map((action) => (
+                      <div key={action} className="flex justify-center">
+                        <div className="flex items-center gap-2.5 w-24">
+                          <Checkbox
+                            id={`${p}-${action}`}
+                            className={cn(
+                              "h-5 w-5",
+                              action === "view" &&
+                                "data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600",
+                              action === "create" &&
+                                "data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500",
+                              action === "edit" &&
+                                "data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500",
+                              action === "delete" &&
+                                "data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500",
+                            )}
+                            checked={(selectedPermissions[p] || []).includes(
+                              action,
+                            )}
+                            onCheckedChange={(checked) =>
+                              handlePermissionChange(p, action, !!checked)
+                            }
+                          />
+                          {/* Invisible spacer to maintain vertical alignment with header */}
+                          <div className="w-12" aria-hidden="true" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
