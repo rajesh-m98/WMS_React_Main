@@ -58,8 +58,8 @@ A high-performance, enterprise-grade Warehouse Management System (WMS) front-end
 3. Configure the environment:
    Create a `.env` file in the root directory:
    ```env
-   VITE_API_URL=http://wms.giri.in:8083/api/v1
-   VITE_COMPANYID=1
+   VITE_API_URL=
+   VITE_COMPANYID=
    ```
 4. Start the development server:
    ```bash
