@@ -108,10 +108,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-[72px] flex items-center justify-between border-b border-border bg-card px-8 shrink-0">
             <div className="flex flex-col">
-              <h2 className="text-xl font-black text-blue-600 tracking-tight leading-tight">
+              <h2 className="text-xl font-black text-blue-600 tracking-tight leading-tight font-display">
                 {title}
               </h2>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
+              <p className="caption-small !text-slate-400 mt-0.5">
                 {description}
               </p>
             </div>
@@ -123,10 +123,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                       {initials}
                     </div>
                     <div className="hidden md:block text-left">
-                      <p className="text-sm font-bold text-slate-900 leading-tight">
+                      <p className="body-strong !text-sm leading-tight">
                         Admin
                       </p>
-                      <p className="text-[10px] font-semibold text-slate-400 leading-tight uppercase tracking-wider">
+                      <p className="caption-small !text-slate-400 leading-tight !text-[10px]">
                         Super User
                       </p>
                     </div>
@@ -136,11 +136,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   align="end"
                   className="w-56 p-2 rounded-2xl shadow-xl border-slate-100 animate-in zoom-in-95 duration-200"
                 >
-                  <div className="px-2 py-3 mb-2 bg-slate-50/50 rounded-xl">
-                    <p className="text-xs font-semibold text-slate-400 mb-0.5">
+                  <div className="px-4 py-3 mb-2 bg-slate-50/50 rounded-xl border border-slate-100">
+                    <p className="caption-small !text-slate-400 mb-0.5">
                       Account Status
                     </p>
-                    <p className="text-sm font-bold text-slate-800">
+                    <p className="body-strong !text-sm">
                       {userEmail}
                     </p>
                   </div>
