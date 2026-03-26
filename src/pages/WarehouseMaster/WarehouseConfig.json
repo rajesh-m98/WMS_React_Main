@@ -1,0 +1,43 @@
+{
+  "strings": {
+    "searchPlaceholder": "Search by facility name or code...",
+    "addWarehouseBtn": "Add Warehouse",
+    "form": {
+      "addTitle": "New Facility Registration",
+      "editTitle": "Update Facility Details",
+      "subtitle": "Define location parameters and BPL assignments",
+      "codeLabel": "Facility Code",
+      "codePlaceholder": "e.g. WH-04",
+      "nameLabel": "Facility Name",
+      "namePlaceholder": "e.g. South Hub",
+      "addressLabel": "Address Line",
+      "addressPlaceholder": "Full physical address...",
+      "gstLabel": "GST Number",
+      "gstPlaceholder": "Mapping identifier...",
+      "bplLabel": "BPL Identifier",
+      "bplPlaceholder": "System BPL ID...",
+      "cancelBtn": "Cancel",
+      "submitBtn": "Commit Facility"
+    },
+    "table": {
+      "identification": "Facility Identification",
+      "location": "Location",
+      "gstBpl": "GST In / BPL",
+      "geofencing": "Geofencing Status",
+      "status": "Node Status",
+      "manage": "Manage"
+    },
+    "noFacilities": "No facilities indexed in system",
+    "deleteDialog": {
+      "title": "Decommission Facility?",
+      "descriptionTemplate": "The facility {name} will be archived. All active inventory in this node might be affected.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Purge Facility"
+    },
+    "detailView": {
+      "gstLabel": "GST Registered",
+      "bplLabel": "BPL System ID",
+      "dismissBtn": "Dismiss Detailed View"
+    }
+  }
+}

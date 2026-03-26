@@ -1,0 +1,50 @@
+{
+  "strings": {
+    "searchPlaceholder": "Search by Item Code or Description...",
+    "syncBtn": "Sync Repository",
+    "syncSuccess": "Synchronized with Global Item Registry",
+    "deleteDialog": {
+      "title": "Purge Item Master?",
+      "descriptionTemplate": "This will remove {itemcode} and all associated historical data. This cannot be undone.",
+      "cancelBtn": "Retain Item",
+      "confirmBtn": "Confirm Deletion"
+    },
+    "table": {
+      "code": "Item Code",
+      "description": "Description",
+      "batch": "Batch Number",
+      "barcode": "Barcode Number",
+      "location": "Location Mapping",
+      "opening": "Opening Stock",
+      "current": "Current Stock",
+      "manage": "Manage",
+      "groupUom": "Group / UOM",
+      "status": "Status"
+    },
+    "dialog": {
+      "create": "Archive New Item",
+      "edit": "Update Repository",
+      "coreInfo": "Core Identification",
+      "logistics": "Logistic Control",
+      "attributes": "Extended Meta Attributes",
+      "layers": "Structural Layers",
+      "itemCode": "Item Code",
+      "description": "Description",
+      "groupCode": "Group Code",
+      "barcode": "Barcode",
+      "uom": "Inventory UOM",
+      "status": "Status (Y/N)",
+      "batch": "Batch Managed",
+      "serial": "Serial Managed",
+      "cancel": "Cancel",
+      "submitCreate": "Initialize Archive",
+      "submitEdit": "Commit Changes"
+    },
+    "noItems": "No items registered in database",
+    "totalCatalog": "Total repository items:",
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
+    }
+  }
+}

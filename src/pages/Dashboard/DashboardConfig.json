@@ -1,0 +1,36 @@
+{
+  "strings": {
+    "loading": {
+      "title": "Synchronizing Metrics",
+      "subtitle": "WMS Core Engine v1.0"
+    },
+    "analytics": {
+      "title": "Activity Analytics",
+      "subtitle": "Inventory flow velocity over 7 days"
+    },
+    "health": {
+      "title": "Node Health",
+      "subtitle": "Live operational monitoring",
+      "footer": "All systems operational"
+    },
+    "recent": {
+      "title": "Recent Activity",
+      "subtitle": "Latest 7 ledger entries",
+      "button": "View Audit Log",
+      "columns": ["ID", "Type", "Ledger Item", "Quantity", "Time"]
+    },
+    "operational": {
+      "title": "Operational Metrics",
+      "subtitle": "Real-time execution status",
+      "metrics": {
+        "inward": "Inward Summary",
+        "outward": "Outward Summary",
+        "load": "Warehouse Load"
+      },
+      "kpi": {
+        "noChange": "No Changes",
+        "initial": "Initialize"
+      }
+    }
+  }
+}

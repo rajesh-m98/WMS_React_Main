@@ -1,0 +1,100 @@
+{
+  "strings": {
+    "searchPlaceholder": "Search by name, email or user ID...",
+    "statusLabel": "Status:",
+    "allUsers": "All Users",
+    "active": "Active",
+    "inactive": "Inactive",
+    "importBtn": "Import Excel",
+    "addUserBtn": "Add New User",
+    "noUsersFound": "No users registered in the system.",
+    "noResultsFound": "No users found matching your current search or filters.",
+    "totalUsersLabel": "Total system users:",
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "deleteDialog": {
+      "title": "Confirm Deletion",
+      "descriptionTemplate": "Are you sure you want to delete {username}? This action cannot be reversed.",
+      "cancelBtn": "Nevermind",
+      "confirmBtn": "Yes, Delete"
+    },
+    "table": {
+      "id": "User ID",
+      "username": "Username",
+      "contact": "Email/Mobile",
+      "role": "Role",
+      "device": "Device",
+      "outlet": "Outlet",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "detail": {
+      "title": "User Profile",
+      "editBtn": "Edit Profile",
+      "personalSection": "Personal Information",
+      "workplaceSection": "Workplace Details",
+      "quickActions": "Quick Actions",
+      "roleAdministrator": "System Administrator",
+      "roleOperator": "Warehouse Operator",
+      "labels": {
+        "fullName": "Full Name",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "role": "System Role",
+        "status": "Account Status",
+        "joined": "Joined On",
+        "warehouse": "Assigned Warehouse",
+        "device": "Primary Device (HST)",
+        "identity": "Identity",
+        "updated": "Updated"
+      },
+      "actions": {
+        "permissions": "Permissions",
+        "resetPassword": "Reset Password",
+        "view": "View",
+        "send": "Send"
+      }
+    },
+    "create": {
+      "title": "Create New User",
+      "subtitle": "Register a new operator or admin",
+      "basicSection": "Basic Information",
+      "mappingSection": "Device & Outlet Mapping",
+      "permissionsSection": "Module Access Permissions",
+      "saveBtn": "Register User",
+      "discardBtn": "Discard",
+      "labels": {
+        "userId": "User ID",
+        "fullName": "Full Name",
+        "email": "Email",
+        "role": "Role",
+        "password": "Access Password",
+        "device": "Assign HST Device",
+        "outlet": "Assign Outlet / WH"
+      },
+      "notes": {
+        "initTitle": "Initialization Note",
+        "initDesc": "The user will be required to change their temporary password upon first HST device login for security compliance."
+      }
+    },
+    "edit": {
+      "title": "Edit Profile",
+      "subtitle": "Modify existing system user credentials",
+      "accountSection": "Account Identification",
+      "saveBtn": "Save Profile",
+      "cancelBtn": "Cancel"
+    },
+    "permissions": [
+      "Transactions",
+      "Master Data",
+      "HST Management",
+      "Bin Management",
+      "Item Management",
+      "Warehouse Management",
+      "Reports",
+      "Settings"
+    ]
+  }
+}

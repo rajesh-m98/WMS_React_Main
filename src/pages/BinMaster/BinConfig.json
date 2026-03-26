@@ -1,0 +1,44 @@
+{
+  "strings": {
+    "searchPlaceholder": "Search across all location nodes...",
+    "addNodeBtn": "Add Child Location",
+    "importBtn": "Import CSV",
+    "exportBtn": "Export",
+    "createNode": {
+      "title": "Register Level {level} Location",
+      "subtitlePrefix": "Currently under:",
+      "rootName": "Warehouse Root",
+      "valueLabel": "Location Value (Label)",
+      "valuePlaceholder": "e.g. Rack A1",
+      "barcodeLabel": "Storage Barcode",
+      "barcodePlaceholder": "Scan or type barcode",
+      "cancelBtn": "Cancel",
+      "submitBtn": "Commit Location"
+    },
+    "editNode": {
+      "title": "Edit Location Information",
+      "subtitlePrefix": "UID:",
+      "valueLabel": "Update Value",
+      "barcodeLabel": "Barcode (Non-Editable)",
+      "cancelBtn": "Discard",
+      "submitBtn": "Save Changes"
+    },
+    "emptyState": {
+      "title": "Location Hierarchy Empty",
+      "description": "Initialize your warehouse layout by adding the first root layer (e.g. Warehouse or Building).",
+      "createBtn": "Create Root Location"
+    },
+    "levelCard": {
+      "prefix": "Level",
+      "suffix": "Location Sub-Unit",
+      "items": "Nodes"
+    },
+    "deleteAlert": {
+      "title": "Are you absolutely sure?",
+      "descriptionTemplate": "This will permanently delete \"{value}\" and all its descendants. This action cannot be undone.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Delete"
+    },
+    "activeFocus": "Active Focus"
+  }
+}

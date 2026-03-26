@@ -1,0 +1,48 @@
+{
+  "strings": {
+    "searchPlaceholder": "Search devices by ID, Serial, or Type...",
+    "importBtn": "Import",
+    "addDeviceBtn": "Add HST",
+    "table": {
+      "deviceId": "Device ID",
+      "deviceName": "Device Name",
+      "brandName": "Brand Name",
+      "serialNo": "Serial No",
+      "mapping": "Aisle Mapping",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "dialogs": {
+      "import": {
+        "title": "Import Devices",
+        "dropzone": "Click to upload or drag and drop",
+        "fileHint": "Supported formats: .csv, .xlsx (Max 5MB)",
+        "cancel": "Cancel",
+        "upload": "Upload"
+      },
+      "form": {
+        "addTitle": "Add New HST Device",
+        "editTitle": "Edit HST Device",
+        "idLabel": "Device ID",
+        "idPlaceholder": "e.g. HST-006",
+        "nameLabel": "Device Name",
+        "namePlaceholder": "e.g. Scanner Gen 2",
+        "brandLabel": "Brand Name",
+        "brandPlaceholder": "e.g. Zebra",
+        "serialLabel": "Serial No",
+        "serialPlaceholder": "Enter serial number...",
+        "mappingLabel": "Aisle Mapping",
+        "mappingPlaceholder": "Mapping type...",
+        "cancel": "Cancel",
+        "addConfirm": "Confirm Add",
+        "editConfirm": "Update Device"
+      },
+      "delete": {
+        "title": "Delete Device?",
+        "descriptionTemplate": "Are you sure you want to delete device {id}? This will detach it from any assigned users.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
+    }
+  }
+}

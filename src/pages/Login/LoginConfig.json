@@ -1,0 +1,21 @@
+{
+  "branding": {
+    "titlePrefix": "Next-Gen",
+    "titleHighlight": "Logistics",
+    "titleSuffix": "Logic.",
+    "subtitle": "Manage mission-critical inventory with real-time analytics, automated picklists, and multi-facility synchronization.",
+    "activeNodesLabel": "Active Nodes:",
+    "activeNodesValue": "Global Compliance 2026",
+    "nodes": ["U1", "U2", "U3"]
+  },
+  "form": {
+    "title": "Secure Access",
+    "subtitle": "Personnel Authentication Terminal",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "admin@gmail.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "submitButton": "Authenticate Session",
+    "footerText": "Authorized Personnel Only • WMS Logic Pro 2.4.1"
+  }
+}
