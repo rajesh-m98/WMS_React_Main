@@ -311,7 +311,7 @@ export const LocationMaster: React.FC = () => {
                       {config.strings.levelCard.suffix}
                     </span>
                   </div>
-                  <Badge className="caption-small !text-[10px] bg-slate-100 text-slate-500 border-0 uppercase px-2 py-0.5">
+                  <Badge className="caption-small !text-[10px] bg-slate-100 text-slate-500 border-0 uppercase px-3 py-1 bg-white hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm font-black tracking-tighter cursor-default">
                     {column.length} {config.strings.levelCard.items}
                   </Badge>
                 </div>
@@ -341,11 +341,25 @@ export const LocationMaster: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        {node.children && node.children.length > 0 && (
-                          <ChevronRight
-                            className={`h-5 w-5 shrink-0 transition-transform ${isNodeSelected(node.id) ? "text-white" : "text-slate-300 group-hover:translate-x-1 group-hover:text-blue-500"}`}
-                          />
-                        )}
+                        <div className="flex items-center gap-3">
+                          {node.children && node.children.length > 0 && (
+                            <Badge
+                              variant="secondary"
+                              className={`!text-[10px] font-black px-2 py-0.5 rounded-lg border-0 transition-all duration-300 ${
+                                isNodeSelected(node.id)
+                                  ? "bg-white/20 text-white"
+                                  : "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-blue-200"
+                              }`}
+                            >
+                              {node.children.length}
+                            </Badge>
+                          )}
+                          {node.children && node.children.length > 0 && (
+                            <ChevronRight
+                              className={`h-4 w-4 shrink-0 transition-transform ${isNodeSelected(node.id) ? "text-white" : "text-slate-300 group-hover:translate-x-1 group-hover:text-blue-500"}`}
+                            />
+                          )}
+                        </div>
                       </button>
                     ))}
                   </div>
