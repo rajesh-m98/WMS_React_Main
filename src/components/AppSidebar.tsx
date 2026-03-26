@@ -251,7 +251,10 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Activity Logs Section */}
-        <SidebarMenu className="mt-2">
+        <SidebarMenu className="mt-2 text-slate-400 font-black text-[10px] uppercase  px-4">
+          System Auditing
+        </SidebarMenu>
+        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -275,6 +278,37 @@ export function AppSidebar() {
                   />
                 </div>
                 <span className="body-strong !text-[15px]">Activity Logs</span>
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem className="mt-2">
+            <SidebarMenuButton
+              asChild
+              isActive={isItemActive("/transactions/dispatch-history")}
+            >
+              <NavLink
+                to="/transactions/dispatch-history"
+                className={`flex items-center gap-3.5 px-4 py-4 rounded-lg transition-all duration-300 ${
+                  isItemActive("/transactions/dispatch-history")
+                    ? "bg-blue-600 text-white font-bold shadow-xl shadow-blue-200/80 scale-[1.02]"
+                    : "text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                }`}
+                activeClassName=""
+                onClick={() =>
+                  handleSidebarClick("/transactions/dispatch-history")
+                }
+              >
+                <div
+                  className={`p-1.5 rounded-xl transition-colors ${isItemActive("/transactions/dispatch-history") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
+                >
+                  <ClipboardList
+                    className={`icon-base shrink-0 ${isItemActive("/transactions/dispatch-history") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
+                  />
+                </div>
+                <span className="body-strong !text-[15px]">
+                  Dispatch History
+                </span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>

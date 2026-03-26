@@ -17,6 +17,7 @@ import { LocationMaster } from "./pages/BinMaster/page";
 import { HSTMaster } from "./pages/HSTMaster/page";
 import { WarehouseMaster } from "./pages/WarehouseMaster/page";
 import SettingsPage from "./pages/SettingsPage";
+import { DispatchHistory } from "./pages/DispatchHistory";
 import { Login } from "./pages/Login/page";
 import NotFound from "./pages/NotFound";
 
@@ -50,6 +51,10 @@ const App = () => (
                     <Route
                       path="/transactions/tasks/:id"
                       element={<TaskDetail />}
+                    />
+                    <Route
+                      path="/transactions/dispatch-history"
+                      element={<DispatchHistory />}
                     />
                     <Route path="/masters/users" element={<UserManagement />} />
                     <Route

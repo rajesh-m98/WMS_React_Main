@@ -200,7 +200,7 @@ export const ActivityLog = () => {
             </div>
           )}
           <div className="p-8 bg-slate-50/30 border-t flex items-center justify-between">
-            <p className="caption-small !text-slate-400 uppercase tracking-[0.2em] font-black">
+            <p className="caption-small !text-slate-400 uppercase  font-black">
               End of Global Audit Ledger
             </p>
             <div className="flex items-center gap-2">

@@ -12,7 +12,7 @@ const PasswordInput = ({ label, value, onChange, placeholder, error }: any) => {
   const [show, setShow] = useState(false);
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-black text-slate-500 uppercase tracking-widest flex justify-between">
+      <Label className="caption-small flex justify-between">
         {label}
       </Label>
       <div className="relative">
@@ -45,14 +45,12 @@ const PasswordInput = ({ label, value, onChange, placeholder, error }: any) => {
 
 const SettingsPage = () => {
   const [passwords, setPasswords] = useState({
-    current: "",
     newPass: "",
     confirm: "",
   });
 
   const handlePasswordUpdate = () => {
     const { isValid, message } = validatePasswordChange(
-      passwords.current,
       passwords.newPass,
       passwords.confirm,
     );
@@ -64,7 +62,7 @@ const SettingsPage = () => {
 
     // In real app, call API here
     toast.success("Password changed successfully!");
-    setPasswords({ current: "", newPass: "", confirm: "" });
+    setPasswords({ newPass: "", confirm: "" });
   };
 
   // Real-time validation for confirm password
@@ -82,19 +80,19 @@ const SettingsPage = () => {
     <div className="space-y-6 max-w-6xl mx-auto animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="heading-section">
             Settings
           </h1>
-          <p className="text-sm font-semibold text-slate-500">
+          <p className="body-main !text-sm mt-1">
             Application settings and preferences
           </p>
         </div>
         <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-xl border border-slate-200 shadow-sm">
           <div className="text-right flex flex-col justify-center">
-            <Label className="text-[13px] font-bold text-slate-700 leading-none">
+            <Label className="text-[13px] font-black text-slate-700 leading-none">
               System Theme
             </Label>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1">
+            <p className="caption-small !text-[9px] mt-1">
               Dark Mode (Auto)
             </p>
           </div>
@@ -109,13 +107,13 @@ const SettingsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         <Card className="border-0 shadow-md rounded-2xl overflow-hidden h-full flex flex-col">
           <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-            <CardTitle className="text-base font-bold text-slate-800">
-              General Configuration
-            </CardTitle>
+             <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-widest">
+               General Configuration
+             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 p-6 bg-white flex-1 flex flex-col">
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-500 uppercase tracking-widest">
+              <Label className="caption-small">
                 Company Name
               </Label>
               <Input
@@ -124,7 +122,7 @@ const SettingsPage = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-black text-slate-500 uppercase tracking-widest">
+              <Label className="caption-small">
                 Default Warehouse
               </Label>
               <Input
@@ -146,20 +144,12 @@ const SettingsPage = () => {
 
         <Card className="border-0 shadow-md rounded-2xl overflow-hidden h-full flex flex-col">
           <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-            <CardTitle className="text-base font-bold text-slate-800">
-              Security Config: Change Password
-            </CardTitle>
+             <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-widest">
+               Security Config: Update
+             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 p-6 bg-white flex-1 flex flex-col">
-            <PasswordInput
-              label="Current Password"
-              value={passwords.current}
-              onChange={(e: any) =>
-                setPasswords({ ...passwords, current: e.target.value })
-              }
-              placeholder="Enter current password"
-            />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex-1 space-y-5">
               <PasswordInput
                 label="New Password"
                 value={passwords.newPass}

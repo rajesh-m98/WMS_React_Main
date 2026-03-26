@@ -66,6 +66,10 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-sans)", "Inter", "sans-serif"],
+        display: ["var(--font-display)", "Outfit", "sans-serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
