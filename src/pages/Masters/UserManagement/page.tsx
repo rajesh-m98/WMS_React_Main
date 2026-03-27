@@ -53,12 +53,12 @@ const PAGE_SIZE = 10;
 const getRoleBadge = (role: number) => {
   if (role === 2)
     return (
-      <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+      <Badge className="bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800 border-purple-100 transition-colors">
         Super User
       </Badge>
     );
   return (
-    <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
+    <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 border-blue-100 transition-colors">
       User
     </Badge>
   );
@@ -157,7 +157,7 @@ export const UserManagement = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white relative min-h-[400px]">
+      <Card className="border-0 shadow-md shadow-slate-200 rounded-2xl overflow-hidden bg-white relative min-h-[400px]">
         {loading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
             <Loader2 className="icon-xl text-blue-600 animate-spin" />
@@ -165,8 +165,8 @@ export const UserManagement = () => {
         )}
         <CardContent className="p-0 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
           <Table className="min-w-[1000px]">
-            <TableHeader>
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
+            <TableHeader className="p-4">
+              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-b-2 border-slate-200">
                 <TableHead className="table-header-font pl-6">
                   {config.strings.table.id}
                 </TableHead>
@@ -235,7 +235,11 @@ export const UserManagement = () => {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`rounded-lg px-2 py-0.5 border-0 caption-small ${user.status === "Active" ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600"}`}
+                        className={`rounded-lg px-2 py-0.5 border-0 caption-small transition-colors ${
+                          user.status === "Active"
+                            ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600"
+                        }`}
                       >
                         {user.status}
                       </Badge>
@@ -245,7 +249,7 @@ export const UserManagement = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => navigate(`/masters/users/${user.id}`)}
                         >
                           <Eye className="h-4 w-4" />
@@ -253,7 +257,7 @@ export const UserManagement = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() =>
                             navigate(`/masters/users/${user.id}/edit`)
                           }
@@ -265,7 +269,7 @@ export const UserManagement = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

@@ -36,7 +36,6 @@
       "personalSection": "Personal Information",
       "workplaceSection": "Workplace Details",
       "quickActions": "Quick Actions",
-      "roleAdministrator": "System Administrator",
       "roleOperator": "Warehouse Operator",
       "labels": {
         "fullName": "Full Name",

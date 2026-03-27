@@ -379,7 +379,7 @@ export const WarehouseMaster = () => {
                       <p className="body-strong !text-slate-900 leading-tight">
                         {wh.warehouse_name}
                       </p>
-                      <p className="table-id-font !text-blue-600 !text-[11px] !tracking-normal">
+                      <p className="label-bold !text-blue-600 !tracking-normal">
                         ID: {wh.id} | CODE: {wh.warehouse_code}
                       </p>
                     </TableCell>
@@ -400,7 +400,7 @@ export const WarehouseMaster = () => {
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p className="text-[11px] text-slate-500 truncate max-w-[150px] leading-snug">
+                      <p className="label-bold !text-slate-500 truncate max-w-[150px] leading-snug">
                         {wh.street || "No street provided"}
                       </p>
                     </TableCell>
@@ -417,7 +417,7 @@ export const WarehouseMaster = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => {
                             setViewingWarehouse(wh);
                           }}
@@ -427,7 +427,7 @@ export const WarehouseMaster = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => {
                             setEditingWarehouse(wh);
                             setIsFormOpen(true);
@@ -440,7 +440,7 @@ export const WarehouseMaster = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

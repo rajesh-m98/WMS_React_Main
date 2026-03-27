@@ -161,7 +161,7 @@ const UserCreate = () => {
         </Button>
         <div>
           <h2 className="heading-section !text-2xl">{strings.title}</h2>
-          <p className="caption-small !text-slate-400 italic">
+          <p className="label-bold !text-slate-400 italic">
             {strings.subtitle.toUpperCase()}
           </p>
         </div>
@@ -178,7 +178,7 @@ const UserCreate = () => {
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="caption-small !text-slate-400">
+                  <Label className="label-bold !text-slate-400">
                     {strings.labels.userId}
                   </Label>
                   <Input
@@ -193,7 +193,7 @@ const UserCreate = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="caption-small !text-slate-400">
+                  <Label className="label-bold !text-slate-400">
                     {strings.labels.fullName}
                   </Label>
                   <Input
@@ -210,7 +210,7 @@ const UserCreate = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="caption-small !text-slate-400">
+                  <Label className="label-bold !text-slate-400">
                     {strings.labels.email}
                   </Label>
                   <Input
@@ -226,7 +226,7 @@ const UserCreate = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="caption-small !text-slate-400">
+                  <Label className="label-bold !text-slate-400">
                     {strings.labels.role}
                   </Label>
                   <Select
@@ -246,7 +246,7 @@ const UserCreate = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="caption-small !text-slate-400">
+                <Label className="label-bold !text-slate-400">
                   {strings.labels.password}
                 </Label>
                 <Input
@@ -277,7 +277,7 @@ const UserCreate = () => {
                     <Laptop className="icon-base" />
                   </div>
                   <div className="flex-1 space-y-2">
-                    <Label className="caption-small !text-slate-400">
+                    <Label className="label-bold !text-slate-400">
                       {strings.labels.device}
                     </Label>
                     <Select
@@ -307,7 +307,7 @@ const UserCreate = () => {
                     <Building2 className="icon-base" />
                   </div>
                   <div className="flex-1 space-y-2">
-                    <Label className="caption-small !text-slate-400">
+                    <Label className="label-bold !text-slate-400">
                       {strings.labels.outlet}
                     </Label>
                     <Select

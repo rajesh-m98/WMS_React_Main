@@ -118,22 +118,22 @@ export const ActivityLog = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/30 border-b border-slate-100">
                 <tr>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-500">
                     Entry ID
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-500">
                     Type
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-500">
                     Item Description
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-500">
                     Partner
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-widest text-right">
+                  <th className="px-10 py-6 label-bold !text-slate-500 text-right">
                     Qty
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-widest text-right">
+                  <th className="px-10 py-6 label-bold !text-slate-500 text-right">
                     Timestamp
                   </th>
                 </tr>
@@ -150,7 +150,7 @@ export const ActivityLog = () => {
                     </td>
                     <td className="px-10 py-6">
                       <Badge
-                        className={`rounded-xl px-4 py-1.5 border-0 font-black text-[10px] tracking-widest text-white shadow-sm ${tx.type === "Inward" ? "bg-blue-600 shadow-blue-100" : "bg-indigo-600 shadow-indigo-100"}`}
+                        className={`rounded-xl px-4 py-1.5 border-0 label-bold text-white shadow-sm ${tx.type === "Inward" ? "bg-blue-600 shadow-blue-100" : "bg-indigo-600 shadow-indigo-100"}`}
                       >
                         {tx.type === "Inward" ? (
                           <ArrowUpRight className="h-3 w-3 mr-1 inline" />
@@ -165,7 +165,7 @@ export const ActivityLog = () => {
                         <span className="text-sm font-black text-slate-800">
                           {tx.item}
                         </span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                        <span className="label-bold !text-slate-400 !tracking-tight">
                           Movement Record #{Math.floor(Math.random() * 10000)}
                         </span>
                       </div>
@@ -200,7 +200,7 @@ export const ActivityLog = () => {
             </div>
           )}
           <div className="p-8 bg-slate-50/30 border-t flex items-center justify-between">
-            <p className="caption-small !text-slate-400 uppercase  font-black">
+            <p className="label-bold !text-slate-400">
               End of Global Audit Ledger
             </p>
             <div className="flex items-center gap-2">

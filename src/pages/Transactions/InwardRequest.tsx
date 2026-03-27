@@ -146,46 +146,46 @@ const InwardRequest = () => {
           <Table className="min-w-max border-collapse">
             <TableHeader>
               <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 border-b border-slate-100">
-                <TableHead className="font-black text-slate-900 px-8 py-5 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-8 py-5 tracking-widest uppercase text-left whitespace-nowrap">
                   ID
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   DocEntry
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Doc Number
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Card Code
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Card Name
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-center whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-center whitespace-nowrap">
                   Doc Date
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-6 text-[11px] tracking-widest uppercase text-center whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-6 tracking-widest uppercase text-center whitespace-nowrap">
                   Line
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Item Code
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Item Name
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Warehouse
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-left whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-left whitespace-nowrap">
                   Batch No
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-right whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-right whitespace-nowrap">
                   Available Qty
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-right whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-right whitespace-nowrap">
                   Put Qty
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-8 text-[11px] tracking-widest uppercase text-right whitespace-nowrap pr-10">
+                <TableHead className="label-bold !text-slate-900 px-8 tracking-widest uppercase text-right whitespace-nowrap pr-10">
                   Action
                 </TableHead>
               </TableRow>
@@ -219,7 +219,7 @@ const InwardRequest = () => {
                         {row.inwardheader?.docnum || "-"}
                       </span>
                     </td>
-                    <td className="px-4 text-slate-500 font-mono text-[11px] uppercase tracking-wide">
+                    <td className="px-4 text-slate-500 label-bold !tracking-wide">
                       {row.inwardheader?.cardcode || "-"}
                     </td>
                     <td className="px-4 text-slate-800 font-black !text-[12px] truncate max-w-[180px]">
@@ -240,7 +240,7 @@ const InwardRequest = () => {
                     <td className="px-4 font-black text-slate-800 text-[12px]">
                       {row.whscode}
                     </td>
-                    <td className="px-4 text-slate-400 font-bold text-[11px] tracking-tight">
+                    <td className="px-4 text-slate-400 label-bold !tracking-tight">
                       {row.batchnumber || "N/A"}
                     </td>
                     <td className="px-4 text-right font-black text-slate-900 tabular-nums">
@@ -255,7 +255,7 @@ const InwardRequest = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                        className="h-9 w-9 rounded-xl shadow-lg shadow-slate-300 bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                         onClick={() =>
                           navigate(`/transactions/tasks/${row.id}`)
                         }

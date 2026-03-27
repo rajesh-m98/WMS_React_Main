@@ -54,6 +54,7 @@ import { handleFetchUsers } from "@/app/manager/masterManager";
 import { handleFetchAllItems } from "@/app/manager/itemManager";
 import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import { handleFetchAllHST } from "@/app/manager/hstManager";
+import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -89,6 +90,9 @@ export function AppSidebar() {
       case "/masters/warehouses":
         dispatch(handleFetchAllWarehouses());
         break;
+      case "/transactions/dispatch-history":
+        dispatch(handleFetchDispatchHistory({ page: 1, size: 15 }));
+        break;
 
       // Transactions
       case "/transactions/InwardRequest":
@@ -113,9 +117,9 @@ export function AppSidebar() {
       <SidebarMenuSubButton asChild isActive={isItemActive(url)}>
         <NavLink
           to={url}
-          className={`flex items-center gap-3 w-full px-4 py-2 rounded-xl text-[13px] transition-all duration-300 ${
+          className={`flex items-center gap-3 w-full px-4 py-2 rounded-xl table-cell-bold transition-all duration-300 ${
             isItemActive(url)
-              ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-100/50"
+              ? "bg-blue-600 text-white shadow-md shadow-blue-100/50"
               : "text-slate-500 hover:text-blue-600 hover:bg-blue-50/50"
           }`}
           activeClassName=""
@@ -137,7 +141,7 @@ export function AppSidebar() {
           <Box className="w-5 h-5 text-white stroke-[2.5]" />
         </div>
         <div className="flex flex-col">
-          <h1 className="heading-main !text-2xl">WMS</h1>
+          <h1 className="heading-section !text-2xl">WMS</h1>
         </div>
       </SidebarHeader>
 
@@ -163,7 +167,7 @@ export function AppSidebar() {
                     className={`icon-base shrink-0 ${isItemActive("/dashboard") ? "text-black" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong !text-[15px]">Dashboard</span>
+                <span className="body-strong">Dashboard</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -178,7 +182,7 @@ export function AppSidebar() {
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
                     <Settings className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
                   </div>
-                  <span className="body-strong !text-[15px] !text-slate-800">
+                  <span className="body-strong !text-slate-800">
                     Masters
                   </span>
                 </div>
@@ -226,7 +230,7 @@ export function AppSidebar() {
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
                     <ArrowLeftRight className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
                   </div>
-                  <span className="body-strong !text-[15px] !text-slate-800">
+                  <span className="body-strong !text-slate-800">
                     Transactions
                   </span>
                 </div>
@@ -251,7 +255,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Activity Logs Section */}
-        <SidebarMenu className="mt-2 text-slate-400 font-black text-[10px] uppercase  px-4">
+        <SidebarMenu className="mt-2 caption-small px-4">
           System Auditing
         </SidebarMenu>
         <SidebarMenu>
@@ -277,7 +281,7 @@ export function AppSidebar() {
                     className={`icon-base shrink-0 ${isItemActive("/activity-logs") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong !text-[15px]">Activity Logs</span>
+                <span className="body-strong">Activity Logs</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -306,7 +310,7 @@ export function AppSidebar() {
                     className={`icon-base shrink-0 ${isItemActive("/transactions/dispatch-history") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong !text-[15px]">
+                <span className="body-strong">
                   Dispatch History
                 </span>
               </NavLink>

@@ -1,0 +1,26 @@
+{
+  "strings": {
+    "title": "Dispatch History",
+    "subtitle": "Track outbound carton logs and shipment tracking",
+    "searchPlaceholder": "Search by Invoice, Doc No, Card Code...",
+    "noRecords": "No Dispatch Records Found",
+    "totalRecords": "Total Dispatch Activity",
+    "table": {
+      "id": "S.No",
+      "docEntry": "Doc Entry",
+      "lineId": "Line ID",
+      "docNo": "Doc No",
+      "cardCode": "Card Code",
+      "cardName": "Card Name",
+      "docDate": "Doc Date",
+      "cartonBarcode": "Carton Barcode",
+      "createdAt": "Created Date",
+      "hstDevice": "HST Device",
+      "userDetails": "User Details",
+      "totalQty": "Total Qty",
+      "remainingQty": "Remaining Qty",
+      "filledQty": "Filled Qty",
+      "actions": "Actions"
+    }
+  }
+}

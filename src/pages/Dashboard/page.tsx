@@ -285,13 +285,13 @@ export const Dashboard = () => {
           <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
             <button
               onClick={() => setAnalysisType("week")}
-              className={`px-6 py-2.5 rounded-xl text-[11px] font-black transition-all ${analysisType === "week" ? "bg-white text-blue-600 shadow-md scale-105" : "text-slate-400"}`}
+              className={`px-6 py-2.5 rounded-xl label-bold transition-all ${analysisType === "week" ? "bg-white text-blue-600 shadow-md scale-105" : "text-slate-400"}`}
             >
               7 DAYS
             </button>
             <button
               onClick={() => setAnalysisType("month")}
-              className={`px-6 py-2.5 rounded-xl text-[11px] font-black transition-all ${analysisType === "month" ? "bg-white text-blue-600 shadow-md scale-105" : "text-slate-400"}`}
+              className={`px-6 py-2.5 rounded-xl label-bold transition-all ${analysisType === "month" ? "bg-white text-blue-600 shadow-md scale-105" : "text-slate-400"}`}
             >
               30 DAYS
             </button>
@@ -388,19 +388,19 @@ export const Dashboard = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50">
                 <tr>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-400">
                     Entry ID
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-400">
                     Operation
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                  <th className="px-10 py-6 label-bold !text-slate-400">
                     Specification
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-right">
                     Qty
                   </th>
-                  <th className="px-10 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-right">
                     Sync
                   </th>
                 </tr>

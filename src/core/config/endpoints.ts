@@ -46,6 +46,9 @@ export const API_ENDPOINTS = {
     TASKS: {
       GET_BY_ID: 'picklist/get_picklist',
       GET_ITEMS: 'picklist/get_all_picklist',
+    },
+    DISPATCH: {
+      GET_HISTORY: 'dispatch_history/get_all_dispatch_history/',
     }
   }
 };

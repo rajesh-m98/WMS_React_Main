@@ -69,12 +69,22 @@ export const handleDeleteHST = (deviceId: number) => async (dispatch: AppDispatc
 
 export const handleFetchHSTTypes = () => async (dispatch: AppDispatch) => {
   try {
-    const response = await api.get<{ status: boolean; data: any[] }>(API_ENDPOINTS.MASTERS.HST.TYPE_ALL);
+    const response = await api.get<{ status: boolean; data: any[]; message?: string }>(API_ENDPOINTS.MASTERS.HST.TYPE_ALL);
     if (response.data.status) {
-      dispatch(hstTypesSuccess(response.data.data));
+      // Normalize data: backend might return array of strings instead of objects
+      const normalizedData = response.data.data.map((item: any) => {
+        if (typeof item === 'string') {
+          return { device_type: item, device_model: item };
+        }
+        return item;
+      });
+      dispatch(hstTypesSuccess(normalizedData));
+    } else {
+      dispatch(hstLoadFailure(response.data.message || "Failed to fetch device types"));
     }
   } catch (err: any) {
     console.error("Error fetching device types", err);
+    dispatch(hstLoadFailure(err.message || "Error fetching device types"));
   }
 };
 

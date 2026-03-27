@@ -12,9 +12,7 @@ const PasswordInput = ({ label, value, onChange, placeholder, error }: any) => {
   const [show, setShow] = useState(false);
   return (
     <div className="space-y-2">
-      <Label className="caption-small flex justify-between">
-        {label}
-      </Label>
+      <Label className="caption-small flex justify-between">{label}</Label>
       <div className="relative">
         <Input
           type={show ? "text" : "password"}
@@ -27,7 +25,7 @@ const PasswordInput = ({ label, value, onChange, placeholder, error }: any) => {
           type="button"
           variant="ghost"
           size="icon"
-          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 rounded-lg"
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 shadow-lg shadow-slate-300 hover:text-slate-600 hover:bg-slate-100/50 rounded-lg"
           onClick={() => setShow(!show)}
           tabIndex={-1}
         >
@@ -80,9 +78,7 @@ const SettingsPage = () => {
     <div className="space-y-6 max-w-6xl mx-auto animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="heading-section">
-            Settings
-          </h1>
+          <h1 className="heading-section">Settings</h1>
           <p className="body-main !text-sm mt-1">
             Application settings and preferences
           </p>
@@ -92,9 +88,7 @@ const SettingsPage = () => {
             <Label className="text-[13px] font-black text-slate-700 leading-none">
               System Theme
             </Label>
-            <p className="caption-small !text-[9px] mt-1">
-              Dark Mode (Auto)
-            </p>
+            <p className="caption-small !text-[9px] mt-1">Dark Mode (Auto)</p>
           </div>
           <Switch
             checked
@@ -107,24 +101,20 @@ const SettingsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         <Card className="border-0 shadow-md rounded-2xl overflow-hidden h-full flex flex-col">
           <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-             <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-widest">
-               General Configuration
-             </CardTitle>
+            <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-widest">
+              General Configuration
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 p-6 bg-white flex-1 flex flex-col">
             <div className="space-y-2">
-              <Label className="caption-small">
-                Company Name
-              </Label>
+              <Label className="caption-small">Company Name</Label>
               <Input
                 defaultValue="WMS Pro Corp"
                 className="h-11 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-semibold text-slate-700"
               />
             </div>
             <div className="space-y-2">
-              <Label className="caption-small">
-                Default Warehouse
-              </Label>
+              <Label className="caption-small">Default Warehouse</Label>
               <Input
                 defaultValue="WH-01"
                 className="h-11 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-semibold text-slate-700"
@@ -144,9 +134,9 @@ const SettingsPage = () => {
 
         <Card className="border-0 shadow-md rounded-2xl overflow-hidden h-full flex flex-col">
           <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-             <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-widest">
-               Security Config: Update
-             </CardTitle>
+            <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-widest">
+              Security Config: Update
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 p-6 bg-white flex-1 flex flex-col">
             <div className="flex-1 space-y-5">

@@ -154,7 +154,7 @@ export const Login = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => dispatch(togglePasswordVisibility())}
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all"
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 text-slate-600 shadow-lg shadow-slate-300 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all"
                       tabIndex={-1}
                     >
                       {loginForm.showPassword ? (

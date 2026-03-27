@@ -142,40 +142,40 @@ const OutwardRequest = () => {
           <Table className="min-w-max border-collapse">
             <TableHeader>
               <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 border-b border-slate-100">
-                <TableHead className="font-black text-slate-900 px-10 py-5 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-10 py-5 tracking-widest uppercase whitespace-nowrap">
                   DocEntry
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap">
                   Line ID
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap">
                   Doc No
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap">
                   Card Code
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap">
                   Card Name
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-center whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-center whitespace-nowrap">
                   Doc Date
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap">
                   Item Code
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap">
                   Item Name
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase whitespace-nowrap text-center">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase whitespace-nowrap text-center">
                   Warehouse
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-right whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-right whitespace-nowrap">
                   Available Qty
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-4 text-[11px] tracking-widest uppercase text-right whitespace-nowrap">
+                <TableHead className="label-bold !text-slate-900 px-4 tracking-widest uppercase text-right whitespace-nowrap">
                   Pick Qty
                 </TableHead>
-                <TableHead className="font-black text-slate-900 px-10 text-[11px] tracking-widest uppercase text-right whitespace-nowrap pr-10">
+                <TableHead className="label-bold !text-slate-900 px-10 tracking-widest uppercase text-right whitespace-nowrap pr-10">
                   Action
                 </TableHead>
               </TableRow>
@@ -209,7 +209,7 @@ const OutwardRequest = () => {
                         {row.outwardheader?.docnum || "-"}
                       </span>
                     </td>
-                    <td className="px-4 text-slate-500 font-mono text-[11px] uppercase">
+                    <td className="px-4 text-slate-500 label-bold !tracking-wide">
                       {row.outwardheader?.cardcode || "-"}
                     </td>
                     <td className="px-4 text-slate-800 font-black !text-[12px] truncate max-w-[180px]">
@@ -239,7 +239,7 @@ const OutwardRequest = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                        className="h-9 w-9 rounded-xl shadow-lg shadow-slate-300 bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                         onClick={() =>
                           navigate(`/transactions/tasks/${row.id}`)
                         }

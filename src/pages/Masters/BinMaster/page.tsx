@@ -196,7 +196,7 @@ export const LocationMaster: React.FC = () => {
                       (selectedPath.length + 1).toString(),
                     )}
                   </DialogTitle>
-                  <p className="table-header-font !text-slate-400 pt-2 italic relative z-10">
+                  <p className="label-bold !text-slate-400 pt-2 italic relative z-10">
                     {config.strings.createNode.subtitlePrefix}{" "}
                     {selectedPath.map((n) => n.value).join(" > ") ||
                       config.strings.createNode.rootName}
@@ -237,7 +237,7 @@ export const LocationMaster: React.FC = () => {
                   <div className="flex justify-end gap-3 pt-4">
                     <Button
                       variant="ghost"
-                      className="rounded-xl h-11 px-6 table-header-font text-slate-500"
+                      className="rounded-xl h-11 px-6 label-bold text-slate-500"
                       onClick={() => dispatch(setCreateOpen(false))}
                     >
                       {config.strings.createNode.cancelBtn}
@@ -268,7 +268,7 @@ export const LocationMaster: React.FC = () => {
               />
               <Button
                 variant="ghost"
-                className="rounded-lg h-9 px-4 table-header-font text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
+                className="rounded-lg h-9 px-4 label-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload className="icon-sm text-blue-500" />{" "}
@@ -276,7 +276,7 @@ export const LocationMaster: React.FC = () => {
               </Button>
               <Button
                 variant="ghost"
-                className="rounded-lg h-9 px-4 table-header-font text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
+                className="rounded-lg h-9 px-4 label-bold text-slate-600 hover:text-slate-900 hover:bg-white transition-all flex items-center gap-2"
                 onClick={() => dispatch(handleExportBins())}
               >
                 <Download className="icon-sm text-emerald-500" />{" "}
@@ -304,7 +304,7 @@ export const LocationMaster: React.FC = () => {
               >
                 <div className="p-3 bg-white border-b border-slate-100 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="table-header-font !text-slate-400">
+                    <span className="label-bold !text-slate-400">
                       {config.strings.levelCard.prefix} {idx + 1}
                     </span>
                     <span className="caption-small text-blue-600 !text-[10px] uppercase font-black">
@@ -394,7 +394,7 @@ export const LocationMaster: React.FC = () => {
                 <DialogTitle className="text-xl font-black mx-auto relative z-10 font-display">
                   {config.strings.editNode.title}
                 </DialogTitle>
-                <p className="table-header-font !text-blue-100 pt-2 italic relative z-10">
+                <p className="label-bold !text-blue-100 pt-2 italic relative z-10">
                   {config.strings.editNode.subtitlePrefix}{" "}
                   {selectedPath[selectedPath.length - 1]?.id}
                 </p>
@@ -428,7 +428,7 @@ export const LocationMaster: React.FC = () => {
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
                     variant="ghost"
-                    className="rounded-xl h-11 px-6 table-header-font text-slate-500"
+                    className="rounded-xl h-11 px-6 label-bold text-slate-500"
                     onClick={() => dispatch(setEditOpen(false))}
                   >
                     {config.strings.editNode.cancelBtn}
@@ -455,7 +455,7 @@ export const LocationMaster: React.FC = () => {
                 <Barcode className="icon-base" />
               </div>
               <div>
-                <p className="table-header-font !text-slate-500 mb-0.5">
+                <p className="label-bold !text-slate-500 mb-0.5">
                   {config.strings.activeFocus}
                 </p>
                 <p className="body-strong !text-sm">
@@ -468,7 +468,7 @@ export const LocationMaster: React.FC = () => {
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-10 w-10 text-slate-400 hover:text-white hover:bg-orange-500 rounded-xl transition-all shadow-sm border border-white/10"
+                className="h-10 w-10 text-slate-400 hover:text-white shadow-lg shadow-slate-300 hover:bg-orange-500 rounded-xl transition-all shadow-sm border border-white/10"
                 onClick={openEdit}
               >
                 <Pencil className="h-4 w-4" />
@@ -478,7 +478,7 @@ export const LocationMaster: React.FC = () => {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-10 w-10 text-rose-400 hover:text-white hover:bg-rose-600 rounded-xl transition-all shadow-sm border border-white/10"
+                    className="h-10 w-10 text-rose-400   hover:text-white hover:bg-rose-600 rounded-xl transition-all shadow-sm border border-white/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

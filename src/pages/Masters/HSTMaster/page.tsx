@@ -299,17 +299,13 @@ export const HSTMaster = () => {
                               key={t.device_type}
                               value={t.device_type}
                             >
-                              {t.device_type}
+                              {t.device_type ?? t}
                             </SelectItem>
                           ))}
                           {types.length === 0 && (
-                            <>
-                              <SelectItem value="Urovo">Urovo</SelectItem>
-                              <SelectItem value="Zebra">Zebra</SelectItem>
-                              <SelectItem value="Honeywell">
-                                Honeywell
-                              </SelectItem>
-                            </>
+                            <div className="p-3 text-center text-[10px] text-slate-400 font-black uppercase italic">
+                              {loading ? "Syncing..." : "No types loaded"}
+                            </div>
                           )}
                         </SelectContent>
                       </Select>
@@ -447,7 +443,7 @@ export const HSTMaster = () => {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                           onClick={() => handleEdit(d)}
                         >
                           <Pencil className="h-4 w-4" />
@@ -458,7 +454,7 @@ export const HSTMaster = () => {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

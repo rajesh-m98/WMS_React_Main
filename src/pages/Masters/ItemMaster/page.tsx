@@ -222,34 +222,34 @@ export const ItemMaster = () => {
             <Table className="min-w-[1600px]">
               <TableHeader>
                 <TableRow className="bg-slate-50/50 border-b-2 border-slate-900/10">
-                  <TableHead className="table-header-font pl-4 whitespace-nowrap">
+                  <TableHead className="label-bold pl-4 whitespace-nowrap">
                     {config.strings.table.id}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.code}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.description}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.batch}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.barcode}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.location}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.opening}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.current}
                   </TableHead>
-                  <TableHead className="table-header-font whitespace-nowrap">
+                  <TableHead className="label-bold whitespace-nowrap">
                     {config.strings.table.status}
                   </TableHead>
-                  <TableHead className="table-header-font text-right pr-8 whitespace-nowrap">
+                  <TableHead className="label-bold text-right pr-8 whitespace-nowrap">
                     {config.strings.table.manage}
                   </TableHead>
                 </TableRow>
@@ -329,7 +329,7 @@ export const ItemMaster = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             onClick={() => handleOpenDialog(item)}
                           >
                             <Edit2 className="h-4 w-4" />
@@ -339,7 +339,7 @@ export const ItemMaster = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                                className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -664,7 +664,7 @@ export const ItemMaster = () => {
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {[...Array(10)].map((_, i) => (
                     <div key={i} className="space-y-1.5">
-                      <Label className="text-[11px] text-slate-600 font-semibold uppercase tracking-tighter">
+                      <Label className="label-bold !text-slate-600 !tracking-tighter !font-semibold">
                         Attr {i + 1}
                       </Label>
                       <Input
@@ -693,7 +693,7 @@ export const ItemMaster = () => {
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="space-y-1.5">
-                      <Label className="text-[11px] text-slate-600 font-semibold uppercase tracking-tighter">
+                      <Label className="label-bold !text-slate-600 !tracking-tighter !font-semibold">
                         Layer {i + 1}
                       </Label>
                       <Input

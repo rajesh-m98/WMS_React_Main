@@ -67,7 +67,7 @@ const TaskDetail = () => {
           <span className="text-[15px] font-black text-slate-900">Status:</span>
           <Badge
             variant="secondary"
-            className="bg-amber-100/50 text-amber-600 font-black px-3 py-1 rounded-full text-[11px] uppercase"
+            className="bg-amber-100/50 text-amber-600 label-bold px-3 py-1 rounded-full"
           >
             Pending
           </Badge>
