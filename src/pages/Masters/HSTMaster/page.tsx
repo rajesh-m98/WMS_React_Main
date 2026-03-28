@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, DialogClose } from "@/components/ui";
 import { Input } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui";
@@ -36,6 +37,7 @@ import {
   Trash2,
   AlertCircle,
   Loader2,
+  Eye,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -55,6 +57,7 @@ import {
   handleCreateHST,
   handleDeleteHST,
   handleFetchHSTTypes,
+  handleFetchHSTById,
 } from "@/app/manager/hstManager";
 import config from "./HSTConfig.json";
 
@@ -68,10 +71,17 @@ interface DeviceForm {
   device_status: number;
   companyid: number;
   warehouse_id: number;
+  layer1: string;
+  layer2: string;
+  layer3: string;
+  layer4: string;
+  layer5: string;
+  layer6: string;
 }
 
 export const HSTMaster = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const {
     data: devices,
     loading,
@@ -81,6 +91,8 @@ export const HSTMaster = () => {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
 
   const [formData, setFormData] = useState<DeviceForm>({
     device_id: "",
@@ -92,17 +104,28 @@ export const HSTMaster = () => {
     device_status: 0,
     companyid: 1,
     warehouse_id: 1,
+    layer1: "",
+    layer2: "",
+    layer3: "",
+    layer4: "",
+    layer5: "",
+    layer6: "",
   });
 
   useEffect(() => {
-    dispatch(handleFetchAllHST());
+    dispatch(handleFetchAllHST({ page, size: PAGE_SIZE }));
     dispatch(handleFetchHSTTypes());
-  }, [dispatch]);
+  }, [dispatch, page]);
+
+  const handleView = (id: number) => {
+    navigate(`/masters/hst/${id}?type=hst`);
+  };
 
   const handleDelete = async (id: number) => {
     const success = await dispatch(handleDeleteHST(id));
     if (success) {
       toast.success("Device deleted successfully");
+      dispatch(handleFetchAllHST({ page, size: PAGE_SIZE }));
     }
   };
 
@@ -118,6 +141,12 @@ export const HSTMaster = () => {
       device_status: device.device_status,
       companyid: device.companyid || 1,
       warehouse_id: device.warehouse_id || 1,
+      layer1: device.layer1 || "",
+      layer2: device.layer2 || "",
+      layer3: device.layer3 || "",
+      layer4: device.layer4 || "",
+      layer5: device.layer5 || "",
+      layer6: device.layer6 || "",
     });
     setOpen(true);
   };
@@ -133,6 +162,12 @@ export const HSTMaster = () => {
       device_status: 0,
       companyid: 1,
       warehouse_id: 1,
+      layer1: "",
+      layer2: "",
+      layer3: "",
+      layer4: "",
+      layer5: "",
+      layer6: "",
     });
     setEditingId(null);
   };
@@ -147,9 +182,12 @@ export const HSTMaster = () => {
       ...formData,
     };
 
-    const success = await dispatch(handleCreateHST(payload));
+    const success = await dispatch(
+      handleCreateHST(payload, editingId || undefined),
+    );
     if (success) {
       toast.success(editingId ? "Device updated" : "Device created");
+      dispatch(handleFetchAllHST({ page, size: PAGE_SIZE }));
       setOpen(false);
       resetForm();
     }
@@ -191,7 +229,7 @@ export const HSTMaster = () => {
                   <Plus className="icon-sm" /> {config.strings.addDeviceBtn}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
+              <DialogContent className="max-w-4xl rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
                 <div className="bg-slate-900 p-6 text-white text-center">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-black mx-auto">
@@ -206,11 +244,11 @@ export const HSTMaster = () => {
                     </p>
                   </DialogHeader>
                 </div>
-                <div className="p-6 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.dialogs.form.idLabel}
+                <div className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+                    <div className="space-y-1.5">
+                      <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
+                        DEVICE ID
                       </Label>
                       <Input
                         value={formData.device_id}
@@ -220,14 +258,14 @@ export const HSTMaster = () => {
                             device_id: e.target.value,
                           })
                         }
-                        placeholder={config.strings.dialogs.form.idPlaceholder}
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
+                        placeholder="DEV-001"
+                        className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900 font-mono"
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.dialogs.form.nameLabel}
+                    <div className="space-y-1.5">
+                      <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
+                        DEVICE NAME
                       </Label>
                       <Input
                         value={formData.device_name}
@@ -237,15 +275,13 @@ export const HSTMaster = () => {
                             device_name: e.target.value,
                           })
                         }
-                        placeholder={
-                          config.strings.dialogs.form.namePlaceholder
-                        }
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                        placeholder="Scanner Name"
+                        className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.dialogs.form.brandLabel}
+                    <div className="space-y-1.5">
+                      <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
+                        BRAND NAME
                       </Label>
                       <Input
                         value={formData.brand_name}
@@ -255,15 +291,13 @@ export const HSTMaster = () => {
                             brand_name: e.target.value,
                           })
                         }
-                        placeholder={
-                          config.strings.dialogs.form.brandPlaceholder
-                        }
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                        placeholder="e.g. Zebra"
+                        className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.dialogs.form.serialLabel}
+                    <div className="space-y-1.5">
+                      <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
+                        Serial Number
                       </Label>
                       <Input
                         value={formData.device_serial_number}
@@ -273,46 +307,31 @@ export const HSTMaster = () => {
                             device_serial_number: e.target.value,
                           })
                         }
-                        placeholder={
-                          config.strings.dialogs.form.serialPlaceholder
-                        }
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
+                        placeholder="ZB12345"
+                        className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900 font-mono"
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
+                    <div className="space-y-1.5">
+                      <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
                         Device Type
                       </Label>
-                      <Select
+                      <Input
                         value={formData.device_type}
-                        onValueChange={(v) =>
-                          setFormData({ ...formData, device_type: v })
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            device_type: e.target.value,
+                          })
                         }
-                      >
-                        <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                          <SelectValue placeholder="Select Type" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl">
-                          {types.map((t: any) => (
-                            <SelectItem
-                              key={t.device_type}
-                              value={t.device_type}
-                            >
-                              {t.device_type ?? t}
-                            </SelectItem>
-                          ))}
-                          {types.length === 0 && (
-                            <div className="p-3 text-center text-[10px] text-slate-400 font-black uppercase italic">
-                              {loading ? "Syncing..." : "No types loaded"}
-                            </div>
-                          )}
-                        </SelectContent>
-                      </Select>
+                        placeholder="Handheld"
+                        className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900"
+                        required
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.dialogs.form.mappingLabel}
+                    <div className="space-y-1.5">
+                      <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
+                        Mapping
                       </Label>
                       <Select
                         value={formData.aisle_mapping}
@@ -320,8 +339,8 @@ export const HSTMaster = () => {
                           setFormData({ ...formData, aisle_mapping: v })
                         }
                       >
-                        <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                          <SelectValue placeholder="Select Mapping" />
+                        <SelectTrigger className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900 shadow-none">
+                          <SelectValue placeholder="Mapping" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="Single">Single</SelectItem>
@@ -330,16 +349,46 @@ export const HSTMaster = () => {
                       </Select>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-3 pt-4">
+
+                  <div className="pt-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-[1px] flex-1 bg-slate-100"></div>
+                      <h3 className="caption-small !text-slate-900 font-black uppercase tracking-wider text-[10px]">
+                        Facility Mapping (Layers)
+                      </h3>
+                      <div className="h-[1px] flex-1 bg-slate-100"></div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+                      {[1, 2, 3, 4, 5, 6].map((num) => (
+                        <div key={num} className="space-y-1.5">
+                          <Label className="caption-small !text-slate-600 uppercase text-[10px] font-black tracking-tight">
+                            Layer {num}
+                          </Label>
+                          <Input
+                            value={(formData as any)[`layer${num}`]}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                [`layer${num}`]: e.target.value,
+                              })
+                            }
+                            placeholder={`Level ${num}`}
+                            className="rounded-xl h-10 bg-slate-50 border-slate-200 body-strong !text-slate-900 font-mono"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
                     <Button
                       variant="ghost"
-                      className="rounded-xl h-11 px-6 body-strong text-slate-500"
+                      className="rounded-xl h-11 px-8 body-strong text-slate-500"
                       onClick={() => setOpen(false)}
                     >
                       {config.strings.dialogs.form.cancel}
                     </Button>
                     <Button
-                      className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-8 body-strong text-white shadow-lg shadow-blue-100 h-11"
+                      className="rounded-xl h-11 bg-blue-600 hover:bg-blue-700 px-10 body-strong text-white shadow-lg shadow-blue-100 transition-all font-black uppercase tracking-wider text-xs"
                       onClick={handleSubmit}
                       disabled={loading}
                     >
@@ -359,7 +408,7 @@ export const HSTMaster = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-md relative min-h-[400px] rounded-2xl overflow-hidden bg-white">
+      <Card className="border-0 shadow-md relative rounded-2xl overflow-hidden bg-white">
         {loading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
             <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
@@ -439,7 +488,16 @@ export const HSTMaster = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2 text-left">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                          onClick={() => handleView(d.id)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+
                         <Button
                           size="icon"
                           variant="ghost"

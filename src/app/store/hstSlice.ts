@@ -20,6 +20,7 @@ interface HSTType {
 
 interface HSTState {
   data: HSTDevice[];
+  currentHST: HSTDevice | null;
   unassigned: HSTDevice[];
   types: HSTType[];
   loading: boolean;
@@ -29,6 +30,7 @@ interface HSTState {
 
 const initialState: HSTState = {
   data: [],
+  currentHST: null,
   unassigned: [],
   types: [],
   loading: false,
@@ -57,6 +59,13 @@ const hstSlice = createSlice({
       state.loading = false;
       state.types = action.payload;
     },
+    hstDetailSuccess: (state, action: PayloadAction<HSTDevice>) => {
+      state.loading = false;
+      state.currentHST = action.payload;
+    },
+    clearCurrentHST: (state) => {
+      state.currentHST = null;
+    },
     hstLoadFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
       state.error = action.payload;
@@ -65,7 +74,7 @@ const hstSlice = createSlice({
 });
 
 export const { 
-  hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure 
+  hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure, hstDetailSuccess, clearCurrentHST
 } = hstSlice.actions;
 
 export default hstSlice.reducer;

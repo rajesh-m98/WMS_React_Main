@@ -3,6 +3,7 @@ import { DispatchHistoryDTO } from '@/core/models/dispatch.model';
 
 interface DispatchState {
   data: DispatchHistoryDTO[];
+  currentDetail: DispatchHistoryDTO | null;
   loading: boolean;
   totalCount: number;
   error: string | null;
@@ -17,6 +18,7 @@ interface DispatchState {
 
 const initialState: DispatchState = {
   data: [],
+  currentDetail: null,
   loading: false,
   totalCount: 0,
   error: null,
@@ -42,6 +44,10 @@ const dispatchSlice = createSlice({
       state.data = action.payload.data;
       state.totalCount = action.payload.total;
     },
+    dispatchDetailSuccess: (state, action: PayloadAction<DispatchHistoryDTO>) => {
+      state.loading = false;
+      state.currentDetail = action.payload;
+    },
     dispatchLoadFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
       state.error = action.payload;
@@ -51,6 +57,7 @@ const dispatchSlice = createSlice({
     },
     clearDispatchData: (state) => {
       state.data = [];
+      state.currentDetail = null;
       state.totalCount = 0;
       state.error = null;
     },
@@ -60,6 +67,7 @@ const dispatchSlice = createSlice({
 export const { 
   dispatchLoadStart, 
   dispatchLoadSuccess, 
+  dispatchDetailSuccess,
   dispatchLoadFailure, 
   setDispatchFilters, 
   clearDispatchData 

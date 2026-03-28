@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui";
@@ -46,6 +47,7 @@ import { Label } from "@/components/ui";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   handleFetchAllWarehouses,
+  handleGetWarehouseById,
   handleCreateWarehouse,
   handleDeleteWarehouse,
   handleRefreshWarehouse,
@@ -55,19 +57,30 @@ import config from "./WarehouseConfig.json";
 
 export const WarehouseMaster = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { data: warehouses, loading } = useAppSelector(
     (state) => state.warehouse,
   );
 
-  const [viewingWarehouse, setViewingWarehouse] = useState<any | null>(null);
-  const [editingWarehouse, setEditingWarehouse] = useState<any | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [loadingAction, setLoadingAction] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingWarehouse, setEditingWarehouse] = useState<any | null>(null);
+
+  const { totalCount } = useAppSelector((state) => state.warehouse);
 
   useEffect(() => {
-    dispatch(handleFetchAllWarehouses());
-  }, [dispatch]);
+    dispatch(
+      handleFetchAllWarehouses({ page, size: pageSize, is_paginate: true }),
+    );
+  }, [dispatch, page]);
+
+  const handleView = (id: number) => {
+    navigate(`/masters/warehouses/${id}?type=warehouse`);
+  };
 
   const filtered = warehouses.filter(
     (wh: any) =>
@@ -116,7 +129,7 @@ export const WarehouseMaster = () => {
     };
 
     const success = await dispatch(
-      handleCreateWarehouse(warehouseData, editingWarehouse?.id || 1),
+      handleCreateWarehouse(warehouseData, editingWarehouse?.id),
     );
     if (success) {
       toast.success(
@@ -124,6 +137,9 @@ export const WarehouseMaster = () => {
       );
       setIsFormOpen(false);
       setEditingWarehouse(null);
+      dispatch(
+        handleFetchAllWarehouses({ page, size: pageSize, is_paginate: true }),
+      );
     }
     setLoadingAction(false);
   };
@@ -163,162 +179,203 @@ export const WarehouseMaster = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="rounded-xl bg-slate-900 hover:bg-black h-12 px-6 body-strong text-white flex items-center gap-2 shadow-lg shadow-slate-100 transition-all active:scale-95">
+                <Button className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-8 body-strong text-white flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95">
                   <Plus className="icon-sm" /> {config.strings.addWarehouseBtn}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-3xl rounded-2xl p-0 overflow-hidden border-0 shadow-2xl animate-in zoom-in-95 max-h-[90vh] flex flex-col">
-                <div className="bg-slate-900 p-6 text-white text-center shrink-0">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center mx-auto mb-3 border border-blue-500/30">
-                    <Building2 className="h-6 w-6 text-blue-400" />
-                  </div>
-                  <DialogHeader>
-                    <DialogTitle className="body-strong !text-white !text-xl text-center w-full">
-                      {editingWarehouse
-                        ? config.strings.form.editTitle
-                        : config.strings.form.addTitle}
-                    </DialogTitle>
-                    <p className="caption-small !text-slate-400 !text-center pt-1">
-                      {config.strings.form.subtitle.toUpperCase()}
-                    </p>
-                  </DialogHeader>
-                </div>
-                <div className="overflow-y-auto p-8 bg-white custom-scrollbar">
-                  <form
-                    onSubmit={handleSubmit}
-                    className="grid grid-cols-2 gap-6"
-                  >
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.form.codeLabel}
-                      </Label>
-                      <Input
-                        name="warehouse_code"
-                        defaultValue={editingWarehouse?.warehouse_code}
-                        placeholder={config.strings.form.codePlaceholder}
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                        required
-                      />
+              <DialogContent className="max-w-6xl p-0 overflow-hidden border-0 shadow-3xl bg-white rounded-[2.5rem]">
+                <DialogHeader className="p-8 bg-slate-900 text-white relative overflow-hidden shrink-0">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl" />
+                  <DialogTitle className="text-3xl font-black tracking-tighter flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                      <Building2 className="icon-base text-white" />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.form.nameLabel}
-                      </Label>
-                      <Input
-                        name="warehouse_name"
-                        defaultValue={editingWarehouse?.warehouse_name}
-                        placeholder={config.strings.form.namePlaceholder}
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        Street Address
-                      </Label>
-                      <Input
-                        name="street"
-                        defaultValue={editingWarehouse?.street}
-                        placeholder="Street details..."
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        City
-                      </Label>
-                      <Input
-                        name="city"
-                        defaultValue={editingWarehouse?.city}
-                        placeholder="City name..."
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        State
-                      </Label>
-                      <Input
-                        name="state"
-                        defaultValue={editingWarehouse?.state}
-                        placeholder="State code (e.g. TN)..."
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        Zip Code
-                      </Label>
-                      <Input
-                        name="zipcode"
-                        defaultValue={editingWarehouse?.zipcode}
-                        placeholder="Postal code..."
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.form.gstLabel}
-                      </Label>
-                      <Input
-                        name="gstnumber"
-                        defaultValue={editingWarehouse?.gstnumber}
-                        placeholder={config.strings.form.gstPlaceholder}
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        {config.strings.form.bplLabel} (ID)
-                      </Label>
-                      <Input
-                        name="bplid"
-                        defaultValue={editingWarehouse?.bplid}
-                        placeholder={config.strings.form.bplPlaceholder}
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        BPL Name
-                      </Label>
-                      <Input
-                        name="bplname"
-                        defaultValue={editingWarehouse?.bplname}
-                        placeholder="System BPL Name..."
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="caption-small !text-slate-400">
-                        Inactive (Y/N)
-                      </Label>
-                      <Input
-                        name="inactive"
-                        defaultValue={editingWarehouse?.inactive || "N"}
-                        placeholder="N"
-                        className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                      />
+                    {editingWarehouse
+                      ? config.strings.form.editTitle
+                      : config.strings.form.addTitle}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="p-10 bg-white overflow-y-auto max-h-[70vh]">
+                  <form onSubmit={handleSubmit} className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {/* Section 1: Core Identification */}
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                          <div className="h-6 w-1 bg-blue-600 rounded-full" />
+                          <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-lg">
+                            Core Identity
+                          </h3>
+                        </div>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              Warehouse Code
+                            </Label>
+                            <Input
+                              name="warehouse_code"
+                              defaultValue={editingWarehouse?.warehouse_code}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900 focus:bg-white transition-all font-mono"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              Warehouse Name
+                            </Label>
+                            <Input
+                              name="warehouse_name"
+                              defaultValue={editingWarehouse?.warehouse_name}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900 focus:bg-white transition-all"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              Status
+                            </Label>
+                            <Input
+                              name="inactive"
+                              defaultValue={editingWarehouse?.inactive || "N"}
+                              placeholder="N = Active, Y = Inactive"
+                              maxLength={1}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900 focus:bg-white transition-all text-center"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 2: Precise Location */}
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                          <div className="h-6 w-1 bg-indigo-600 rounded-full" />
+                          <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-lg">
+                            Location Details
+                          </h3>
+                        </div>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              Street / Area
+                            </Label>
+                            <Input
+                              name="street"
+                              defaultValue={editingWarehouse?.street}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                City
+                              </Label>
+                              <Input
+                                name="city"
+                                defaultValue={editingWarehouse?.city}
+                                className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                Zipcode
+                              </Label>
+                              <Input
+                                name="zipcode"
+                                defaultValue={editingWarehouse?.zipcode}
+                                className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                State
+                              </Label>
+                              <Input
+                                name="state"
+                                defaultValue={editingWarehouse?.state}
+                                className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                Country
+                              </Label>
+                              <Input
+                                name="country"
+                                defaultValue={
+                                  editingWarehouse?.country || "India"
+                                }
+                                className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 3: Technical & GST */}
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                          <div className="h-6 w-1 bg-emerald-600 rounded-full" />
+                          <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-lg">
+                            Technical Scope
+                          </h3>
+                        </div>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              GST Number
+                            </Label>
+                            <Input
+                              name="gstnumber"
+                              defaultValue={editingWarehouse?.gstnumber}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono tracking-wider transition-all focus:bg-white"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              BPL Name
+                            </Label>
+                            <Input
+                              name="bplname"
+                              defaultValue={editingWarehouse?.bplname}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                              BPL ID
+                            </Label>
+                            <Input
+                              name="bplid"
+                              defaultValue={editingWarehouse?.bplid}
+                              className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono italic"
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="col-span-2 flex justify-end gap-3 pt-6 border-t mt-4 shrink-0">
+                    <div className="flex justify-end gap-3 pt-8 border-t border-slate-100">
                       <Button
                         type="button"
-                        variant="ghost"
-                        className="rounded-xl body-strong text-slate-500 h-11 px-8"
+                        variant="outline"
+                        className="rounded-xl h-12 px-8 border-2 border-slate-200 body-strong text-slate-600 hover:bg-slate-50 transition-all"
                         onClick={() => setIsFormOpen(false)}
                       >
-                        {config.strings.form.cancelBtn}
+                        Cancel
                       </Button>
                       <Button
                         type="submit"
-                        className="rounded-xl bg-slate-900 hover:bg-black px-10 body-strong h-11 text-white shadow-lg flex items-center gap-2"
+                        className="rounded-xl bg-blue-600 hover:bg-slate-900 text-white px-12 h-12 body-strong transition-all shadow-xl shadow-blue-100 active:scale-95 flex items-center gap-2"
                         disabled={loadingAction}
                       >
                         {loadingAction && (
                           <Loader2 className="icon-sm animate-spin" />
                         )}
-                        {config.strings.form.submitBtn}
+                        {editingWarehouse
+                          ? "Commit Sync"
+                          : "Initialize Facility"}
                       </Button>
                     </div>
                   </form>
@@ -329,211 +386,183 @@ export const WarehouseMaster = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-md rounded-2xl overflow-hidden bg-white relative min-h-[400px]">
-        {loading && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-          </div>
-        )}
-        <CardContent className="p-0 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
-          <Table className="min-w-[1200px]">
-            <TableHeader>
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b">
-                <TableHead className="table-header-font pl-6 h-12">
-                  {config.strings.table.identification}
-                </TableHead>
-                <TableHead className="table-header-font h-12">
-                  {config.strings.table.location}
-                </TableHead>
-                <TableHead className="table-header-font h-12">
-                  {config.strings.table.gstBpl}
-                </TableHead>
-                <TableHead className="table-header-font h-12">
-                  Address Info
-                </TableHead>
-                <TableHead className="table-header-font h-12">
-                  {config.strings.table.status}
-                </TableHead>
-                <TableHead className="table-header-font h-12 text-right pr-6">
-                  {config.strings.table.manage}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 && !loading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="h-60 text-center text-slate-400 font-medium italic"
-                  >
-                    {config.strings.noFacilities}
-                  </TableCell>
+      <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
+            <Table className="w-full">
+              <TableHeader>
+                <TableRow className="bg-slate-50/80 border-b border-slate-200 hover:bg-slate-50/80">
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[80px]">
+                    SL NO
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap">
+                    WAREHOUSE NAME
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[200px]">
+                    WAREHOUSE CODE
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[250px]">
+                    GST NUMBER
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap text-right w-[150px]">
+                    ACTIONS
+                  </TableHead>
                 </TableRow>
-              ) : (
-                filtered.map((wh: any) => (
-                  <TableRow
-                    key={wh.id}
-                    className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all body-strong"
-                  >
-                    <TableCell className="pl-6 h-16">
-                      <p className="body-strong !text-slate-900 leading-tight">
-                        {wh.warehouse_name}
-                      </p>
-                      <p className="label-bold !text-blue-600 !tracking-normal">
-                        ID: {wh.id} | CODE: {wh.warehouse_code}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <MapPin className="icon-sm text-slate-300" />
-                        <span className="caption-small">
-                          {wh.city || "—"}, {wh.state || "—"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <p className="caption-small !text-[10px] !text-slate-400 uppercase leading-none mb-1">
-                        GST: {wh.gstnumber || "N/A"}
-                      </p>
-                      <p className="caption-small !text-[10px] !text-slate-400 uppercase leading-none">
-                        BPL: {wh.bplid || "N/A"}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <p className="label-bold !text-slate-500 truncate max-w-[150px] leading-snug">
-                        {wh.street || "No street provided"}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`rounded-xl px-3 py-1 border-0 body-strong ${wh.inactive === "N" ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700" : "bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700"}`}
-                      >
-                        {wh.inactive === "N" ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                          onClick={() => {
-                            setViewingWarehouse(wh);
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                          onClick={() => {
-                            setEditingWarehouse(wh);
-                            setIsFormOpen(true);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
-                            <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
-                              <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
-                              <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
-                                {config.strings.deleteDialog.title}
-                              </AlertDialogTitle>
-                            </div>
-                            <div className="p-10 text-center flex flex-col items-center">
-                              <AlertDialogHeader>
-                                <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
-                                  {config.strings.deleteDialog.descriptionTemplate.replace(
-                                    "{name}",
-                                    wh.warehouse_name,
-                                  )}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <div className="flex gap-4 w-full mt-10">
-                                <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
-                                  {config.strings.deleteDialog.cancelBtn}
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
-                                  onClick={() => handleDelete(wh.id)}
-                                >
-                                  {config.strings.deleteDialog.confirmBtn}
-                                </AlertDialogAction>
-                              </div>
-                            </div>
-                          </AlertDialogContent>
-                        </AlertDialog>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-40 text-center">
+                      <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="icon-xl text-blue-600 animate-spin" />
+                        <p className="caption-small !text-slate-400">
+                          Syncing Facilities...
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-40 text-center text-slate-400 font-bold uppercase tracking-widest"
+                    >
+                      No Facilities Match Search
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filtered.map((wh: any) => (
+                    <TableRow
+                      key={wh.id}
+                      className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-bold"
+                    >
+                      <TableCell className="px-5 py-4 text-[11px] font-mono text-black text-center">
+                        {wh.id}
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight">
+                        {wh.warehouse_name}
+                      </TableCell>
+                      <TableCell className="px-5 py-4 font-mono text-[12px] font-bold text-blue-600 whitespace-nowrap uppercase tracking-widest">
+                        {wh.warehouse_code}
+                      </TableCell>
+                      <TableCell className="px-5 py-4">
+                        <Badge
+                          variant="outline"
+                          className="rounded-lg border border-slate-200 bg-white font-mono text-[11px] font-bold px-3 py-1 text-slate-600 shadow-sm whitespace-nowrap uppercase"
+                        >
+                          {wh.gstnumber || "—"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right px-5 py-4">
+                        <div className="flex items-center justify-end gap-2 text-left transition-all">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            onClick={() => handleView(wh.id)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            onClick={() => {
+                              setEditingWarehouse(wh);
+                              setIsFormOpen(true);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                              <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                                <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                                <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
+                                  {config.strings.deleteDialog.title}
+                                </AlertDialogTitle>
+                              </div>
+                              <div className="p-10 text-center flex flex-col items-center">
+                                <AlertDialogHeader className="flex flex-col items-center">
+                                  <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto text-center">
+                                    {config.strings.deleteDialog.descriptionTemplate.replace(
+                                      "{name}",
+                                      wh.warehouse_name,
+                                    )}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="flex gap-4 w-full mt-10">
+                                  <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
+                                    {config.strings.deleteDialog.cancelBtn}
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
+                                    onClick={() => handleDelete(wh.id)}
+                                  >
+                                    {config.strings.deleteDialog.confirmBtn}
+                                  </AlertDialogAction>
+                                </div>
+                              </div>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">
+                {config.strings.totalFacilities}
+              </span>
+              <span className="h-4 w-[2px] bg-slate-200 rounded-full mx-1" />
+              <span className="text-sm font-black text-slate-900 tabular-nums">
+                {totalCount}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="h-12 border-2 border-slate-100 body-strong px-4 rounded-xl disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === 1 || loading}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </Button>
+              <div className="flex items-center gap-2 px-4">
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                  Page
+                </span>
+                <span className="h-10 w-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-lg shadow-blue-100">
+                  {page}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                className="h-12 border-2 border-slate-100 body-strong px-4 rounded-xl disabled:opacity-30 transition-all active:scale-95"
+                disabled={warehouses.length < pageSize || loading}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next Page
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
-
-      {/* Detail Viewer Dialog (Secondary View) */}
-      <Dialog
-        open={!!viewingWarehouse}
-        onOpenChange={() => setViewingWarehouse(null)}
-      >
-        <DialogContent className="max-w-md rounded-2xl p-0 border-0 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
-          <div className="h-32 bg-slate-900 relative flex items-center justify-center">
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#2563eb_1px,transparent_1px)] [background-size:16px_16px]" />
-            <Building2 className="h-12 w-12 text-blue-500 relative" />
-          </div>
-          <div className="p-8 text-center -mt-6">
-            <div className="inline-block bg-white p-2 rounded-2xl shadow-xl border border-slate-50 mb-4">
-              <Fingerprint className="h-8 w-8 text-slate-900" />
-            </div>
-            <h2 className="text-2xl font-black text-slate-900 leading-none mb-2">
-              {viewingWarehouse?.warehouse_name}
-            </h2>
-            <p className="text-xs font-black text-blue-600 uppercase tracking-widest">
-              {viewingWarehouse?.warehouse_code}
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 mt-8 pb-4">
-              <div className="bg-slate-50 p-4 rounded-2xl text-left border border-slate-100">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                  {config.strings.detailView.gstLabel}
-                </p>
-                <p className="text-sm font-bold text-slate-700">
-                  {viewingWarehouse?.gstnumber || "—"}
-                </p>
-              </div>
-              <div className="bg-slate-50 p-4 rounded-2xl text-left border border-slate-100">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                  {config.strings.detailView.bplLabel} (ID)
-                </p>
-                <p className="text-sm font-bold text-slate-700">
-                  {viewingWarehouse?.bplid || "—"}
-                </p>
-              </div>
-            </div>
-
-            <Button
-              className="w-full h-12 rounded-xl bg-slate-900 font-bold mt-4 shadow-lg active:scale-[0.98] transition-all"
-              onClick={() => setViewingWarehouse(null)}
-            >
-              {config.strings.detailView.dismissBtn}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

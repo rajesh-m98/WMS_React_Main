@@ -16,8 +16,11 @@ import { ItemMaster } from "./pages/Masters/ItemMaster/page";
 import { LocationMaster } from "./pages/Masters/BinMaster/page";
 import { HSTMaster } from "./pages/Masters/HSTMaster/page";
 import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
+import MasterDetail from "./pages/Masters/MasterDetail";
 import SettingsPage from "./pages/SettingsPage";
 import { DispatchHistory } from "./pages/DispatchHistory/DispatchHistory";
+import { InwardHistory } from "./pages/Transactions/InwardHistory";
+import { OutwardHistory } from "./pages/Transactions/OutwardHistory";
 import { Login } from "./pages/Login/page";
 import NotFound from "./pages/NotFound";
 
@@ -56,6 +59,14 @@ const App = () => (
                       path="/transactions/dispatch-history"
                       element={<DispatchHistory />}
                     />
+                    <Route
+                      path="/transactions/inward-history"
+                      element={<InwardHistory />}
+                    />
+                    <Route
+                      path="/transactions/outward-history"
+                      element={<OutwardHistory />}
+                    />
                     <Route path="/masters/users" element={<UserManagement />} />
                     <Route
                       path="/masters/users/create"
@@ -67,11 +78,17 @@ const App = () => (
                       element={<UserEdit />}
                     />
                     <Route path="/masters/items" element={<ItemMaster />} />
+                    <Route path="/masters/items/:id" element={<MasterDetail />} />
                     <Route path="/masters/bins" element={<LocationMaster />} />
                     <Route path="/masters/hst" element={<HSTMaster />} />
+                    <Route path="/masters/hst/:id" element={<MasterDetail />} />
                     <Route
                       path="/masters/warehouses"
                       element={<WarehouseMaster />}
+                    />
+                    <Route
+                      path="/masters/warehouses/:id"
+                      element={<MasterDetail />}
                     />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="*" element={<NotFound />} />

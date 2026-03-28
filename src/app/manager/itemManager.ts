@@ -1,7 +1,7 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
 import { 
-  itemLoadStart, itemLoadSuccess, itemLoadFailure 
+  itemLoadStart, itemLoadSuccess, itemLoadFailure, itemDetailSuccess 
 } from '../store/itemSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 import { ItemDTO } from '@/core/models/master.model';
@@ -26,7 +26,7 @@ export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: Ap
     });
     
     if (params?.warehouseid) {
-      queryParams.append('warehouseid', params.warehouseid.toString());
+      queryParams.append('warehouse_id', params.warehouseid.toString());
     }
     
     if (params?.search) {
@@ -36,9 +36,10 @@ export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: Ap
     const response = await api.get(`${API_ENDPOINTS.MASTERS.ITEMS.ALL}?${queryParams.toString()}`);
     
     if (response.data.status) {
+      const respData = response.data.data;
       dispatch(itemLoadSuccess({
-        data: response.data.data.items || [],
-        total: response.data.data.total || 0
+        data: respData.items || [],
+        total: respData.total || 0
       }));
       return true;
     } else {
@@ -51,18 +52,39 @@ export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: Ap
   }
 };
 
-export const handleCreateItem = (itemData: Partial<ItemDTO>, productId: number = 1) => async (dispatch: AppDispatch) => {
+export const handleFetchItemById = (itemId: number) => async (dispatch: AppDispatch) => {
+  try {
+    const response = await api.get<{ status: boolean; data: any; message?: string }>(`${API_ENDPOINTS.MASTERS.ITEMS.GET_BY_ID}?item_id=${itemId}`);
+    if (response.data.status) {
+      dispatch(itemDetailSuccess(response.data.data));
+      return response.data.data;
+    } else {
+      dispatch(itemLoadFailure(response.data.message || "Failed to fetch item details"));
+      return null;
+    }
+  } catch (err: any) {
+    dispatch(itemLoadFailure(err.message || "Error fetching item details"));
+    return null;
+  }
+};
+
+export const handleCreateItem = (itemData: Partial<ItemDTO>, editId?: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(itemLoadStart());
-    const response = await api.post(`${API_ENDPOINTS.MASTERS.ITEMS.CREATE}?product_id=${productId}`, itemData);
+    const url = editId 
+      ? `${API_ENDPOINTS.MASTERS.ITEMS.CREATE}?item_id=${editId}`
+      : API_ENDPOINTS.MASTERS.ITEMS.CREATE;
+
+    const response = await api.post(url, itemData);
     if (response.data.status) {
       return true;
     } else {
-      dispatch(itemLoadFailure(response.data.message || "Failed to process item"));
+      dispatch(itemLoadFailure(response.data.message || (editId ? "Failed to update item" : "Failed to create item")));
       return false;
     }
   } catch (err: any) {
-    dispatch(itemLoadFailure(err.message || "Error processing item"));
+    const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || (editId ? "Error updating item" : "Error creating item");
+    dispatch(itemLoadFailure(errorMsg));
     return false;
   }
 };
@@ -70,7 +92,7 @@ export const handleCreateItem = (itemData: Partial<ItemDTO>, productId: number =
 export const handleDeleteItem = (id: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(itemLoadStart());
-    const response = await api.delete(`${API_ENDPOINTS.MASTERS.ITEMS.DELETE}?product_id=${id}`);
+    const response = await api.delete(`${API_ENDPOINTS.MASTERS.ITEMS.DELETE}?item_id=${id}`);
     if (response.data.status) {
       return true;
     } else {

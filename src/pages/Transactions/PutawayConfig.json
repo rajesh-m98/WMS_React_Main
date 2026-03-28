@@ -1,0 +1,42 @@
+{
+  "strings": {
+    "inwardTitle": "Inward Putaway History",
+    "outwardTitle": "Outward Putaway History",
+    "searchPlaceholder": "Search by Doc Number, Item, or Partner...",
+    "noRecords": "No Putaway Records Found",
+    "totalRecords": "Total Records",
+    "insightTitle": "Putaway Insight",
+    "insightSub": "System Transaction Detail",
+    "table": {
+      "id": "SL NO",
+      "docNo": "DOC NUMBER",
+      "warehouse": "WAREHOUSE",
+      "partner": "PARTNER",
+      "docDate": "DOC DATE",
+      "itemCode": "ITEM CODE",
+      "batch": "BATCH NUMBER",
+      "qty": "QUANTITY",
+      "status": "STATUS",
+      "actions": "ACTIONS"
+    },
+    "details": {
+      "core": "CORE TRANSACTION DETAILS",
+      "logistics": "LOGISTICS & HIERARCHY",
+      "docEntry": "Doc Entry",
+      "cardCode": "Card Code",
+      "cardName": "Card Name",
+      "warehouse": "Warehouse",
+      "itemCode": "Item Code",
+      "batch": "Batch No",
+      "docDate": "Doc Date",
+      "quantity": "Quantity",
+      "type": "Type",
+      "status": "Status",
+      "docNum": "Doc Num",
+      "branch": "Branch",
+      "sysNum": "Sys Number",
+      "deviceId": "Device ID",
+      "userId": "User ID"
+    }
+  }
+}

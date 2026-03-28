@@ -5,7 +5,6 @@
     "allUsers": "All Users",
     "active": "Active",
     "inactive": "Inactive",
-    "importBtn": "Import Excel",
     "addUserBtn": "Add New User",
     "noUsersFound": "No users registered in the system.",
     "noResultsFound": "No users found matching your current search or filters.",
@@ -21,12 +20,13 @@
       "confirmBtn": "Yes, Delete"
     },
     "table": {
-      "id": "User ID",
+      "id": "S.No",
+      "userId": "User ID",
+      "employeeId": "Emp ID",
+      "fullName": "Full Name",
       "username": "Username",
-      "contact": "Email/Mobile",
       "role": "Role",
-      "device": "Device",
-      "outlet": "Outlet",
+      "department": "Department",
       "status": "Status",
       "actions": "Actions"
     },
@@ -86,14 +86,14 @@
       "cancelBtn": "Cancel"
     },
     "permissions": [
-      "Transactions",
-      "Master Data",
-      "HST Management",
-      "Bin Management",
-      "Item Management",
-      "Warehouse Management",
-      "Reports",
-      "Settings"
+      { "label": "Live Dashboard", "key": "dashboard" },
+      { "label": "Stock Inventory", "key": "inventory" },
+      { "label": "Orders & Dispatch", "key": "orders" },
+      { "label": "Stock Updates", "key": "stock_update" },
+      { "label": "System Reports", "key": "reports" },
+      { "label": "Master Records", "key": "master_data" },
+      { "label": "User Management", "key": "user_management" },
+      { "label": "System Settings", "key": "settings" }
     ]
   }
 }

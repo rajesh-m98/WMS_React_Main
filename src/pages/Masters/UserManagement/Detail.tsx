@@ -92,10 +92,10 @@ const UserDetail = () => {
           </div>
         </div>
         <Button
-          className="bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-300 rounded-xl px-6 body-strong shadow-lg shadow-slate-200 transition-all active:scale-95"
-          onClick={() => navigate(`/masters/users/${id}/edit`)}
+          className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 rounded-xl px-6 body-strong transition-all active:scale-95"
+          onClick={() => setShowPermissions(true)}
         >
-          <Pencil className="icon-sm mr-2" /> {strings.editBtn}
+          <ShieldCheck className="icon-sm mr-2" /> View Permissions
         </Button>
       </div>
 
@@ -114,7 +114,7 @@ const UserDetail = () => {
                   {strings.labels.fullName}
                 </p>
                 <p className="body-strong !text-slate-800 uppercase leading-tight">
-                  {user.username}
+                  {user.firstname} {user.lastname}
                 </p>
               </div>
               <div className="space-y-1.5">
@@ -122,8 +122,7 @@ const UserDetail = () => {
                   {strings.labels.email}
                 </p>
                 <p className="body-strong !text-slate-800 flex items-center gap-3 decoration-blue-500/30 underline-offset-4">
-                  <Mail className="icon-sm text-blue-500" />{" "}
-                  {user.email_id || "-"}
+                  <Mail className="icon-sm text-blue-500" /> {user.email || "-"}
                 </p>
               </div>
               <div className="space-y-1.5">
@@ -137,11 +136,11 @@ const UserDetail = () => {
               </div>
               <div className="space-y-1.5">
                 <p className="label-bold !text-slate-400 tracking-widest">
-                  {strings.labels.joined}
+                  Department
                 </p>
                 <p className="body-strong !text-slate-800 flex items-center gap-3 uppercase">
-                  <Clock className="icon-sm text-slate-400" />{" "}
-                  {new Date(user.created_at || "").toLocaleDateString()}
+                  <Building2 className="icon-sm text-slate-400" />{" "}
+                  {user.department || "-"}
                 </p>
               </div>
               <div className="space-y-1.5">
@@ -150,11 +149,11 @@ const UserDetail = () => {
                 </p>
                 <div className="flex pt-1">
                   {Number(user.role) === 2 ? (
-                    <Badge className="bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100 hover:text-purple-800 transition-colors px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tight">
+                    <Badge className="bg-purple-100 text-purple-700 border-purple-100 hover:bg-purple-200 hover:text-purple-800 transition-colors px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tight">
                       Super User
                     </Badge>
                   ) : (
-                    <Badge className="bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100 hover:text-blue-800 transition-colors px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tight">
+                    <Badge className="bg-blue-100 text-blue-700 border-blue-100 hover:bg-blue-200 hover:text-blue-800 transition-colors px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tight">
                       Operator
                     </Badge>
                   )}
@@ -167,8 +166,8 @@ const UserDetail = () => {
                 <div className="flex pt-1">
                   <Badge
                     className={`px-4 py-1 rounded-full border-0 text-[10px] font-black transition-colors uppercase tracking-tight ${
-                      user.status === "Active"
-                        ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700"
+                      user.status?.toLowerCase() === "active"
+                        ? "bg-emerald-100 text-emerald-700"
                         : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600"
                     }`}
                   >
@@ -178,22 +177,20 @@ const UserDetail = () => {
               </div>
               <div className="space-y-1.5">
                 <p className="label-bold !text-slate-400 tracking-widest">
-                  {strings.labels.identity || "Identity"}
+                  Emp ID
                 </p>
                 <p className="body-strong !text-slate-800 flex items-center gap-3 uppercase">
                   <ShieldCheck className="icon-sm text-slate-400" />{" "}
-                  {user.userid || "-"}
+                  {user.employee_id || "-"}
                 </p>
               </div>
               <div className="space-y-1.5">
                 <p className="label-bold !text-slate-400 tracking-widest">
-                  {strings.labels.updated || "Last Update"}
+                  Username
                 </p>
                 <p className="body-strong !text-slate-800 flex items-center gap-3 uppercase">
-                  <Clock className="icon-sm text-slate-400" />{" "}
-                  {user.updated_at
-                    ? new Date(user.updated_at).toLocaleDateString()
-                    : "-"}
+                  <UserIcon className="icon-sm text-slate-400" />{" "}
+                  {user.username || "-"}
                 </p>
               </div>
             </CardContent>
@@ -209,87 +206,85 @@ const UserDetail = () => {
                 {strings.workplaceSection || "Workplace & Access"}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 flex-grow flex flex-col">
-              {/* Workplace Details Section */}
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="space-y-3">
-                  <p className="label-bold !text-slate-400 tracking-widest">
+            <CardContent className="p-6 flex-grow flex flex-col space-y-8">
+              {/* Primary Facility Info */}
+              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                <div className="space-y-1.5">
+                  <p className="label-bold !text-slate-400 tracking-widest uppercase">
                     {strings.labels.warehouse}
                   </p>
-                  <div className="space-y-1.5">
-                    <p className="body-strong !text-slate-800 uppercase leading-none">
+                  <div className="space-y-1">
+                    <p className="body-strong !text-slate-800 uppercase text-sm">
                       {user.db_warehouse?.warehouse_name || "Not Assigned"}
                     </p>
-                    <p className="caption-small text-blue-600 bg-blue-50/50 inline-block px-3 py-1 rounded border border-blue-100 tracking-tighter">
-                      CODE: {user.db_warehouse?.warehouse_code || "-"}
+                    <p className="caption-small text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 inline-block">
+                      {user.db_warehouse?.warehouse_code || "-"}
                     </p>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <p className="label-bold !text-slate-400 tracking-widest">
-                    {strings.labels.device}
+                <div className="space-y-1.5 text-right">
+                  <p className="label-bold !text-slate-400 tracking-widest uppercase">
+                    Reporting Manager
                   </p>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 shadow-sm border border-blue-100/50">
-                      <Smartphone className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <p className="body-strong !text-slate-800 uppercase leading-none">
-                        {user.db_device?.device_type || "No Device"}
-                      </p>
-                      <p className="caption-small !text-slate-400 tracking-widest leading-none">
-                        SN: {user.db_device?.device_serial_number || "-"}
-                      </p>
-                    </div>
-                  </div>
+                  <p className="body-strong !text-slate-800 uppercase text-sm">
+                    {user.reportingmanager || "No Manager"}
+                  </p>
+                  <p className="caption-small !text-slate-400">
+                    Outlet: {user.outlet || "-"}
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <p className="label-bold !text-slate-400 tracking-widest uppercase">
+                    GST Number
+                  </p>
+                  <p className="body-strong !text-slate-800 text-sm">
+                    {user.db_warehouse?.gstnumber || "-"}
+                  </p>
+                </div>
+                <div className="space-y-1.5 text-right">
+                  <p className="label-bold !text-slate-400 tracking-widest uppercase">
+                    Branch Detail
+                  </p>
+                  <p className="body-strong !text-slate-800 uppercase text-sm">
+                    {user.db_warehouse?.bplname || "-"}
+                  </p>
+                  <p className="caption-small !text-slate-400">
+                    BPL ID: {user.db_warehouse?.bplid || "-"}
+                  </p>
                 </div>
               </div>
 
-              {/* Divider */}
-              <div className="relative mb-8">
-                <div
-                  className="absolute inset-0 flex items-center"
-                  aria-hidden="true"
-                >
-                  <div className="w-full border-t border-b-2 border-slate-200"></div>
+              {/* Address Section */}
+              <div className="p-5 rounded-[1.5rem] bg-slate-50 border border-slate-100 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-1 h-1 bg-blue-600 rounded-full" />
+                  <p className="label-bold text-slate-900 tracking-widest uppercase text-xs">
+                    Facility Location
+                  </p>
                 </div>
-                <div className="relative flex justify-start">
-                  <span className="bg-white pr-4 label-bold !text-slate-400 tracking-widest">
-                    {strings.quickActions}
-                  </span>
-                </div>
-              </div>
-
-              {/* Quick Actions Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50/50 border border-b-2 border-slate-200 group transition-all hover:bg-white hover:shadow-md hover:border-blue-100">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-500 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <span className="body-strong !text-slate-700 tracking-tight uppercase leading-none">
-                      {strings.actions.permissions}
-                    </span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="label-bold !text-slate-400 text-[10px] uppercase">
+                      Street / Area
+                    </p>
+                    <p className="text-[13px] font-bold text-slate-700 leading-snug">
+                      {user.db_warehouse?.location} <br />
+                      {user.db_warehouse?.street} <br />
+                      {user.db_warehouse?.block}
+                    </p>
                   </div>
-                  <button
-                    onClick={() => setShowPermissions(true)}
-                    className="caption-medium text-blue-600 transition-colors hover:text-blue-700"
-                  >
-                    {strings.actions.view}
-                  </button>
-                </div>
-                <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50/50 border border-b-2 border-slate-200 group transition-all hover:bg-white hover:shadow-md hover:border-blue-100">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-500 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
-                      <MailCheck className="w-5 h-5" />
-                    </div>
-                    <span className="body-strong !text-slate-700 tracking-tight uppercase leading-none">
-                      {strings.actions.resetPassword}
-                    </span>
+                  <div className="space-y-1 text-right">
+                    <p className="label-bold !text-slate-400 text-[10px] uppercase">
+                      City / ZIP
+                    </p>
+                    <p className="text-[13px] font-bold text-slate-700">
+                      {user.db_warehouse?.city} <br />
+                      {user.db_warehouse?.state} - {user.db_warehouse?.zipcode}
+                      <br />
+                      {user.db_warehouse?.country}
+                    </p>
                   </div>
-                  <button className="caption-medium text-blue-600 transition-colors hover:text-blue-700">
-                    {strings.actions.send}
-                  </button>
                 </div>
               </div>
             </CardContent>
@@ -299,47 +294,78 @@ const UserDetail = () => {
 
       {/* Permissions Modal */}
       <AlertDialog open={showPermissions} onOpenChange={setShowPermissions}>
-        <AlertDialogContent className="max-w-md rounded-2xl border-0 shadow-2xl p-0 overflow-hidden">
-          <AlertDialogHeader className="bg-slate-900 p-6 text-white text-left">
-            <AlertDialogTitle className="flex items-center gap-3 text-lg font-black uppercase tracking-tight">
-              <ListChecks className="h-6 w-6 text-blue-400" />
-              User Module Access
+        <AlertDialogContent className="max-w-xl rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+          <AlertDialogHeader className="bg-slate-900 p-8 text-white text-left relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
+            <AlertDialogTitle className="flex items-center gap-4 text-2xl font-black uppercase tracking-tight relative z-10">
+              <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-xl shadow-blue-500/20 transition-transform hover:scale-105">
+                <ListChecks className="h-6 w-6 text-white" />
+              </div>
+              Module Access Audit
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-1">
-              Currently assigned permissions for {user.username}
+            <AlertDialogDescription className="text-slate-400 text-[11px] font-black uppercase tracking-widest mt-2 ml-1 relative z-10">
+              Assigned Permissions Profile for:{" "}
+              <span className="text-blue-400">{user.username}</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <div className="p-6 bg-white overflow-y-auto max-h-[400px]">
-            <div className="grid grid-cols-1 gap-2">
-              {user.permission ? (
-                user.permission.split(",").map((perm, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100 group hover:border-blue-200 hover:bg-blue-50/30 transition-all"
-                  >
-                    <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                    <span className="text-sm font-black text-slate-700 uppercase tracking-tight">
-                      {perm.trim()}
-                    </span>
+          <div className="p-8 bg-white overflow-y-auto max-h-[500px] scrollbar-premium">
+            <div className="grid grid-cols-1 gap-8">
+              {user.permission && user.permission.length > 0 ? (
+                user.permission.map((perm, index) => (
+                  <div key={perm.id} className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Badge
+                        className={`px-4 py-1.5 rounded-full border-0 label-bold !tracking-widest capitalize ${
+                          perm.operation_type?.toLowerCase() === "write"
+                            ? "bg-rose-100 text-rose-600"
+                            : "bg-emerald-100 text-emerald-600"
+                        }`}
+                      >
+                        {perm.operation_type} Access
+                      </Badge>
+                      <div className="h-[2px] flex-1 bg-slate-50" />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {perm.operation_pages.map((page, pIdx) => (
+                        <div
+                          key={pIdx}
+                          className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50/50 border border-slate-100 group hover:border-blue-200 hover:bg-white hover:shadow-md transition-all duration-300"
+                        >
+                          <div
+                            className={`h-2 w-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] ${
+                              perm.operation_type?.toLowerCase() === "write"
+                                ? "bg-rose-500 shadow-rose-200"
+                                : "bg-blue-500 shadow-blue-200"
+                            }`}
+                          />
+                          <span className="text-xs font-black text-slate-700 uppercase tracking-tight">
+                            {page.replace(/_/g, " ")}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))
               ) : (
-                <p className="text-center py-10 text-slate-400 text-sm font-black uppercase tracking-widest">
-                  No permissions assigned
-                </p>
+                <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-30">
+                  <ShieldCheck className="h-20 w-20 text-slate-300" />
+                  <p className="text-center text-slate-400 text-sm font-black uppercase tracking-widest">
+                    No permissions assigned
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
-          <AlertDialogFooter className="p-4 bg-slate-50 border-t border-slate-100">
+          <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex gap-4">
             <AlertDialogAction
               onClick={() => setShowPermissions(false)}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-12 font-black uppercase tracking-widest shadow-lg active:scale-[0.98] transition-all"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-14 font-black uppercase tracking-widest shadow-xl shadow-slate-200 active:scale-[0.98] transition-all border-0"
             >
-              Close
+              close{" "}
             </AlertDialogAction>
-          </AlertDialogFooter>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>

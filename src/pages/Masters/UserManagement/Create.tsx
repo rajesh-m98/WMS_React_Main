@@ -36,83 +36,43 @@ const UserCreate = () => {
 
   const [formData, setFormData] = useState({
     userId: "",
-    fullName: "",
+    employee_id: "",
+    firstname: "",
+    lastname: "",
+    username: "",
     email: "",
+    mobile_number: "",
     role: "3", // Standard User
     password: "",
     device: "0",
     outlet: "1",
+    department: "",
     status: "Active",
   });
 
-  const [selectedPermissions, setSelectedPermissions] = useState<
-    Record<string, string[]>
-  >({});
+  const [readPages, setReadPages] = useState<string[]>([]);
+  const [writePages, setWritePages] = useState<string[]>([]);
 
-  const handlePermissionChange = (
-    module: string,
-    action: string,
-    checked: boolean,
-  ) => {
-    setSelectedPermissions((prev) => {
-      const current = prev[module] || [];
-      if (checked) {
-        if (current.includes(action)) return prev;
-        return { ...prev, [module]: [...current, action] };
-      } else {
-        if (!current.includes(action)) return prev;
-        return { ...prev, [module]: current.filter((a) => a !== action) };
-      }
-    });
-  };
-
-  const toggleColumn = (action: string) => {
-    const allSelectedInColumn = permissionsList.every((p) =>
-      (selectedPermissions[p] || []).includes(action),
-    );
-
-    setSelectedPermissions((prev) => {
-      const next = { ...prev };
-      permissionsList.forEach((p) => {
-        const current = next[p] || [];
-        if (allSelectedInColumn) {
-          next[p] = current.filter((a) => a !== action);
-        } else {
-          if (!current.includes(action)) {
-            next[p] = [...current, action];
-          }
-        }
-      });
-      return next;
-    });
-  };
-
-  const toggleRow = (module: string) => {
-    const actions = ["view", "create", "edit", "delete"];
-    const allSelectedInRow = actions.every((a) =>
-      (selectedPermissions[module] || []).includes(a),
-    );
-
-    setSelectedPermissions((prev) => ({
-      ...prev,
-      [module]: allSelectedInRow ? [] : actions,
-    }));
-  };
-
-  const toggleAll = () => {
-    const actions = ["view", "create", "edit", "delete"];
-    const isEverythingSelected = permissionsList.every((p) =>
-      actions.every((a) => (selectedPermissions[p] || []).includes(a)),
-    );
-
-    if (isEverythingSelected) {
-      setSelectedPermissions({});
+  const togglePermission = (page: string, type: "read" | "write") => {
+    if (type === "read") {
+      setReadPages((prev) =>
+        prev.includes(page) ? prev.filter((p) => p !== page) : [...prev, page],
+      );
     } else {
-      const all: Record<string, string[]> = {};
-      permissionsList.forEach((p) => {
-        all[p] = actions;
-      });
-      setSelectedPermissions(all);
+      setWritePages((prev) =>
+        prev.includes(page) ? prev.filter((p) => p !== page) : [...prev, page],
+      );
+    }
+  };
+
+  const toggleAll = (type: "read" | "write") => {
+    const list = type === "read" ? readPages : writePages;
+    const setter = type === "read" ? setReadPages : setWritePages;
+
+    if (list.length === permissionsList.length) {
+      setter([]);
+    } else {
+      setter(permissionsList.map((p: any) => p.key));
     }
   };
 
@@ -120,23 +80,37 @@ const UserCreate = () => {
     e.preventDefault();
     setLoading(true);
 
-    const permissionString = Object.entries(selectedPermissions)
-      .map(([mod, acts]) => `${mod}:[${acts.join(",")}]`)
-      .join(";");
+    const permission = [];
+    if (readPages.length > 0) {
+      permission.push({
+        operation_type: "read",
+        operation_pages: readPages,
+      });
+    }
+    if (writePages.length > 0) {
+      permission.push({
+        operation_type: "write",
+        operation_pages: writePages,
+      });
+    }
 
     const payload = {
       companyid: 1,
       warehouse_id: Number(formData.outlet),
       userid: formData.userId,
-      username: formData.fullName,
+      employee_id: formData.employee_id,
+      firstname: formData.firstname,
+      lastname: formData.lastname,
+      username: formData.username,
       email_id: formData.email,
       password: formData.password,
-      mobile_number: 0, // Placeholder as per API
+      mobile_number: formData.mobile_number || "0",
       role: Number(formData.role),
       device_id: Number(formData.device),
       mobile_token: "",
       status: formData.status,
-      permission: permissionString,
+      department: formData.department,
+      permission: permission,
     };
 
     const success = await dispatch(handleCreateUser(payload));
@@ -172,14 +146,14 @@ const UserCreate = () => {
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
               <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
-                <UserPlus className="icon-sm" /> {strings.basicSection}
+                <UserPlus className="icon-sm" /> Personal & Account Data
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400">
-                    {strings.labels.userId}
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    User ID
                   </Label>
                   <Input
                     placeholder="e.g. USR006"
@@ -193,25 +167,74 @@ const UserCreate = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400">
-                    {strings.labels.fullName}
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Employee ID
                   </Label>
                   <Input
-                    placeholder="John Doe"
+                    placeholder="EMP-001"
                     autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
                     required
-                    value={formData.fullName}
+                    value={formData.employee_id}
                     onChange={(e) =>
-                      setFormData({ ...formData, fullName: e.target.value })
+                      setFormData({ ...formData, employee_id: e.target.value })
                     }
                   />
                 </div>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400">
-                    {strings.labels.email}
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    First Name
+                  </Label>
+                  <Input
+                    placeholder="John"
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    required
+                    value={formData.firstname}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstname: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Last Name
+                  </Label>
+                  <Input
+                    placeholder="Doe"
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    required
+                    value={formData.lastname}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastname: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Username
+                  </Label>
+                  <Input
+                    placeholder="johndoe"
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    required
+                    value={formData.username}
+                    onChange={(e) =>
+                      setFormData({ ...formData, username: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Email Address
                   </Label>
                   <Input
                     type="email"
@@ -226,8 +249,27 @@ const UserCreate = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400">
-                    {strings.labels.role}
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Phone Number
+                  </Label>
+                  <Input
+                    type="tel"
+                    placeholder="+91 9876543210"
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    required
+                    value={formData.mobile_number}
+                    onChange={(e) =>
+                      setFormData({ ...formData, mobile_number: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    System Role
                   </Label>
                   <Select
                     value={formData.role}
@@ -244,22 +286,22 @@ const UserCreate = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label className="label-bold !text-slate-400">
-                  {strings.labels.password}
-                </Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                  required
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                />
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Access Password
+                  </Label>
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    required
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -267,76 +309,73 @@ const UserCreate = () => {
           <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
               <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
-                <Building2 className="icon-sm" /> {strings.mappingSection}
+                <Building2 className="icon-sm" /> Facility mapping
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
-                    <Laptop className="icon-base" />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <Label className="label-bold !text-slate-400">
-                      {strings.labels.device}
-                    </Label>
-                    <Select
-                      value={formData.device}
-                      onValueChange={(v) =>
-                        setFormData({ ...formData, device: v })
-                      }
-                    >
-                      <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="0">Auto-Assign Later</SelectItem>
-                        <SelectItem value="1">
-                          Device 01 - Scanner (Mumbai)
-                        </SelectItem>
-                        <SelectItem value="2">
-                          Device 02 - Tablet (Mumbai)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Department
+                  </Label>
+                  <Input
+                    placeholder="Operations"
+                    autoComplete="off"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    required
+                    value={formData.department}
+                    onChange={(e) =>
+                      setFormData({ ...formData, department: e.target.value })
+                    }
+                  />
                 </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
-                    <Building2 className="icon-base" />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <Label className="label-bold !text-slate-400">
-                      {strings.labels.outlet}
-                    </Label>
-                    <Select
-                      value={formData.outlet}
-                      onValueChange={(v) =>
-                        setFormData({ ...formData, outlet: v })
-                      }
-                    >
-                      <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="1">
-                          Main Warehouse (Global)
-                        </SelectItem>
-                        <SelectItem value="2">Central Hub - MUM01</SelectItem>
-                        <SelectItem value="3">North Hub - DEL01</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                    Warehouse Outlet
+                  </Label>
+                  <Select
+                    value={formData.outlet}
+                    onValueChange={(v) =>
+                      setFormData({ ...formData, outlet: v })
+                    }
+                  >
+                    <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                      <SelectItem value="1">Main Warehouse (Global)</SelectItem>
+                      <SelectItem value="2">Central Hub - MUM01</SelectItem>
+                      <SelectItem value="3">North Hub - DEL01</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+              
+              <div className="space-y-2">
+                <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                  Assigned Device
+                </Label>
+                <Select
+                  value={formData.device}
+                  onValueChange={(v) =>
+                    setFormData({ ...formData, device: v })
+                  }
+                >
+                  <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="0">Auto-Assign Later</SelectItem>
+                    <SelectItem value="1">Device 01 - Scanner</SelectItem>
+                    <SelectItem value="2">Device 02 - Tablet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                <p className="caption-small !text-slate-900">
-                  {strings.notes.initTitle}
-                </p>
+              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                <p className="caption-small !text-slate-900">System Note</p>
                 <p className="body-main !text-sm !text-slate-500 leading-relaxed italic">
-                  {strings.notes.initDesc}
+                  New users are created with 'Active' status by default. Initial permissions must be audited after saving.
                 </p>
               </div>
             </CardContent>
@@ -345,98 +384,86 @@ const UserCreate = () => {
 
         <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-8">
-            <CardTitle className="caption-small !text-slate-500">
-              Module Access Permissions
+            <CardTitle className="caption-small !text-slate-500 flex items-center justify-between">
+              <span>Module Access Matrix</span>
+              <div className="flex gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-blue-600" />
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Read Mode</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Write Mode</span>
+                </div>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
-              <div className="grid grid-cols-5 bg-slate-50 p-4 border-b border-slate-100 items-center">
-                <div className="col-span-1 pl-4 flex items-center gap-3">
-                  <Checkbox
-                    id="all-permissions"
-                    className="h-5 w-5 border-slate-400"
-                    checked={
-                      permissionsList.length > 0 &&
-                      permissionsList.every((p) =>
-                        ["view", "create", "edit", "delete"].every((a) =>
-                          (selectedPermissions[p] || []).includes(a),
-                        ),
-                      )
-                    }
-                    onCheckedChange={toggleAll}
-                  />
-                  <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px]">
-                    Module
-                  </span>
-                </div>
-                {/* Each action column uses a fixed-width container for consistent checkbox centering */}
-                {["view", "create", "edit", "delete"].map((action) => (
-                  <div key={action} className="flex justify-center">
-                    <div className="flex items-center gap-2.5 w-24">
-                      <Checkbox
-                        className="h-5 w-5 border-slate-400"
-                        checked={permissionsList.every((p) =>
-                          (selectedPermissions[p] || []).includes(action),
-                        )}
-                        onCheckedChange={() => toggleColumn(action)}
-                      />
+              <div className="overflow-x-auto">
+                <div className="min-w-[1000px]">
+                  {/* Header Row: Module Names */}
+                  <div className="grid grid-cols-[180px_repeat(8,1fr)] bg-slate-50 border-b border-slate-100 items-center">
+                    <div className="p-4 border-r border-slate-100">
                       <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px]">
-                        {action === "delete" ? "Remove" : action}
+                        Modules \ Access
                       </span>
                     </div>
-                  </div>
-                ))}
-              </div>
-              <div className="divide-y divide-slate-50 bg-white">
-                {permissionsList.map((p) => (
-                  <div
-                    key={p}
-                    className="grid grid-cols-5 p-3 items-center hover:bg-slate-50/50 transition-colors"
-                  >
-                    <div className="col-span-1 flex items-center gap-3 pl-4">
-                      <Checkbox
-                        id={`row-${p}`}
-                        className="h-5 w-5 border-slate-400"
-                        checked={["view", "create", "edit", "delete"].every(
-                          (a) => (selectedPermissions[p] || []).includes(a),
-                        )}
-                        onCheckedChange={() => toggleRow(p)}
-                      />
-                      <span className="body-strong !text-sm !text-slate-800">
-                        {p}
-                      </span>
-                    </div>
-                    {["view", "create", "edit", "delete"].map((action) => (
-                      <div key={action} className="flex justify-center">
-                        <div className="flex items-center gap-2.5 w-24">
-                          <Checkbox
-                            id={`${p}-${action}`}
-                            className={cn(
-                              "h-5 w-5",
-                              action === "view" &&
-                                "data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600",
-                              action === "create" &&
-                                "data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500",
-                              action === "edit" &&
-                                "data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500",
-                              action === "delete" &&
-                                "data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500",
-                            )}
-                            checked={(selectedPermissions[p] || []).includes(
-                              action,
-                            )}
-                            onCheckedChange={(checked) =>
-                              handlePermissionChange(p, action, !!checked)
-                            }
-                          />
-                          {/* Invisible spacer to maintain vertical alignment with header */}
-                          <div className="w-12" aria-hidden="true" />
-                        </div>
+                    {permissionsList.map((p: any) => (
+                      <div key={p.key} className="p-4 text-center border-r border-slate-100 last:border-r-0">
+                        <span className="body-strong !text-[11px] !text-slate-800 uppercase tracking-tighter">
+                          {p.label}
+                        </span>
                       </div>
                     ))}
                   </div>
-                ))}
+
+                  {/* Read Access Row */}
+                  <div className="grid grid-cols-[180px_repeat(8,1fr)] items-center border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
+                    <div className="p-4 bg-slate-50/50 border-r border-slate-100 flex items-center justify-between">
+                      <span className="body-strong !text-blue-600 uppercase tracking-widest !text-[10px]">
+                        Read Access
+                      </span>
+                      <Checkbox
+                        className="h-4 w-4 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                        checked={readPages.length === permissionsList.length}
+                        onCheckedChange={() => toggleAll("read")}
+                      />
+                    </div>
+                    {permissionsList.map((p: any) => (
+                      <div key={p.key} className="p-4 flex justify-center border-r border-slate-50 last:border-r-0">
+                        <Checkbox
+                          className="h-6 w-6 border-slate-200 bg-slate-50 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 transition-all rounded-lg"
+                          checked={readPages.includes(p.key)}
+                          onCheckedChange={() => togglePermission(p.key, "read")}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Write Access Row */}
+                  <div className="grid grid-cols-[180px_repeat(8,1fr)] items-center hover:bg-slate-50/30 transition-colors">
+                    <div className="p-4 bg-slate-50/50 border-r border-slate-100 flex items-center justify-between">
+                      <span className="body-strong !text-emerald-600 uppercase tracking-widest !text-[10px]">
+                        Write Access
+                      </span>
+                      <Checkbox
+                        className="h-4 w-4 border-slate-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                        checked={writePages.length === permissionsList.length}
+                        onCheckedChange={() => toggleAll("write")}
+                      />
+                    </div>
+                    {permissionsList.map((p: any) => (
+                      <div key={p.key} className="p-4 flex justify-center border-r border-slate-50 last:border-r-0">
+                        <Checkbox
+                          className="h-6 w-6 border-slate-200 bg-slate-50 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 transition-all rounded-lg"
+                          checked={writePages.includes(p.key)}
+                          onCheckedChange={() => togglePermission(p.key, "write")}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -453,7 +480,7 @@ const UserCreate = () => {
           </Button>
           <Button
             type="submit"
-            className="px-12 bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 body-strong text-white uppercase  text-xs h-11 transition-all active:scale-95"
+            className="px-12 bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 body-strong text-white uppercase text-xs h-11 transition-all active:scale-95"
             disabled={loading}
           >
             {loading ? (

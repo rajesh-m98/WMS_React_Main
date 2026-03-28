@@ -12,6 +12,7 @@ import hstReducer from './hstSlice';
 import warehouseReducer from './warehouseSlice';
 import itemReducer from './itemSlice';
 import dispatchReducer from './dispatchSlice';
+import putawayReducer from './putawaySlice';
 
 export const store = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const store = configureStore({
     warehouse: warehouseReducer,
     item: itemReducer,
     dispatch: dispatchReducer,
+    putaway: putawayReducer,
   },
 });
 

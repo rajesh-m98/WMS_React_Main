@@ -23,7 +23,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     navigate("/login");
   };
 
-  const userEmail = userData?.email_id || "admin@wms.com";
+  const userEmail = userData?.email || "admin@wms.com";
   const initials = userEmail.charAt(0).toUpperCase();
 
   const getPageInfo = (path: string) => {
@@ -43,10 +43,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           title: "Dashboard",
           description: "Overview of warehouse operations and activity",
         },
-        "/activity-logs": {
-          title: "Activity Logs",
-          description: "Complete system-wide movement history and audit trail",
-        },
+        // "/activity-logs": {
+        //   title: "Activity Logs",
+        //   description: "Complete system-wide movement history and audit trail",
+        // },
         "/masters/users": {
           title: "User Master",
           description: "Manage application users and their roles",
@@ -74,6 +74,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         "/transactions/OutwardRequest": {
           title: "Outward PickList",
           description: "Track and manage outward shipment and picking queues",
+        },
+        "/transactions/dispatch-history": {
+          title: "Dispatch History",
+          description:
+            "Archive of processed transactions and document auditing",
+        },
+        "/transactions/inward-history": {
+          title: "Inward Putaway History",
+          description: "Archive of processed inward putaway transactions",
+        },
+        "/transactions/outward-history": {
+          title: "Outward Picklist History",
+          description: "Archive of processed outward picklist transactions",
         },
       };
     return (

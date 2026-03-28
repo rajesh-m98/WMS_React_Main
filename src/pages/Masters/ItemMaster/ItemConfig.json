@@ -39,7 +39,7 @@
       "serial": "Serial Managed",
       "cancel": "Cancel",
       "submitCreate": "Initialize Archive",
-      "submitEdit": "Commit Changes"
+      "submitEdit": "Update"
     },
     "noItems": "No items registered in database",
     "totalCatalog": "Total items:",

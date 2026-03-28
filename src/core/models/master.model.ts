@@ -1,29 +1,50 @@
+export interface UserPermissionDTO {
+  id: number;
+  userid: number;
+  operation_type: string;
+  operation_pages: string[];
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: string | null;
+  is_deleted?: boolean;
+}
+
 export interface UserDTO {
   id: number;
-  userid: string;
-  username: string;
-  email_id: string;
-  role: number | string;
-  status: string;
   warehouse_id: number;
-  device_id?: number | string;
-  companyid: number;
+  userid: string;
+  employee_id: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  username: string;
   mobile_number: string;
+  department: string;
+  role: number | string;
+  otp?: string;
+  reportingmanager?: string;
+  outlet?: number;
   mobile_token?: string;
-  permission?: string;
-  is_deleted?: boolean;
-  created_at?: string;
-  updated_at?: string;
+  status: string;
   db_warehouse?: {
     id: number;
     warehouse_name: string;
     warehouse_code: string;
+    gstnumber?: string;
+    street?: string;
+    block?: string;
+    bplid?: string;
+    bplname?: string;
+    location?: string;
+    city?: string;
+    state?: string;
+    zipcode?: string;
+    country?: string;
   };
-  db_device?: {
-    id: number;
-    device_type: string;
-    device_serial_number: string;
-  };
+  permission?: UserPermissionDTO[];
+  created_at?: string | null;
+  updated_at?: string | null;
+  is_deleted?: boolean;
 }
 
 export interface HSTDeviceDTO {
@@ -38,6 +59,7 @@ export interface ItemDTO {
   companyid: number;
   warehouse_id: number;
   item_code: string;
+  batch_number: string;
   item_description: string;
   frgnname?: string | null;
   itmsgrpcod?: string | null;

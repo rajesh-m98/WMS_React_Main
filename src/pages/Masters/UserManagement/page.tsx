@@ -44,7 +44,10 @@ import {
 } from "@/components/ui";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { handleFetchUsers } from "@/app/manager/masterManager";
+import {
+  handleFetchUsers,
+  handleDeleteUser,
+} from "@/app/manager/masterManager";
 import api from "@/lib/api";
 import config from "./UserConfig.json";
 
@@ -90,23 +93,13 @@ export const UserManagement = () => {
   }, [dispatch, debouncedSearch, page]);
 
   const handleDelete = async (id: number) => {
-    try {
-      const response = await api.post("/api/users/delete_user", { id });
-      if (response.data.status) {
-        toast.success("User deleted successfully");
-        dispatch(handleFetchUsers({ companyid: 1 }));
-      } else {
-        toast.error(response.data.message || "Failed to delete user");
-      }
-    } catch (error) {
-      toast.error("Operation failed");
-    }
+    await dispatch(handleDeleteUser(id));
   };
 
   const displayUsers = users; // Now using server-side filtered data
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-700 pb-10">
       <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-3 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-2/5 shrink-0">
@@ -139,15 +132,6 @@ export const UserManagement = () => {
               </Select>
             </div>
             <Button
-              variant="outline"
-              className="rounded-xl h-12 px-5 body-strong flex items-center gap-2 border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
-            >
-              <Upload className="icon-sm" />{" "}
-              <span className="hidden sm:inline">
-                {config.strings.importBtn}
-              </span>
-            </Button>
-            <Button
               className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-6 body-strong text-white flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95"
               onClick={() => navigate("/masters/users/create")}
             >
@@ -156,194 +140,214 @@ export const UserManagement = () => {
           </div>
         </CardContent>
       </Card>
-
-      <Card className="border-0 shadow-md shadow-slate-200 rounded-2xl overflow-hidden bg-white relative min-h-[400px]">
-        {loading && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
-            <Loader2 className="icon-xl text-blue-600 animate-spin" />
-          </div>
-        )}
-        <CardContent className="p-0 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
-          <Table className="min-w-[1000px]">
-            <TableHeader className="p-4">
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-b-2 border-slate-200">
-                <TableHead className="table-header-font pl-6">
-                  {config.strings.table.id}
-                </TableHead>
-                <TableHead className="table-header-font">
-                  {config.strings.table.username}
-                </TableHead>
-                <TableHead className="table-header-font">
-                  {config.strings.table.contact}
-                </TableHead>
-                <TableHead className="table-header-font">
-                  {config.strings.table.role}
-                </TableHead>
-                <TableHead className="table-header-font">
-                  {config.strings.table.device}
-                </TableHead>
-                <TableHead className="table-header-font">
-                  {config.strings.table.outlet}
-                </TableHead>
-                <TableHead className="table-header-font">
-                  {config.strings.table.status}
-                </TableHead>
-                <TableHead className="table-header-font text-right pr-6">
-                  {config.strings.table.actions}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {displayUsers.length === 0 && !loading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-60 text-center body-main">
-                    {users.length === 0
-                      ? config.strings.noUsersFound
-                      : config.strings.noResultsFound ||
-                        "No users match your filters"}
-                  </TableCell>
+      {/* Table Section */}
+      <Card className="border-0 shadow-2xl rounded-[3rem] bg-white overflow-hidden relative">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto scrollbar-premium scrollbar-thin scrollbar-thumb-slate-200">
+            <Table className="min-w-full">
+              <TableHeader className="bg-slate-50/50">
+                <TableRow className="border-b-2 border-slate-900/10">
+                  <TableHead className="label-bold px-6 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.id}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.userId}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.employeeId}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.fullName}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.username}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.role}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.department}
+                  </TableHead>
+                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
+                    {config.strings.table.status}
+                  </TableHead>
+                  <TableHead className="label-bold px-10 py-5 text-right pr-6 whitespace-nowrap">
+                    {config.strings.table.actions}
+                  </TableHead>
                 </TableRow>
-              ) : (
-                displayUsers.map((user) => (
-                  <TableRow
-                    key={user.id}
-                    className="border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-colors group"
-                  >
-                    <TableCell className="table-id-font pl-6">
-                      {user.userid}
-                    </TableCell>
-                    <TableCell>
-                      <span className="body-strong leading-none">
-                        {user.username}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <p className="body-main !text-sm truncate max-w-[150px]">
-                        {user.email_id || "-"}
-                      </p>
-                      <p className="caption-medium text-slate-500">
-                        {user.mobile_number || "-"}
-                      </p>
-                    </TableCell>
-                    <TableCell>{getRoleBadge(Number(user.role))}</TableCell>
-                    <TableCell className="body-main">
-                      {user.device_id || "None"}
-                    </TableCell>
-                    <TableCell className="body-main">
-                      {user.warehouse_id || "None"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`rounded-lg px-2 py-0.5 border-0 caption-small transition-colors ${
-                          user.status === "Active"
-                            ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700"
-                            : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600"
-                        }`}
-                      >
-                        {user.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                          onClick={() => navigate(`/masters/users/${user.id}`)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                          onClick={() =>
-                            navigate(`/masters/users/${user.id}/edit`)
-                          }
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
-                            <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
-                              <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
-                              <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
-                                {config.strings.deleteDialog.title}
-                              </AlertDialogTitle>
-                            </div>
-                            <div className="p-10 text-center flex flex-col items-center">
-                              <AlertDialogHeader>
-                                <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
-                                  {config.strings.deleteDialog.descriptionTemplate.replace(
-                                    "{username}",
-                                    user.username,
-                                  )}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <div className="flex gap-4 w-full mt-10">
-                                <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
-                                  {config.strings.deleteDialog.cancelBtn}
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
-                                  onClick={() => handleDelete(user.id)}
-                                >
-                                  {config.strings.deleteDialog.confirmBtn}
-                                </AlertDialogAction>
-                              </div>
-                            </div>
-                          </AlertDialogContent>
-                        </AlertDialog>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="h-96 text-left">
+                      <div className="flex flex-col items-center justify-center gap-4">
+                        <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
+                        <p className="label-bold !text-slate-400">
+                          Loading User Management...
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : displayUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="h-96 text-left">
+                      <div className="flex flex-col items-center justify-center gap-4 opacity-20">
+                        <UserPlus className="h-20 w-20 text-slate-400" />
+                        <p className="text-xl font-black text-slate-400 uppercase">
+                          {config.strings.noUsersFound}
+                        </p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  displayUsers.map((user, idx) => (
+                    <TableRow
+                      key={user.id}
+                      className="hover:bg-blue-50/40 transition-all duration-300 group cursor-default border-b border-slate-50 text-left"
+                    >
+                      <td className="px-6 py-5 label-bold !text-slate-400 whitespace-nowrap text-left">
+                        {(page - 1) * PAGE_SIZE + idx + 1}
+                      </td>
+                      <td className="px-4 py-2 text-sm font-black text-blue-600 rounded-lg whitespace-nowrap text-left">
+                        <span className="rounded-lg">{user.userid}</span>
+                      </td>
+                      <td className="px-4 py-5 text-sm font-bold text-slate-500 tabular-nums text-left whitespace-nowrap">
+                        {user.employee_id}
+                      </td>
+                      <td className="px-4 py-5 text-sm font-black text-slate-800 whitespace-nowrap text-left">
+                        {user.firstname} {user.lastname}
+                      </td>
+                      <td className="px-4 py-5 text-sm font-black text-slate-500 text-left whitespace-nowrap">
+                        {user.username}
+                      </td>
+                      <td className="px-4 py-5 text-left">
+                        {getRoleBadge(Number(user.role))}
+                      </td>
+                      <td className="px-4 py-5 text-sm font-bold text-slate-600 text-left whitespace-nowrap">
+                        {user.department}
+                      </td>
+                      <td className="px-4 py-5 text-left whitespace-nowrap">
+                        <Badge
+                          variant="outline"
+                          className={`rounded-lg px-3 py-1 border-0 label-bold transition-colors ${
+                            user.status?.toLowerCase() === "active"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {user.status}
+                        </Badge>
+                      </td>
+                      <td className="px-10 py-5 text-right pr-6">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-10 w-10 rounded-2xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            onClick={() =>
+                              navigate(`/masters/users/${user.id}`)
+                            }
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            onClick={() =>
+                              navigate(`/masters/users/${user.id}/edit`)
+                            }
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
+                              <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
+                                <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                                <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
+                                  {config.strings.deleteDialog.title}
+                                </AlertDialogTitle>
+                              </div>
+                              <div className="p-10 text-center flex flex-col items-center">
+                                <AlertDialogHeader>
+                                  <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
+                                    {config.strings.deleteDialog.descriptionTemplate.replace(
+                                      "{username}",
+                                      user.username,
+                                    )}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="flex gap-4 w-full mt-10">
+                                  <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
+                                    {config.strings.deleteDialog.cancelBtn}
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
+                                    onClick={() => handleDelete(user.id)}
+                                  >
+                                    {config.strings.deleteDialog.confirmBtn}
+                                  </AlertDialogAction>
+                                </div>
+                              </div>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </td>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination Content */}
+          <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="h-10 px-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white flex items-center gap-3 transition-all cursor-default pointer-events-none group shadow-sm"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="label-bold text-slate-400 text-[11px] uppercase tracking-widest font-black leading-none pt-0.5">
+                    {config.strings.totalUsersLabel}
+                  </span>
+                  <div className="h-6 px-2.5 bg-blue-600 group-hover:bg-blue-700 text-white rounded-[6px] flex items-center justify-center font-black text-xs tabular-nums shadow-md shadow-blue-100 transition-colors">
+                    {totalCount}
+                  </div>
+                </div>
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === 1 || loading}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                <ChevronLeft className="h-6 w-6 text-slate-600" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page * PAGE_SIZE >= totalCount || loading}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                <ChevronRight className="h-6 w-6 text-slate-600" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
-
-      <div className="flex items-center justify-between px-2 pt-2">
-        <p className="body-main !text-sm italic">
-          {config.strings.totalUsersLabel}{" "}
-          <span className="body-strong !text-slate-900 tracking-tight">
-            {totalCount}
-          </span>
-        </p>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl px-4 body-strong border-slate-200"
-            disabled={page === 1 || loading}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            <ChevronLeft className="icon-sm mr-1" />{" "}
-            {config.strings.pagination.prev}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl px-4 body-strong border-slate-200"
-            disabled={page * PAGE_SIZE >= totalCount || loading}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            {config.strings.pagination.next}{" "}
-            <ChevronRight className="icon-sm ml-1" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 };

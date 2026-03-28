@@ -1,9 +1,13 @@
-import api from '@/lib/api';
-import { AppDispatch } from '../store';
-import { 
-  requestLoadStart, inwardLoadSuccess, outwardLoadSuccess, requestLoadFailure 
-} from '../store/requestSlice';
-import { API_ENDPOINTS } from '@/core/config/endpoints';
+import api from "@/lib/api";
+import { AppDispatch, RootState } from "../store";
+import {
+  requestLoadStart,
+  inwardLoadSuccess,
+  outwardLoadSuccess,
+  unifiedRequestSuccess,
+  requestLoadFailure,
+} from "../store/requestSlice";
+import { API_ENDPOINTS } from "@/core/config/endpoints";
 
 interface FetchParams {
   page?: number;
@@ -11,66 +15,84 @@ interface FetchParams {
   search?: string;
   from_date?: string;
   to_date?: string;
+  forceRefresh?: boolean;
 }
 
-export const handleFetchInwardRequests = (params?: FetchParams) => async (dispatch: AppDispatch) => {
-  try {
-    dispatch(requestLoadStart('inward'));
-    
-    const requestBody = {
-      page: params?.page || 1,
-      pageSize: params?.size || 10,
-      is_paginate: true,
-      search: params?.search || "",
-      from_date: params?.from_date || "",
-      to_date: params?.to_date || "",
-    };
+/**
+ * Unified request fetcher that hits API once and updates both buckets.
+ */
+const fetchUnifiedRequests = async (
+  dispatch: AppDispatch,
+  getState: () => RootState,
+  params?: FetchParams,
+) => {
+  const { lastFetched, inward, outward } = getState().request;
 
-    const response = await api.post(API_ENDPOINTS.TRANSACTIONS.INWARD.GET_ALL, requestBody);
+  // Deduplicate concurrent requests
+  if (inward.loading || outward.loading) {
+    console.log("Request fetch already in progress, skipping...");
+    return true;
+  }
+
+  if (lastFetched && !params?.forceRefresh) {
+    console.log("Using cached requests...");
+    return true;
+  }
+
+  try {
+    dispatch(requestLoadStart("all"));
+
+    const queryParams = new URLSearchParams({
+      is_paginate: (params?.size !== undefined).toString(),
+      page: (params?.page || 1).toString(),
+      size: (params?.size || 100).toString(),
+    });
+
+    const response = await api.get(
+      `${API_ENDPOINTS.TRANSACTIONS.PUTAWAY.GET_ALL}?${queryParams.toString()}`,
+    );
 
     if (response.data.status) {
-      dispatch(inwardLoadSuccess({ 
-        data: response.data.data.items || [], 
-        total: response.data.data.totalCount || 0 
-      }));
+      const allItems = response.data.data.items || [];
+      // Only items that are NOT status 3 (Completed) are "Requests"
+      const inward = allItems.filter(
+        (i: any) => i.putaway_type === 1 && i.status !== 3,
+      );
+      const outward = allItems.filter(
+        (i: any) => i.putaway_type === 2 && i.status !== 3,
+      );
+
+      dispatch(unifiedRequestSuccess({ inward, outward }));
+      return true;
     } else {
-      dispatch(requestLoadFailure({ type: 'inward', error: "Failed to retrieve inward requests" }));
+      dispatch(
+        requestLoadFailure({
+          type: "all",
+          error: "Failed to retrieve unified requests",
+        }),
+      );
+      return false;
     }
   } catch (err: any) {
-    dispatch(requestLoadFailure({ 
-      type: 'inward', 
-      error: err.response?.data?.message || err.message || "Error fetching inward data" 
-    }));
+    dispatch(
+      requestLoadFailure({
+        type: "all",
+        error:
+          err.response?.data?.message || err.message || "Error fetching requests",
+      }),
+    );
+    return false;
   }
 };
 
-export const handleFetchOutwardRequests = (params?: FetchParams) => async (dispatch: AppDispatch) => {
-  try {
-    dispatch(requestLoadStart('outward'));
-    
-    const requestBody = {
-      page: params?.page || 1,
-      pageSize: params?.size || 10,
-      is_paginate: true,
-      search: params?.search || "",
-      from_date: params?.from_date || "",
-      to_date: params?.to_date || "",
-    };
+export const handleFetchInwardRequests =
+  (params?: FetchParams) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    return fetchUnifiedRequests(dispatch, getState, params);
+  };
 
-    const response = await api.post(API_ENDPOINTS.TRANSACTIONS.OUTWARD.GET_ALL, requestBody);
-
-    if (response.data.status) {
-      dispatch(outwardLoadSuccess({ 
-        data: response.data.data.items || [], 
-        total: response.data.data.totalCount || 0 
-      }));
-    } else {
-      dispatch(requestLoadFailure({ type: 'outward', error: "Failed to retrieve outward requests" }));
-    }
-  } catch (err: any) {
-    dispatch(requestLoadFailure({ 
-      type: 'outward', 
-      error: err.response?.data?.message || err.message || "Error fetching outward data" 
-    }));
-  }
-};
+export const handleFetchOutwardRequests =
+  (params?: FetchParams) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    return fetchUnifiedRequests(dispatch, getState, params);
+  };

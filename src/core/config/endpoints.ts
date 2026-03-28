@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     USERS: 'users/get_all_user/',
     CREATE_USER: 'users/create_user/',
     USER_BY_ID: 'users/get_user_by_id/',
+    DELETE_USER: 'users/delete_user/',
     HST: {
       ALL: 'device/get_all_device/',
       CREATE: 'device/device_create/',
@@ -22,11 +23,11 @@ export const API_ENDPOINTS = {
     BINS_CREATE: 'layerconfig/layerconfig_create/',
     BINS_DELETE: 'layerconfig/delete_layerconfig/',
     ITEMS: {
-      ALL: 'registration/get_all_product/',
-      CREATE: 'registration/product_create/',
-      GET_BY_ID: 'registration/get_product/',
-      REFRESH: 'registration/refresh_product/',
-      DELETE: 'registration/delete_product/',
+      ALL: 'items/get_all_item/',
+      CREATE: 'items/item_create/',
+      GET_BY_ID: 'items/get_item/',
+      REFRESH: 'items/refresh_item/',
+      DELETE: 'items/delete_item/',
     },
     WAREHOUSE: {
       ALL: 'warehouse/get_all_warehouse/',
@@ -38,17 +39,22 @@ export const API_ENDPOINTS = {
   },
   TRANSACTIONS: {
     INWARD: {
-      GET_ALL: 'inward_router/get_all_inward',
+      // Use PUTAWAY common endpoint
     },
     OUTWARD: {
-      GET_ALL: 'outward/get_all_outward',
+      // Use PUTAWAY common endpoint
     },
     TASKS: {
       GET_BY_ID: 'picklist/get_picklist',
       GET_ITEMS: 'picklist/get_all_picklist',
     },
     DISPATCH: {
-      GET_HISTORY: 'dispatch_history/get_all_dispatch_history/',
+      GET_HISTORY: 'dispatch/get_all_dispatch/',
+      GET_DETAIL: 'dispatch/get_dispatch/',
+    },
+    PUTAWAY: {
+      GET_ALL: 'putaway/get_all_putaway/',
+      GET_BY_ID: 'putaway/get_putaway/',
     }
   }
 };

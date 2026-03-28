@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui";
+import BarcodeDisplay from "react-barcode";
 import { Input } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui";
@@ -23,6 +24,7 @@ import {
   Loader2,
   Upload,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   handleFetchBins,
@@ -216,24 +218,26 @@ export const LocationMaster: React.FC = () => {
                       }
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="caption-small uppercase text-slate-400">
-                      {config.strings.createNode.barcodeLabel}
-                    </Label>
-                    <div className="relative">
-                      <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
-                      <Input
-                        placeholder={
-                          config.strings.createNode.barcodePlaceholder
-                        }
-                        className="rounded-xl h-11 border-slate-200 pl-10 font-mono"
-                        value={formData.barcode}
-                        onChange={(e) =>
-                          setFormData({ ...formData, barcode: e.target.value })
-                        }
-                      />
+                  {selectedPath.length >= 4 && (
+                    <div className="space-y-2">
+                      <Label className="caption-small uppercase text-slate-400">
+                        {config.strings.createNode.barcodeLabel}
+                      </Label>
+                      <div className="relative">
+                        <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
+                        <Input
+                          placeholder={
+                            config.strings.createNode.barcodePlaceholder
+                          }
+                          className="rounded-xl h-11 border-slate-200 pl-10 font-mono"
+                          value={formData.barcode}
+                          onChange={(e) =>
+                            setFormData({ ...formData, barcode: e.target.value })
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="flex justify-end gap-3 pt-4">
                     <Button
                       variant="ghost"
@@ -329,11 +333,29 @@ export const LocationMaster: React.FC = () => {
                       >
                         <div className="flex flex-col items-start text-left">
                           <span
-                            className={`table-cell-bold leading-tight ${isNodeSelected(node.id) ? "!text-white" : "text-slate-800"}`}
+                            className={`table-cell-bold leading-tight w-full ${isNodeSelected(node.id) ? "!text-white" : "text-slate-800"}`}
                           >
-                            {node.value}
+                            {idx >= 4 ? (
+                              <div
+                                className={`p-2 bg-white rounded-lg shadow-sm border border-slate-100 flex flex-col items-center justify-center w-full min-h-[100px] ${isNodeSelected(node.id) ? "ring-2 ring-white/50" : ""}`}
+                              >
+                                <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                                  <BarcodeDisplay
+                                    value={node.value}
+                                    width={1.8}
+                                    height={50}
+                                    fontSize={14}
+                                    background="transparent"
+                                    displayValue={true}
+                                    format="CODE128"
+                                  />
+                                </div>
+                              </div>
+                            ) : (
+                              node.value
+                            )}
                           </span>
-                          {node.barcode && (
+                          {node.barcode && idx < 4 && (
                             <span
                               className={`table-id-font mt-1 px-1.5 py-0.5 rounded !text-[10px] ${isNodeSelected(node.id) ? "bg-white/20 !text-blue-50" : "bg-slate-100 !text-slate-500"}`}
                             >
@@ -412,19 +434,18 @@ export const LocationMaster: React.FC = () => {
                     }
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-black uppercase text-slate-400 tracking-wider font-sans">
-                    {config.strings.editNode.barcodeLabel}
-                  </Label>
-                  <Input
-                    className="rounded-xl h-11 border-slate-200 font-mono bg-slate-50 cursor-not-allowed opacity-70"
-                    value={formData.barcode}
-                    disabled={true}
-                    onChange={(e) =>
-                      setFormData({ ...formData, barcode: e.target.value })
-                    }
-                  />
-                </div>
+                {selectedPath.length >= 5 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-black uppercase text-slate-400 tracking-wider font-sans">
+                      {config.strings.editNode.barcodeLabel}
+                    </Label>
+                    <Input
+                      className="rounded-xl h-11 border-slate-200 font-mono bg-slate-50 cursor-not-allowed opacity-70"
+                      value={formData.barcode}
+                      disabled={true}
+                    />
+                  </div>
+                )}
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
                     variant="ghost"
@@ -458,7 +479,7 @@ export const LocationMaster: React.FC = () => {
                 <p className="label-bold !text-slate-500 mb-0.5">
                   {config.strings.activeFocus}
                 </p>
-                <p className="body-strong !text-sm">
+                <p className="body-strong text-white !text-sm">
                   {selectedPath[selectedPath.length - 1].value}
                 </p>
               </div>

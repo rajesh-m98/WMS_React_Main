@@ -32,26 +32,12 @@ export const handleLoginSubmit = () => async (dispatch: AppDispatch, getState: (
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
 
-      // Temporary mock user data until full user profile endpoint is used
-      const mockUserData: UserData = {
-        id: 1,
-        email_id: 'admin@wms.com',
-        role: 'ADMIN',
-        username: username,
-        warehouse_id: 1,
-        userid: '',
-        status: '',
-        companyid: 0,
-        mobile_number: ''
-      };
+      
 
       localStorage.setItem('token', access_token);
       if (refresh_token) {
         localStorage.setItem('refresh_token', refresh_token);
       }
-      localStorage.setItem('userData', JSON.stringify(mockUserData));
-
-      dispatch(loginSuccess({ access_token, refresh_token, userData: mockUserData }));
       toast.success(response.data.message || 'Authentication successful');
       return true;
     } else {

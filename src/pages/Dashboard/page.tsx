@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   Server,
   Zap,
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { Badge } from "@/components/ui";
@@ -33,12 +34,12 @@ import {
   AreaChart,
 } from "recharts";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { handleFetchDashboardData } from "@/app/manager/dashboardManager";
+
 import { handleFetchUsers } from "@/app/manager/masterManager";
 import { handleFetchAllHST } from "@/app/manager/hstManager";
 import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import { handleFetchAllItems } from "@/app/manager/itemManager";
-import config from "./DashboardConfig.json";
+import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
 
 const iconMap: Record<string, any> = {
   Users,
@@ -61,61 +62,12 @@ const iconMap: Record<string, any> = {
   Zap,
 };
 
-const DUMMY_CHART_WEEK = [
-  { name: "Mon", inward: 420, outward: 310 },
-  { name: "Tue", inward: 580, outward: 450 },
-  { name: "Wed", inward: 390, outward: 520 },
-  { name: "Thu", inward: 710, outward: 480 },
-  { name: "Fri", inward: 850, outward: 610 },
-  { name: "Sat", inward: 460, outward: 390 },
-  { name: "Sun", inward: 320, outward: 280 },
-];
-
-const DUMMY_CHART_MONTH = [
-  { name: "Week 1", inward: 2100, outward: 1850 },
-  { name: "Week 2", inward: 2450, outward: 2100 },
-  { name: "Week 3", inward: 2200, outward: 2400 },
-  { name: "Week 4", inward: 2600, outward: 2250 },
-];
-
-const DEFAULT_TRANSACTIONS = [
-  {
-    id: "7402",
-    type: "Inward",
-    item: "Industrial Storage Rack 2U",
-    qty: 50,
-    date: "10:15 AM",
-  },
-  {
-    id: "9101",
-    type: "Outward",
-    item: "Precision Motion Sensor",
-    qty: 120,
-    date: "11:30 AM",
-  },
-  {
-    id: "7401",
-    type: "Inward",
-    item: "High-Speed Mesh Router",
-    qty: 200,
-    date: "09:45 AM",
-  },
-  {
-    id: "9102",
-    type: "Outward",
-    item: "Hydraulic Pallet Jack",
-    qty: 8,
-    date: "02:20 PM",
-  },
-];
-
 export const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [analysisType, setAnalysisType] = useState<"week" | "month">("week");
-  const { kpis, recentTransactions, chartData, loading } = useAppSelector(
-    (state) => state.dashboard,
-  );
+
+  // Get real data from specialized master / transaction slices
   const { totalCount: realUserCount } = useAppSelector(
     (state) => state.master.users,
   );
@@ -124,18 +76,94 @@ export const Dashboard = () => {
     (state) => state.warehouse,
   );
   const { totalCount: itemCount } = useAppSelector((state) => state.item);
+  const inward = useAppSelector((state) => state.putaway.inward);
+  const outward = useAppSelector((state) => state.putaway.outward);
+
   const [deltas, setDeltas] = useState<Record<string, string>>({});
+  const [dataReady, setDataReady] = useState(false);
 
   useEffect(() => {
-    dispatch(handleFetchDashboardData());
-    dispatch(handleFetchUsers({ companyid: 1 }));
-    dispatch(handleFetchAllHST());
-    dispatch(handleFetchAllWarehouses());
-    dispatch(handleFetchAllItems());
+    const initFetch = async () => {
+      try {
+        await Promise.all([
+          dispatch(handleFetchUsers({ companyid: 1, size: 5 })),
+          dispatch(handleFetchAllHST()),
+          dispatch(handleFetchAllWarehouses()),
+          dispatch(handleFetchAllItems()),
+          dispatch(
+            handleFetchPutawayHistory("inward", {
+              page: 1,
+              size: 50,
+              forceRefresh: true,
+            }),
+          ),
+        ]);
+        setDataReady(true);
+      } catch (err) {
+        console.error("Dashboard init fetch failed:", err);
+        setDataReady(true);
+      }
+    };
+    initFetch();
   }, [dispatch]);
 
+  // Combined and sorted transactions for the real-time ledger
+  const activeTransactions = useMemo(() => {
+    return [...inward.data, ...outward.data]
+      .sort((a, b) => {
+        const idA = typeof a.id === "number" ? a.id : parseInt(a.id) || 0;
+        const idB = typeof b.id === "number" ? b.id : parseInt(b.id) || 0;
+        return idB - idA;
+      })
+      .slice(0, 10);
+  }, [inward.data, outward.data]);
+
+  const displayTransactions = useMemo(() => {
+    return activeTransactions.map((tx) => ({
+      id: tx.id?.toString(),
+      type: tx.putaway_type === 1 ? "Inward" : "Outward",
+      item: tx.item_code,
+      qty: tx.quantity,
+      date: tx.docdate,
+    }));
+  }, [activeTransactions]);
+
+  // Generate real chart data from transaction history
+  const chartData = useMemo(() => {
+    const days = analysisType === "week" ? 7 : 30;
+    const dataPoints: any[] = [];
+    const today = new Date();
+
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+
+      // Local date string for robust matching (YYYY-MM-DD)
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const dateStr = `${year}-${month}-${day}`;
+
+      const name =
+        analysisType === "week"
+          ? d.toLocaleDateString("en-US", { weekday: "short" })
+          : `${month}/${day}`;
+
+      // Using .length for "how many" transactions instead of quantity sum
+      const dayInward = inward.data.filter((tx) =>
+        tx.docdate?.includes(dateStr),
+      ).length;
+      const dayOutward = outward.data.filter((tx) =>
+        tx.docdate?.includes(dateStr),
+      ).length;
+
+      dataPoints.push({ name, inward: dayInward, outward: dayOutward });
+    }
+    return dataPoints;
+  }, [analysisType, inward.data, outward.data]);
+
   useEffect(() => {
-    if (!loading) {
+    if (dataReady) {
       const lastSeen = JSON.parse(
         localStorage.getItem("dashboard_last_seen_metrics") || "{}",
       );
@@ -161,82 +189,83 @@ export const Dashboard = () => {
         }),
       );
     }
-  }, [loading, hstCount, warehouseCount, realUserCount, itemCount]);
+  }, [dataReady, hstCount, warehouseCount, realUserCount, itemCount]);
 
-  const activeChartData = chartData?.length
-    ? chartData
-    : analysisType === "week"
-      ? DUMMY_CHART_WEEK
-      : DUMMY_CHART_MONTH;
-  const activeTransactions = recentTransactions?.length
-    ? recentTransactions
-    : DEFAULT_TRANSACTIONS;
+  if (!dataReady) {
+    return (
+      <div className="h-[80vh] flex flex-col items-center justify-center gap-6 animate-in fade-in zoom-in duration-700">
+        <Loader2 className="h-16 w-16 text-blue-600 animate-spin" />
+        <div className="text-center">
+          <p className="caption-small !text-slate-400 uppercase tracking-widest mt-2">
+            Synchronizing Warehouse Intelligence...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  const displayKpis =
-    kpis && kpis.length >= 4
-      ? kpis
-      : [
-          {
-            title: "HST Devices",
-            value: hstCount.toString(),
-            icon: "Smartphone",
-            change: deltas.hst || "Syncing",
-            up: deltas.hst !== "+0",
-            bg: "kpi-card-blue",
-            iconColor: "text-blue-600",
-            link: "/masters/hst",
-          },
-          {
-            title: "Warehouse Count",
-            value: warehouseCount.toString(),
-            icon: "Warehouse",
-            change: deltas.warehouse || "Syncing",
-            up: deltas.warehouse !== "+0",
-            bg: "kpi-card-green",
-            iconColor: "text-emerald-600",
-            link: "/masters/warehouses",
-          },
-          {
-            title: "Active Users",
-            value: realUserCount.toString(),
-            icon: "Users",
-            change: deltas.users || "Syncing",
-            up: deltas.users !== "+0",
-            bg: "kpi-card-purple",
-            iconColor: "text-purple-600",
-            link: "/masters/users",
-          },
-          {
-            title: "Total Items",
-            value: itemCount.toLocaleString(),
-            icon: "Box",
-            change: deltas.items || "Syncing",
-            up: deltas.items !== "+0",
-            bg: "kpi-card-amber",
-            iconColor: "text-amber-600",
-            link: "/masters/items",
-          },
-          {
-            title: "Inward Pending",
-            value: "18",
-            icon: "ArrowUpRight",
-            change: "-2",
-            up: false,
-            bg: "kpi-card-rose",
-            iconColor: "text-rose-600",
-            link: "/transactions/InwardRequest",
-          },
-          {
-            title: "Outward Pick",
-            value: "42",
-            icon: "ArrowDownLeft",
-            change: "+8",
-            up: true,
-            bg: "kpi-card-cyan",
-            iconColor: "text-cyan-600",
-            link: "/transactions/OutwardRequest",
-          },
-        ];
+  const displayKpis = [
+    {
+      title: "HST Devices",
+      value: hstCount.toString(),
+      icon: "Smartphone",
+      change: deltas.hst || "+0",
+      up: deltas.hst !== "+0",
+      bg: "kpi-card-blue",
+      iconColor: "text-blue-600",
+      link: "/masters/hst",
+    },
+    {
+      title: "Warehouse Nodes",
+      value: warehouseCount.toString(),
+      icon: "Warehouse",
+      change: deltas.warehouse || "+0",
+      up: deltas.warehouse !== "+0",
+      bg: "kpi-card-green",
+      iconColor: "text-emerald-600",
+      link: "/masters/warehouses",
+    },
+    {
+      title: "Active Users",
+      value: realUserCount.toString(),
+      icon: "Users",
+      change: deltas.users || "+0",
+      up: deltas.users !== "+0",
+      bg: "kpi-card-purple",
+      iconColor: "text-purple-600",
+      link: "/masters/users",
+    },
+    {
+      title: "Master Items",
+      value: itemCount.toLocaleString(),
+      icon: "Box",
+      change: deltas.items || "+0",
+      up: deltas.items !== "+0",
+      bg: "kpi-card-amber",
+      iconColor: "text-amber-600",
+      link: "/masters/items",
+    },
+    {
+      title: "Inward Pending",
+      value: inward.totalCount.toString(),
+      icon: "ArrowUpRight",
+      change: "+Today",
+      up: true,
+      bg: "kpi-card-rose",
+      iconColor: "text-rose-600",
+      link: "/transactions/inward-history",
+    },
+    {
+      title: "Outward History",
+      value: outward.totalCount.toString(),
+      icon: "ArrowDownLeft",
+      change: "+Live",
+      up: true,
+      bg: "kpi-card-cyan",
+      iconColor: "text-cyan-600",
+      link: "/transactions/outward-history",
+    },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
@@ -266,7 +295,7 @@ export const Dashboard = () => {
                 <h3 className="caption-small mb-1 opacity-60 uppercase">
                   {kpi.title}
                 </h3>
-                <p className="text-2xl heading-section tracking-tight tabular-nums">
+                <p className="text-2xl font-black heading-section tracking-tight tabular-nums">
                   {kpi.value}
                 </p>
               </CardContent>
@@ -275,13 +304,18 @@ export const Dashboard = () => {
         })}
       </div>
 
-      {/* Full Width Activity Analytics */}
+      {/* Real Analytics Chart */}
       <Card className="border-0 shadow-2xl rounded-[3rem] overflow-hidden bg-white">
         <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between px-10 py-8 border-b border-slate-50 relative">
           <div className="absolute top-0 left-0 w-2 h-full bg-blue-600" />
-          <CardTitle className="heading-section !text-2xl text-slate-900 uppercase">
-            Activity Analytics
-          </CardTitle>
+          <div>
+            <CardTitle className="heading-section !text-2xl text-slate-900 uppercase">
+              Activity Analytics
+            </CardTitle>
+            <p className="caption-small !text-slate-400 mt-1 uppercase tracking-widest">
+              Live Movement Trends
+            </p>
+          </div>
           <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
             <button
               onClick={() => setAnalysisType("week")}
@@ -300,7 +334,7 @@ export const Dashboard = () => {
         <CardContent className="p-10 pt-6">
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart key={analysisType} data={activeChartData}>
+              <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorInward" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
@@ -345,7 +379,7 @@ export const Dashboard = () => {
                   stroke="#2563eb"
                   strokeWidth={4}
                   fill="url(#colorInward)"
-                  animationDuration={3000}
+                  animationDuration={1500}
                 />
                 <Area
                   type="monotone"
@@ -353,7 +387,7 @@ export const Dashboard = () => {
                   stroke="#8b5cf6"
                   strokeWidth={4}
                   fill="url(#colorOutward)"
-                  animationDuration={3000}
+                  animationDuration={1500}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -368,19 +402,12 @@ export const Dashboard = () => {
           <div className="flex items-center justify-between w-full">
             <div>
               <CardTitle className="heading-section !text-2xl text-slate-900 uppercase">
-                Real-time Ledger
+                Recent Logs
               </CardTitle>
               <p className="caption-small !text-slate-400 mt-1 uppercase tracking-widest">
                 Global Movement History
               </p>
             </div>
-            <Button
-              variant="ghost"
-              className="rounded-2xl h-14 px-8 font-black text-slate-900 border-2 border-slate-50 hover:bg-slate-900 hover:text-white transition-all duration-500 shadow-sm"
-              onClick={() => navigate("/activity-logs")}
-            >
-              VIEW ALL AUDITS
-            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -388,25 +415,25 @@ export const Dashboard = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50">
                 <tr>
-                  <th className="px-10 py-6 label-bold !text-slate-400">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-[11px] uppercase tracking-widest">
                     Entry ID
                   </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-[11px] uppercase tracking-widest">
                     Operation
                   </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-[11px] uppercase tracking-widest">
                     Specification
                   </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-right">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-right text-[11px] uppercase tracking-widest">
                     Qty
                   </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-right">
+                  <th className="px-10 py-6 label-bold !text-slate-400 text-right text-[11px] uppercase tracking-widest">
                     Sync
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {activeTransactions.map((tx) => (
+                {displayTransactions.map((tx) => (
                   <tr
                     key={tx.id}
                     className="hover:bg-blue-50/30 transition-all duration-300 group cursor-pointer border-b border-slate-50 last:border-0"
@@ -417,7 +444,7 @@ export const Dashboard = () => {
                     </td>
                     <td className="px-10 py-6">
                       <Badge
-                        className={`rounded-lg px-3 py-1.5 border-0 font-black text-[10px] tracking-widest text-white ${tx.type === "Inward" ? "bg-blue-600" : "bg-indigo-600"}`}
+                        className={`rounded-lg px-3 py-1.5 border-0 font-black text-[10px] tracking-widest text-white ${tx.type === "Inward" ? "bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.3)]" : "bg-indigo-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]"}`}
                       >
                         {tx.type.toUpperCase()}
                       </Badge>
@@ -425,10 +452,10 @@ export const Dashboard = () => {
                     <td className="px-10 py-6">
                       <div className="flex flex-col">
                         <span className="text-sm font-black text-slate-800">
-                          {tx.item}
+                          {tx.item || "General Inventory"}
                         </span>
                         <span className="text-[10px] font-bold text-slate-400 uppercase">
-                          Document Verified
+                          Movement Verified
                         </span>
                       </div>
                     </td>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui";
 import { Input } from "@/components/ui";
 import { Button } from "@/components/ui";
@@ -17,85 +17,26 @@ import {
   ChevronRight,
   Eye,
   Package,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const DUMMY_INWARD_DATA = [
-  {
-    id: 7402,
-    inwardheader: {
-      docentry: 1045,
-      docnum: "GR-2024-001",
-      cardcode: "V-900",
-      cardname: "Global Logistics Inc.",
-      docdate: "2024-03-26",
-    },
-    lineid: 1,
-    itemcode: "WMS-ACK-882",
-    name: "Industrial Storage Rack 2U",
-    whscode: "WH-01",
-    batchnumber: "BCH-0012",
-    quantity: 50,
-    putQty: 12,
-  },
-  {
-    id: 7401,
-    inwardheader: {
-      docentry: 1046,
-      docnum: "GR-2024-002",
-      cardcode: "V-342",
-      cardname: "Techative Solutions",
-      docdate: "2024-03-25",
-    },
-    lineid: 3,
-    itemcode: "ELC-SNR-004",
-    name: "Precision Motion Sensor",
-    whscode: "WH-02",
-    batchnumber: "BCH-0045",
-    quantity: 200,
-    putQty: 45,
-  },
-  {
-    id: 7400,
-    inwardheader: {
-      docentry: 1047,
-      docnum: "GR-2024-003",
-      cardcode: "V-118",
-      cardname: "Zenith Warehousing",
-      docdate: "2024-03-25",
-    },
-    lineid: 1,
-    itemcode: "MCH-PLT-JCK",
-    name: "Hydraulic Pallet Jack",
-    whscode: "WH-01",
-    batchnumber: "SER-8821",
-    quantity: 8,
-    putQty: 2,
-  },
-  {
-    id: 7399,
-    inwardheader: {
-      docentry: 1048,
-      docnum: "GR-2024-004",
-      cardcode: "V-900",
-      cardname: "Global Logistics Inc.",
-      docdate: "2024-03-24",
-    },
-    lineid: 2,
-    itemcode: "NET-WRL-RT",
-    name: "High-Speed Mesh Router",
-    whscode: "WH-03",
-    batchnumber: "N/A",
-    quantity: 15,
-    putQty: 0,
-  },
-];
+import { useAppDispatch, useAppSelector } from "@/app/store";
+import { handleFetchInwardRequests } from "@/app/manager/requestManager";
 
 const InwardRequest = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { data: inwardData, loading } = useAppSelector(
+    (state) => state.request.inward,
+  );
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  useEffect(() => {
+    dispatch(handleFetchInwardRequests({ page: 1, size: 50 }));
+  }, [dispatch]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
@@ -191,9 +132,20 @@ const InwardRequest = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {DUMMY_INWARD_DATA.length === 0 ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="h-80 text-center">
+                  <TableCell colSpan={14} className="h-64 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                      <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
+                      <p className="caption-small !text-slate-400 uppercase tracking-widest font-black">
+                        Syncing Requests...
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : inwardData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={14} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center opacity-40">
                       <Package className="h-16 w-16 mb-4 text-slate-300" />
                       <p className="heading-section !text-xl text-slate-400">
@@ -203,7 +155,7 @@ const InwardRequest = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                DUMMY_INWARD_DATA.map((row) => (
+                inwardData.map((row: any) => (
                   <TableRow
                     key={row.id}
                     className="hover:bg-blue-50/40 border-b border-slate-50 last:border-0 transition-all duration-300 group"
@@ -212,36 +164,36 @@ const InwardRequest = () => {
                       #{row.id}
                     </td>
                     <td className="px-4 font-bold text-slate-900 tabular-nums">
-                      {row.inwardheader?.docentry || "-"}
+                      {row.inwardheader?.docentry || row.doc_entry || "-"}
                     </td>
                     <td className="px-4 font-black text-blue-600 tabular-nums">
                       <span className="px-2.5 py-1 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
-                        {row.inwardheader?.docnum || "-"}
+                        {row.inwardheader?.docnum || row.docnum || "-"}
                       </span>
                     </td>
                     <td className="px-4 text-slate-500 label-bold !tracking-wide">
-                      {row.inwardheader?.cardcode || "-"}
+                      {row.inwardheader?.cardcode || row.cardcode || "-"}
                     </td>
                     <td className="px-4 text-slate-800 font-black !text-[12px] truncate max-w-[180px]">
-                      {row.inwardheader?.cardname || "-"}
+                      {row.inwardheader?.cardname || row.cardname || "-"}
                     </td>
                     <td className="px-4 text-slate-500 font-bold text-center tabular-nums text-[12px] whitespace-nowrap">
-                      {row.inwardheader?.docdate || "-"}
+                      {row.inwardheader?.docdate || row.docdate || "-"}
                     </td>
                     <td className="px-6 text-center font-black text-slate-400 tabular-nums">
                       {row.lineid || "-"}
                     </td>
                     <td className="px-4 font-black text-blue-600 text-[12px]">
-                      {row.itemcode}
+                      {row.itemcode || row.item_code}
                     </td>
                     <td className="px-4 text-slate-600 font-bold text-[12px] truncate max-w-[200px]">
-                      {row.name}
+                      {row.name || row.item_description}
                     </td>
                     <td className="px-4 font-black text-slate-800 text-[12px]">
-                      {row.whscode}
+                      {row.whscode || row.whs_code}
                     </td>
                     <td className="px-4 text-slate-400 label-bold !tracking-tight">
-                      {row.batchnumber || "N/A"}
+                      {row.batchnumber || row.batch_number || "N/A"}
                     </td>
                     <td className="px-4 text-right font-black text-slate-900 tabular-nums">
                       {row.quantity || 0}
@@ -257,7 +209,9 @@ const InwardRequest = () => {
                         size="icon"
                         className="h-9 w-9 rounded-xl shadow-lg shadow-slate-300 bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                         onClick={() =>
-                          navigate(`/transactions/tasks/${row.id}`)
+                          navigate(
+                            `/transactions/tasks/${row.id}?type=request&reqType=inward`,
+                          )
                         }
                       >
                         <Eye className="h-4 w-4" />

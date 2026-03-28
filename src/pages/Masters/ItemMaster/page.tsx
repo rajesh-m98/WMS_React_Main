@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -70,6 +71,7 @@ const PAGE_SIZE = 15;
 
 export const ItemMaster = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const {
     data: items,
     loading,
@@ -146,6 +148,10 @@ export const ItemMaster = () => {
     setIsDialogOpen(true);
   };
 
+  const handleView = (id: number) => {
+    navigate(`/masters/items/${id}?type=item`);
+  };
+
   const handleSubmit = async () => {
     if (!formData.item_code || !formData.item_description) {
       toast.error("Code and Description are required");
@@ -153,7 +159,7 @@ export const ItemMaster = () => {
     }
 
     const success = await dispatch(
-      handleCreateItem(formData, editingItem?.id || 1),
+      handleCreateItem(formData, editingItem?.id || undefined),
     );
     if (success) {
       toast.success(editingItem ? "Item updated" : "Item created");
@@ -218,46 +224,31 @@ export const ItemMaster = () => {
 
       <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
         <CardContent className="p-0">
-          <div className="overflow-x-auto scrollbar-premium scrollbar-thin scrollbar-thumb-slate-200">
-            <Table className="min-w-[1600px]">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
+            <Table className="w-full">
               <TableHeader>
-                <TableRow className="bg-slate-50/50 border-b-2 border-slate-900/10">
-                  <TableHead className="label-bold pl-4 whitespace-nowrap">
-                    {config.strings.table.id}
+                <TableRow className="bg-slate-50/80 border-b border-slate-200 hover:bg-slate-50/80">
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[150px]">
+                    ITEM CODE
                   </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.code}
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-auto">
+                    DESCRIPTION
                   </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.description}
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[150px]">
+                    BATCH NUMBER
                   </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.batch}
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-auto">
+                    BARCODE
                   </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.barcode}
-                  </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.location}
-                  </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.opening}
-                  </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.current}
-                  </TableHead>
-                  <TableHead className="label-bold whitespace-nowrap">
-                    {config.strings.table.status}
-                  </TableHead>
-                  <TableHead className="label-bold text-right pr-8 whitespace-nowrap">
-                    {config.strings.table.manage}
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap text-right w-[150px]">
+                    ACTIONS
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-80 text-center">
+                    <TableCell colSpan={5} className="h-40 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="icon-xl text-blue-600 animate-spin" />
                         <p className="caption-small !text-slate-400">
@@ -269,8 +260,8 @@ export const ItemMaster = () => {
                 ) : items.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={10}
-                      className="h-80 text-center text-slate-400 font-bold uppercase tracking-widest"
+                      colSpan={5}
+                      className="h-40 text-center text-slate-400 font-bold uppercase tracking-widest"
                     >
                       {config.strings.noItems}
                     </TableCell>
@@ -281,55 +272,37 @@ export const ItemMaster = () => {
                       key={item.id}
                       className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-bold"
                     >
-                      <TableCell className="pl-4 py-5 body-strong">
-                        {item.id}
-                      </TableCell>
-                      <TableCell className="table-cell-font py-5">
+                      <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight whitespace-nowrap">
                         {item.item_code}
                       </TableCell>
-                      <TableCell className="body-strong !text-slate-600 max-w-[280px] py-5 leading-relaxed">
+                      <TableCell className="px-5 text-[13px] font-bold text-slate-800 py-4 leading-relaxed group-hover:text-slate-950 transition-colors">
                         {item.item_description}
                       </TableCell>
-                      <TableCell className="py-5">
-                        <Badge
-                          variant="outline"
-                          className="rounded-lg border-2 border-slate-100 bg-white font-mono text-xs px-2.5 py-1 text-slate-600"
-                        >
-                          {item.manbtchnum || "N/A"}
-                        </Badge>
+                      <TableCell className="px-5 py-4 font-mono text-[12px] font-bold text-slate-600 whitespace-nowrap">
+                        {item.batch_number || "BATCH-N/A"}
                       </TableCell>
-                      <TableCell className="py-5">
+                      <TableCell className="px-5 py-4 whitespace-nowrap">
                         <Badge
                           variant="outline"
-                          className="rounded-lg border-2 border-slate-100 bg-white table-id-font px-2.5 py-1 text-slate-600"
+                          className="rounded-lg border border-slate-200 bg-white font-mono text-[11px] font-bold px-3 py-1 text-slate-600 shadow-sm whitespace-nowrap"
                         >
                           {item.barcode || "—"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="py-5 font-bold text-slate-600">
-                        {item.location_mapping || "Single"}
-                      </TableCell>
-                      <TableCell className="py-5 font-black text-slate-900 tabular-nums">
-                        {item.opening_stock || 0}
-                      </TableCell>
-                      <TableCell className="py-5">
-                        <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-black tabular-nums">
-                          {item.current_stock || 0}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-5">
-                        <Badge
-                          className={`rounded-xl px-4 py-1.5 border-0 caption-small shadow-sm ${item.active === "Y" ? "bg-emerald-500 text-white" : "bg-slate-400 text-white"}`}
-                        >
-                          {item.active === "Y" ? "ACTIVE" : "INACTIVE"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right pr-8 py-5">
-                        <div className="flex items-center justify-end gap-2 transition-all">
+                      <TableCell className="text-right px-5 py-4">
+                        <div className="flex items-center justify-end gap-2 text-left transition-all">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            onClick={() => handleView(item.id)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             onClick={() => handleOpenDialog(item)}
                           >
                             <Edit2 className="h-4 w-4" />
@@ -339,7 +312,7 @@ export const ItemMaster = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                                className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -384,13 +357,14 @@ export const ItemMaster = () => {
           </div>
 
           <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <p className="text-sm font-black text-slate-400 uppercase tracking-widest italic">
-                {config.strings.totalCatalog}{" "}
-                <span className="text-slate-900 ml-2 border-b-2 border-blue-500">
-                  {totalCount}
-                </span>
-              </p>
+            <div className="flex items-center gap-3 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">
+                {config.strings.totalCatalog}
+              </span>
+              <span className="h-4 w-[2px] bg-slate-200 rounded-full mx-1" />
+              <span className="text-sm font-black text-slate-900 tabular-nums">
+                {totalCount}
+              </span>
             </div>
 
             <div className="flex items-center gap-2">

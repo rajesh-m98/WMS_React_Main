@@ -4,6 +4,7 @@ import {
   userLoadStart, userLoadSuccess, userDetailSuccess, userLoadFailure,
   clearCurrentUser
 } from '../store/masterSlice';
+import { toast } from 'sonner';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 import { UserDTO, HSTDeviceDTO } from '@/core/models/master.model';
 
@@ -77,7 +78,7 @@ export const handleFetchUserById = (userId: number) => async (dispatch: AppDispa
 export const handleCreateUser = (userData: any) => async (dispatch: AppDispatch) => {
   try {
     dispatch(userLoadStart());
-    const response = await api.post(`${API_ENDPOINTS.MASTERS.CREATE_USER}?user_id=1`, userData);
+    const response = await api.post(API_ENDPOINTS.MASTERS.CREATE_USER, userData);
     if (response.data.status) {
       // Refresh user list
       dispatch(handleFetchUsers({ companyid: 1 }));
@@ -88,6 +89,25 @@ export const handleCreateUser = (userData: any) => async (dispatch: AppDispatch)
     }
   } catch (err: any) {
     const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || "Error creating user";
+    dispatch(userLoadFailure(errorMsg));
+    return false;
+  }
+};
+
+export const handleDeleteUser = (userId: number) => async (dispatch: AppDispatch) => {
+  try {
+    dispatch(userLoadStart());
+    const response = await api.delete(`${API_ENDPOINTS.MASTERS.DELETE_USER}?user_id=${userId}`);
+    if (response.data.status) {
+      toast.success("User deleted successfully");
+      dispatch(handleFetchUsers({ companyid: 1 }));
+      return true;
+    } else {
+      dispatch(userLoadFailure(response.data.message || "Failed to delete user"));
+      return false;
+    }
+  } catch (err: any) {
+    const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || "Error deleting user";
     dispatch(userLoadFailure(errorMsg));
     return false;
   }

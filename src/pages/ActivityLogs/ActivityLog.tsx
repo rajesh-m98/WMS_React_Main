@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,99 +14,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { Input } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui";
-
-const ALL_ACTIVITY = [
-  {
-    id: "7402",
-    type: "Inward",
-    item: "Industrial Storage Rack 2U",
-    qty: 50,
-    date: "2024-03-26",
-    time: "10:15 AM",
-    status: "Completed",
-    partner: "Global Logistics",
-  },
-  {
-    id: "9101",
-    type: "Outward",
-    item: "Precision Motion Sensor",
-    qty: 120,
-    date: "2024-03-26",
-    time: "11:30 AM",
-    status: "In Progress",
-    partner: "Tech Solutions",
-  },
-  {
-    id: "7401",
-    type: "Inward",
-    item: "High-Speed Mesh Router",
-    qty: 200,
-    date: "2024-03-25",
-    time: "09:45 AM",
-    status: "Completed",
-    partner: "A1 Warehouse",
-  },
-  {
-    id: "9102",
-    type: "Outward",
-    item: "Hydraulic Pallet Jack",
-    qty: 8,
-    date: "2024-03-25",
-    time: "02:20 PM",
-    status: "Pending",
-    partner: "Express Freight",
-  },
-  {
-    id: "7399",
-    type: "Inward",
-    item: "Safety Helmet Pro",
-    qty: 300,
-    date: "2024-03-24",
-    time: "11:00 AM",
-    status: "Completed",
-    partner: "Safety First",
-  },
-  {
-    id: "7398",
-    type: "Outward",
-    item: "RFID Readers",
-    qty: 45,
-    date: "2024-03-24",
-    time: "03:15 PM",
-    status: "Completed",
-    partner: "Retail Corp",
-  },
-  {
-    id: "7397",
-    type: "Inward",
-    item: "Fiber Optic Cables",
-    qty: 1000,
-    date: "2024-03-24",
-    time: "08:30 AM",
-    status: "Completed",
-    partner: "NetLink",
-  },
-  {
-    id: "7396",
-    type: "Outward",
-    item: "Universal Converters",
-    qty: 50,
-    date: "2024-03-23",
-    time: "01:45 PM",
-    status: "Completed",
-    partner: "Innovate Inc",
-  },
-];
+import { useAppDispatch, useAppSelector } from "@/app/store";
+import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
 
 export const ActivityLog = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [searchTerm, setSearchTerm] = useState("");
+  const { inward, outward } = useAppSelector((state) => state.putaway);
 
-  const filteredData = ALL_ACTIVITY.filter(
+  useEffect(() => {
+    dispatch(handleFetchPutawayHistory("inward", { page: 1, size: 50 }));
+    dispatch(handleFetchPutawayHistory("outward", { page: 1, size: 50 }));
+  }, [dispatch]);
+
+  const combinedData = [...inward.data, ...outward.data]
+    .sort((a, b) => b.id - a.id)
+    .map(tx => ({
+      id: tx.id?.toString(),
+      type: tx.putaway_type === 1 ? "Inward" : "Outward",
+      item: tx.item_code,
+      qty: tx.quantity,
+      date: tx.docdate,
+      time: tx.updated_at || tx.docdate,
+      status: "Completed",
+      partner: tx.cardname,
+      docNum: tx.docnum
+    }));
+
+  const filteredData = combinedData.filter(
     (item) =>
-      item.item.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.id.includes(searchTerm) ||
-      item.partner.toLowerCase().includes(searchTerm.toLowerCase()),
+      item.item?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.id?.includes(searchTerm) ||
+      item.partner?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.docNum?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -143,7 +84,7 @@ export const ActivityLog = () => {
                   <tr
                     key={tx.id}
                     className="hover:bg-blue-50/40 transition-all duration-300 group cursor-pointer"
-                    onClick={() => navigate(`/transactions/tasks/${tx.id}`)}
+                    onClick={() => navigate(`/transactions/tasks/${tx.id}?type=putaway&reqType=${tx.type.toLowerCase()}`)}
                   >
                     <td className="px-10 py-6 text-sm font-black text-slate-900 font-mono">
                       {tx.id}

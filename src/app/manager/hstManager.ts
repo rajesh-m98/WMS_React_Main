@@ -1,16 +1,34 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
 import { 
-  hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure 
+  hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure, hstDetailSuccess 
 } from '../store/hstSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 
-export const handleFetchAllHST = (companyid: number = 1) => async (dispatch: AppDispatch) => {
+export const handleFetchAllHST = (params?: { page?: number; size?: number; companyid?: number }) => async (dispatch: AppDispatch) => {
   try {
     dispatch(hstLoadStart());
-    const response = await api.get<{ status: boolean; data: any[] }>(`${API_ENDPOINTS.MASTERS.HST.ALL}?companyid=${companyid}`);
+    
+    // Construct search params with backend required format
+    const queryParams = new URLSearchParams({
+      companyid: (params?.companyid || 1).toString(),
+      is_paginate: 'true',
+      page: (params?.page || 1).toString(),
+      size: (params?.size || 50).toString()
+    });
+
+    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.HST.ALL}?${queryParams.toString()}`);
+    
     if (response.data.status) {
-      dispatch(hstLoadSuccess({ data: response.data.data }));
+      const respData = response.data.data;
+      if (respData && respData.items) {
+        dispatch(hstLoadSuccess({ 
+          data: respData.items,
+          total: respData.total || respData.items.length
+        }));
+      } else {
+        dispatch(hstLoadSuccess({ data: respData }));
+      }
     } else {
       dispatch(hstLoadFailure("Failed to retrieve all devices"));
     }
@@ -33,19 +51,26 @@ export const handleFetchUnassignedHST = (companyid: number = 1) => async (dispat
   }
 };
 
-export const handleCreateHST = (deviceData: any) => async (dispatch: AppDispatch) => {
+export const handleCreateHST = (deviceData: any, editId?: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(hstLoadStart());
-    const response = await api.post(`${API_ENDPOINTS.MASTERS.HST.CREATE}?device_id=1`, deviceData);
+    
+    // For CREATE: no URL params. For EDIT: pass device_id in URL.
+    const url = editId 
+      ? `${API_ENDPOINTS.MASTERS.HST.CREATE}?device_id=${editId}`
+      : API_ENDPOINTS.MASTERS.HST.CREATE;
+
+    const response = await api.post(url, deviceData);
+    
     if (response.data.status) {
-      dispatch(handleFetchAllHST());
       return true;
     } else {
-      dispatch(hstLoadFailure(response.data.message || "Failed to create device"));
+      dispatch(hstLoadFailure(response.data.message || (editId ? "Failed to update device" : "Failed to create device")));
       return false;
     }
   } catch (err: any) {
-    dispatch(hstLoadFailure(err.message || "Error creating device"));
+    const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || (editId ? "Error updating device" : "Error creating device");
+    dispatch(hstLoadFailure(errorMsg));
     return false;
   }
 };
@@ -85,6 +110,22 @@ export const handleFetchHSTTypes = () => async (dispatch: AppDispatch) => {
   } catch (err: any) {
     console.error("Error fetching device types", err);
     dispatch(hstLoadFailure(err.message || "Error fetching device types"));
+  }
+};
+
+export const handleFetchHSTById = (deviceId: number) => async (dispatch: AppDispatch) => {
+  try {
+    const response = await api.get<{ status: boolean; data: any; message?: string }>(`${API_ENDPOINTS.MASTERS.HST.GET_BY_ID}?device_id=${deviceId}`);
+    if (response.data.status) {
+      dispatch(hstDetailSuccess(response.data.data));
+      return response.data.data;
+    } else {
+      dispatch(hstLoadFailure(response.data.message || "Failed to fetch device details"));
+      return null;
+    }
+  } catch (err: any) {
+    dispatch(hstLoadFailure(err.message || "Error fetching device details"));
+    return null;
   }
 };
 

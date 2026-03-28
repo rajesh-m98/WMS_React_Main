@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui";
 import { Input } from "@/components/ui";
 import { Button } from "@/components/ui";
@@ -17,81 +17,26 @@ import {
   ChevronRight,
   Eye,
   PackageSearch,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const DUMMY_OUTWARD_DATA = [
-  {
-    id: 9101,
-    outwardheader: {
-      docentry: 5012,
-      docnum: "SO-10042",
-      cardcode: "C-112",
-      cardname: "Reliance Retail Ltd.",
-      docdate: "2024-03-26",
-    },
-    lineid: 1,
-    itemcode: "WMS-ACK-882",
-    name: "Industrial Storage Rack 2U",
-    whscode: "WH-01",
-    quantity: 120,
-    pickQty: 45,
-  },
-  {
-    id: 9102,
-    outwardheader: {
-      docentry: 5013,
-      docnum: "SO-10043",
-      cardcode: "C-982",
-      cardname: "Amazon Logistics",
-      docdate: "2024-03-26",
-    },
-    lineid: 2,
-    itemcode: "ELC-SNR-004",
-    name: "Precision Motion Sensor",
-    whscode: "WH-02",
-    quantity: 500,
-    pickQty: 250,
-  },
-  {
-    id: 9103,
-    outwardheader: {
-      docentry: 5014,
-      docnum: "SO-10044",
-      cardcode: "C-445",
-      cardname: "Flipkart Warehouse",
-      docdate: "2024-03-25",
-    },
-    lineid: 1,
-    itemcode: "MCH-PLT-JCK",
-    name: "Hydraulic Pallet Jack",
-    whscode: "WH-01",
-    quantity: 12,
-    pickQty: 12,
-  },
-  {
-    id: 9104,
-    outwardheader: {
-      docentry: 5015,
-      docnum: "SO-10045",
-      cardcode: "C-112",
-      cardname: "Reliance Retail Ltd.",
-      docdate: "2024-03-24",
-    },
-    lineid: 4,
-    itemcode: "NET-WRL-RT",
-    name: "High-Speed Mesh Router",
-    whscode: "WH-03",
-    quantity: 25,
-    pickQty: 0,
-  },
-];
+import { useAppDispatch, useAppSelector } from "@/app/store";
+import { handleFetchOutwardRequests } from "@/app/manager/requestManager";
 
 const OutwardRequest = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { data: outwardData, loading } = useAppSelector(
+    (state) => state.request.outward,
+  );
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  useEffect(() => {
+    dispatch(handleFetchOutwardRequests({ page: 1, size: 50 }));
+  }, [dispatch]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
@@ -181,9 +126,20 @@ const OutwardRequest = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {DUMMY_OUTWARD_DATA.length === 0 ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="h-80 text-center">
+                  <TableCell colSpan={12} className="h-64 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                      <Loader2 className="h-10 w-10 text-indigo-600 animate-spin" />
+                      <p className="caption-small !text-slate-400 uppercase tracking-widest font-black">
+                        Syncing Requests...
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : outwardData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={12} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center opacity-40">
                       <PackageSearch className="h-16 w-16 mb-4 text-slate-300" />
                       <p className="heading-section !text-xl text-slate-400 uppercase tracking-widest">
@@ -193,46 +149,46 @@ const OutwardRequest = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                DUMMY_OUTWARD_DATA.map((row) => (
+                outwardData.map((row: any) => (
                   <TableRow
                     key={row.id}
                     className="hover:bg-indigo-50/40 border-b border-slate-50 last:border-0 transition-all duration-300 group"
                   >
                     <td className="px-10 py-5 font-black text-slate-900 tabular-nums tabular-nums-tight">
-                      {row.outwardheader?.docentry || "-"}
+                      {row.outwardheader?.docentry || row.doc_entry || "-"}
                     </td>
                     <td className="px-4 text-slate-500 font-bold text-[12px]">
                       {row.lineid || "-"}
                     </td>
                     <td className="px-4 font-black text-indigo-600 tabular-nums">
                       <span className="px-2.5 py-1 bg-indigo-50 rounded-lg shadow-sm border border-indigo-100">
-                        {row.outwardheader?.docnum || "-"}
+                        {row.outwardheader?.docnum || row.docnum || "-"}
                       </span>
                     </td>
                     <td className="px-4 text-slate-500 label-bold !tracking-wide">
-                      {row.outwardheader?.cardcode || "-"}
+                      {row.outwardheader?.cardcode || row.cardcode || "-"}
                     </td>
                     <td className="px-4 text-slate-800 font-black !text-[12px] truncate max-w-[180px]">
-                      {row.outwardheader?.cardname || "-"}
+                      {row.outwardheader?.cardname || row.cardname || "-"}
                     </td>
                     <td className="px-4 text-slate-500 font-bold text-center tabular-nums text-[12px] whitespace-nowrap">
-                      {row.outwardheader?.docdate || "-"}
+                      {row.outwardheader?.docdate || row.docdate || "-"}
                     </td>
                     <td className="px-4 font-black text-indigo-600 text-[12px]">
-                      {row.itemcode}
+                      {row.itemcode || row.item_code}
                     </td>
                     <td className="px-4 text-slate-600 font-bold text-[12px] truncate max-w-[200px]">
-                      {row.name}
+                      {row.name || row.item_description}
                     </td>
                     <td className="px-4 font-black text-slate-800 text-center text-[12px] tabular-nums tracking-wide">
-                      {row.whscode}
+                      {row.whscode || row.whs_code}
                     </td>
                     <td className="px-4 text-right font-black text-slate-900 tabular-nums tabular-nums-tight">
                       {row.quantity || 0}
                     </td>
                     <td className="px-4 text-right">
                       <span className="px-4 py-1.5 bg-slate-100 rounded-xl font-black !text-slate-900 tabular-nums border border-slate-200">
-                        {row.pickQty || 0}
+                        {row.pickQty || row.putQty || 0}
                       </span>
                     </td>
                     <td className="px-10 text-right pr-10">
@@ -241,7 +197,9 @@ const OutwardRequest = () => {
                         size="icon"
                         className="h-9 w-9 rounded-xl shadow-lg shadow-slate-300 bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                         onClick={() =>
-                          navigate(`/transactions/tasks/${row.id}`)
+                          navigate(
+                            `/transactions/tasks/${row.id}?type=request&reqType=outward`,
+                          )
                         }
                       >
                         <Eye className="h-4 w-4" />

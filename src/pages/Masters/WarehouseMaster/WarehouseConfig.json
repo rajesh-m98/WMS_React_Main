@@ -1,5 +1,6 @@
 {
   "strings": {
+    
     "searchPlaceholder": "Search by facility name or code...",
     "addWarehouseBtn": "Add Warehouse",
     "form": {
@@ -17,8 +18,10 @@
       "bplLabel": "BPL Identifier",
       "bplPlaceholder": "System BPL ID...",
       "cancelBtn": "Cancel",
+      
       "submitBtn": "Commit Facility"
     },
+    "totalFacilities": "Total Facilities",
     "table": {
       "identification": "Facility Identification",
       "location": "Location",

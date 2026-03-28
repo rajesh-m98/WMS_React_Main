@@ -48,20 +48,20 @@ import {
   fetchInwardHistory,
   fetchOutwardHistory,
 } from "@/app/store/historySlice";
-import { handleFetchDashboardData } from "@/app/manager/dashboardManager";
 import { handleFetchBins } from "@/app/manager/binManager";
 import { handleFetchUsers } from "@/app/manager/masterManager";
 import { handleFetchAllItems } from "@/app/manager/itemManager";
 import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import { handleFetchAllHST } from "@/app/manager/hstManager";
 import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
+import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
 
 export function AppSidebar() {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
   const isItemActive = (url: string) => {
-    return location.pathname === url;
+    return location.pathname.startsWith(url);
   };
 
   const handleSidebarClick = (url: string) => {
@@ -69,17 +69,11 @@ export function AppSidebar() {
     const params = { page: 1, size: 10, search: "" };
 
     switch (url) {
-      // Dashboard
-      case "/dashboard":
-        dispatch(handleFetchDashboardData());
-        break;
-
-      // Masters
       case "/masters/users":
         dispatch(handleFetchUsers({ companyid: 1 }));
         break;
       case "/masters/hst":
-        dispatch(handleFetchAllHST(1));
+        dispatch(handleFetchAllHST({ companyid: 1 }));
         break;
       case "/masters/bins":
         dispatch(handleFetchBins());
@@ -92,6 +86,12 @@ export function AppSidebar() {
         break;
       case "/transactions/dispatch-history":
         dispatch(handleFetchDispatchHistory({ page: 1, size: 15 }));
+        break;
+      case "/transactions/inward-history":
+        dispatch(handleFetchPutawayHistory("inward", { page: 1, size: 15 }));
+        break;
+      case "/transactions/outward-history":
+        dispatch(handleFetchPutawayHistory("outward", { page: 1, size: 15 }));
         break;
 
       // Transactions
@@ -182,9 +182,7 @@ export function AppSidebar() {
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
                     <Settings className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
                   </div>
-                  <span className="body-strong !text-slate-800">
-                    Masters
-                  </span>
+                  <span className="body-strong !text-slate-800">Masters</span>
                 </div>
                 <ChevronDown className="icon-sm text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
               </SidebarMenuButton>
@@ -241,13 +239,13 @@ export function AppSidebar() {
               <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
                 <SubMenuItem
                   title="Inward Putaway"
-                  url="/transactions/InwardRequest"
-                  icon={History}
+                  url="/transactions/inward-history"
+                  icon={PackagePlus}
                 />
                 <SubMenuItem
-                  title="Outward PickList"
-                  url="/transactions/OutwardRequest"
-                  icon={ClipboardCheck}
+                  title="Outward Picklist"
+                  url="/transactions/outward-history"
+                  icon={PackageMinus}
                 />
               </SidebarMenuSub>
             </CollapsibleContent>
@@ -259,7 +257,7 @@ export function AppSidebar() {
           System Auditing
         </SidebarMenu>
         <SidebarMenu>
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={isItemActive("/activity-logs")}
@@ -284,9 +282,9 @@ export function AppSidebar() {
                 <span className="body-strong">Activity Logs</span>
               </NavLink>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
 
-          <SidebarMenuItem className="mt-2">
+          <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={isItemActive("/transactions/dispatch-history")}
@@ -310,9 +308,7 @@ export function AppSidebar() {
                     className={`icon-base shrink-0 ${isItemActive("/transactions/dispatch-history") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong">
-                  Dispatch History
-                </span>
+                <span className="body-strong">Dispatch History</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
