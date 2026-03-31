@@ -47,6 +47,7 @@ import {
   Download,
   Settings2,
   Wifi,
+  ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector, useAppDispatch } from "@/app/store";
@@ -134,6 +135,26 @@ export const PackageMaster = () => {
     contentRef: printRef,
     documentTitle: `Barcodes_${typeNameForBatch}_${Date.now()}`,
   });
+
+  const handleDownloadImage = async () => {
+    if (!printRef.current) return;
+    try {
+      toast.info("Preparing digital media...");
+      const dataUrl = await toPng(printRef.current, {
+        quality: 1,
+        backgroundColor: "#fff",
+        pixelRatio: 2,
+      });
+      const link = document.createElement("a");
+      link.download = `Labels_${typeNameForBatch}_${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("Image downloaded!");
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("Failed to download image.");
+    }
+  };
 
   const handleDownloadPDF = async () => {
     if (!printRef.current) return;
@@ -627,6 +648,16 @@ export const PackageMaster = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-10 px-4 rounded-xl border-2 border-blue-100 bg-blue-50/50 text-[10px] font-black uppercase text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                      onClick={handleDownloadImage}
+                      disabled={generatedBarcodes.length === 0}
+                    >
+                      <ImageIcon className="mr-2 h-3.5 w-3.5" /> Download Image
+                      (PNG)
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
