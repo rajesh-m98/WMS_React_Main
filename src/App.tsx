@@ -16,6 +16,7 @@ import { ItemMaster } from "./pages/Masters/ItemMaster/page";
 import { LocationMaster } from "./pages/Masters/BinMaster/page";
 import { HSTMaster } from "./pages/Masters/HSTMaster/page";
 import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
+import { PackageMaster } from "./pages/Masters/PackageMaster/page";
 import MasterDetail from "./pages/Masters/MasterDetail";
 import SettingsPage from "./pages/SettingsPage";
 import { DispatchHistory } from "./pages/DispatchHistory/DispatchHistory";
@@ -90,6 +91,8 @@ const App = () => (
                       path="/masters/warehouses/:id"
                       element={<MasterDetail />}
                     />
+                    <Route path="/masters/packaging" element={<PackageMaster />} />
+                    <Route path="/masters/packaging/:id" element={<MasterDetail />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

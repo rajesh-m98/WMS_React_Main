@@ -52,7 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           description: "Manage application users and their roles",
         },
         "/masters/hst": {
-          title: "HST Master",
+          title: "HHT Master",
           description: "Manage handheld terminal devices",
         },
         "/masters/bins": {

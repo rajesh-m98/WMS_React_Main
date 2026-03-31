@@ -36,6 +36,12 @@ export const API_ENDPOINTS = {
       REFRESH: 'warehouse/refresh_warehouse/',
       DELETE: 'warehouse/delete_warehouse/',
     },
+    PACKAGING: {
+      ALL: 'packaging/get_all_package/',
+      CREATE: 'packaging/package_create/',
+      GET_BY_ID: 'packaging/get_package/',
+      DELETE: 'packaging/delete_package/',
+    },
   },
   TRANSACTIONS: {
     INWARD: {

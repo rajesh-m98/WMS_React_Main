@@ -2,7 +2,7 @@
   "strings": {
     "searchPlaceholder": "Search devices by ID, Serial, or Type...",
     "importBtn": "Import",
-    "addDeviceBtn": "Add HST",
+    "addDeviceBtn": "Add HHT",
     "table": {
       "deviceId": "Device ID",
       "deviceName": "Device Name",
@@ -21,10 +21,10 @@
         "upload": "Upload"
       },
       "form": {
-        "addTitle": "Add New HST Device",
-        "editTitle": "Edit HST Device",
+        "addTitle": "Add New HHT Device",
+        "editTitle": "Edit HHT Device",
         "idLabel": "Device ID",
-        "idPlaceholder": "e.g. HST-006",
+        "idPlaceholder": "e.g. HHT-006",
         "nameLabel": "Device Name",
         "namePlaceholder": "e.g. Scanner Gen 2",
         "brandLabel": "Brand Name",

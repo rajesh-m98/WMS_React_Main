@@ -119,3 +119,23 @@ export interface CreateBinPayload {
   layer6?: string;
   barcode: string;
 }
+
+export interface PackageDTO {
+  id: number;
+  package_type_name: string;
+  package_code: string;
+  description: string;
+  dimensions?: string; // Stored as a JSON string or simplified format
+  max_weight?: number;
+  weight_unit?: string;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreatePackagePayload {
+  package_type_name: string;
+  package_code: string;
+  description: string;
+  status: string;
+}

@@ -195,7 +195,7 @@ export function AppSidebar() {
                   icon={Users}
                 />
                 <SubMenuItem
-                  title="HST Master"
+                  title="HHT Master"
                   url="/masters/hst"
                   icon={Smartphone}
                 />
@@ -213,6 +213,11 @@ export function AppSidebar() {
                   title="Warehouse Master"
                   url="/masters/warehouses"
                   icon={Warehouse}
+                />
+                <SubMenuItem
+                  title="Package Master"
+                  url="/masters/packaging"
+                  icon={Archive}
                 />
               </SidebarMenuSub>
             </CollapsibleContent>

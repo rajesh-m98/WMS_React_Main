@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserDTO } from '@/core/models/master.model';
+import { UserDTO, PackageDTO } from '@/core/models/master.model';
 
 interface MasterState {
   users: {
@@ -9,10 +9,17 @@ interface MasterState {
     totalCount: number;
     error: string | null;
   };
+  packages: {
+    data: PackageDTO[];
+    loading: boolean;
+    totalCount: number;
+    error: string | null;
+  };
 }
 
 const initialState: MasterState = {
   users: { data: [], currentUser: null, loading: false, totalCount: 0, error: null },
+  packages: { data: [], loading: false, totalCount: 0, error: null },
 };
 
 const masterSlice = createSlice({
@@ -42,14 +49,27 @@ const masterSlice = createSlice({
     },
 
 
-    // Items
-
+    // Package Master
+    packageLoadStart: (state) => {
+      state.packages.loading = true;
+      state.packages.error = null;
+    },
+    packageLoadSuccess: (state, action: PayloadAction<{ data: PackageDTO[]; total?: number }>) => {
+      state.packages.loading = false;
+      state.packages.data = action.payload.data;
+      state.packages.totalCount = action.payload.total ?? action.payload.data.length;
+    },
+    packageLoadFailure: (state, action: PayloadAction<string>) => {
+      state.packages.loading = false;
+      state.packages.error = action.payload;
+    },
 
   },
 });
 
 export const { 
-  userLoadStart, userLoadSuccess, userDetailSuccess, userLoadFailure, clearCurrentUser
+  userLoadStart, userLoadSuccess, userDetailSuccess, userLoadFailure, clearCurrentUser,
+  packageLoadStart, packageLoadSuccess, packageLoadFailure
 } = masterSlice.actions;
 
 export default masterSlice.reducer;

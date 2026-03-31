@@ -1,0 +1,39 @@
+{
+  "strings": {
+    "searchPlaceholder": "Search by Package Code or Description...",
+    "syncBtn": "Sync Data",
+    "syncSuccess": "Packaging data synchronized",
+    "deleteDialog": {
+      "title": "Delete Package Config?",
+      "descriptionTemplate": "This will remove {code} and all associated metadata. This cannot be undone.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Confirm Deletion"
+    },
+    "table": {
+      "id": "ID",
+      "code": "Package Code",
+      "name": "Type Name",
+      "description": "Description",
+      "barcode": "Barcode",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "dialog": {
+      "create": "Add New Package",
+      "edit": "Edit Package",
+      "generate": "Add New Batch",
+      "numPackages": "Number of Packages",
+      "prefix": "Barcode Prefix",
+      "submitCreate": "Create Package",
+      "submitEdit": "Update Package",
+      "submitGenerate": "Generate & Save",
+      "cancel": "Cancel"
+    },
+    "noItems": "No packaging configurations found",
+    "totalCatalog": "Total Packages:",
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
+    }
+  }
+}
