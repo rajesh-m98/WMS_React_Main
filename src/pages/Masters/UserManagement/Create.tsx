@@ -215,7 +215,7 @@ const UserCreate = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="label-bold !text-slate-400 uppercase text-[10px]">
@@ -260,7 +260,10 @@ const UserCreate = () => {
                     required
                     value={formData.mobile_number}
                     onChange={(e) =>
-                      setFormData({ ...formData, mobile_number: e.target.value })
+                      setFormData({
+                        ...formData,
+                        mobile_number: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -350,16 +353,14 @@ const UserCreate = () => {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label className="label-bold !text-slate-400 uppercase text-[10px]">
                   Assigned Device
                 </Label>
                 <Select
                   value={formData.device}
-                  onValueChange={(v) =>
-                    setFormData({ ...formData, device: v })
-                  }
+                  onValueChange={(v) => setFormData({ ...formData, device: v })}
                 >
                   <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
                     <SelectValue />
@@ -375,7 +376,8 @@ const UserCreate = () => {
               <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
                 <p className="caption-small !text-slate-900">System Note</p>
                 <p className="body-main !text-sm !text-slate-500 leading-relaxed italic">
-                  New users are created with 'Active' status by default. Initial permissions must be audited after saving.
+                  New users are created with 'Active' status by default. Initial
+                  permissions must be audited after saving.
                 </p>
               </div>
             </CardContent>
@@ -389,11 +391,15 @@ const UserCreate = () => {
               <div className="flex gap-6">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-blue-600" />
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Read Mode</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                    Read Mode
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-emerald-600" />
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Write Mode</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                    Write Mode
+                  </span>
                 </div>
               </div>
             </CardTitle>
@@ -410,7 +416,10 @@ const UserCreate = () => {
                       </span>
                     </div>
                     {permissionsList.map((p: any) => (
-                      <div key={p.key} className="p-4 text-center border-r border-slate-100 last:border-r-0">
+                      <div
+                        key={p.key}
+                        className="p-4 text-center border-r border-slate-100 last:border-r-0"
+                      >
                         <span className="body-strong !text-[11px] !text-slate-800 uppercase tracking-tighter">
                           {p.label}
                         </span>
@@ -418,11 +427,10 @@ const UserCreate = () => {
                     ))}
                   </div>
 
-                  {/* Read Access Row */}
                   <div className="grid grid-cols-[180px_repeat(8,1fr)] items-center border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
                     <div className="p-4 bg-slate-50/50 border-r border-slate-100 flex items-center justify-between">
                       <span className="body-strong !text-blue-600 uppercase tracking-widest !text-[10px]">
-                        Read Access
+                        Access
                       </span>
                       <Checkbox
                         className="h-4 w-4 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
@@ -431,34 +439,16 @@ const UserCreate = () => {
                       />
                     </div>
                     {permissionsList.map((p: any) => (
-                      <div key={p.key} className="p-4 flex justify-center border-r border-slate-50 last:border-r-0">
+                      <div
+                        key={p.key}
+                        className="p-4 flex justify-center border-r border-slate-50 last:border-r-0"
+                      >
                         <Checkbox
                           className="h-6 w-6 border-slate-200 bg-slate-50 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 transition-all rounded-lg"
                           checked={readPages.includes(p.key)}
-                          onCheckedChange={() => togglePermission(p.key, "read")}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Write Access Row */}
-                  <div className="grid grid-cols-[180px_repeat(8,1fr)] items-center hover:bg-slate-50/30 transition-colors">
-                    <div className="p-4 bg-slate-50/50 border-r border-slate-100 flex items-center justify-between">
-                      <span className="body-strong !text-emerald-600 uppercase tracking-widest !text-[10px]">
-                        Write Access
-                      </span>
-                      <Checkbox
-                        className="h-4 w-4 border-slate-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                        checked={writePages.length === permissionsList.length}
-                        onCheckedChange={() => toggleAll("write")}
-                      />
-                    </div>
-                    {permissionsList.map((p: any) => (
-                      <div key={p.key} className="p-4 flex justify-center border-r border-slate-50 last:border-r-0">
-                        <Checkbox
-                          className="h-6 w-6 border-slate-200 bg-slate-50 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 transition-all rounded-lg"
-                          checked={writePages.includes(p.key)}
-                          onCheckedChange={() => togglePermission(p.key, "write")}
+                          onCheckedChange={() =>
+                            togglePermission(p.key, "read")
+                          }
                         />
                       </div>
                     ))}
