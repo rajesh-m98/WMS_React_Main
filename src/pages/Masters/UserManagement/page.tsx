@@ -88,15 +88,25 @@ export const UserManagement = () => {
         search: debouncedSearch,
         page: page,
         size: PAGE_SIZE,
+        status: statusFilter,
       }),
     );
-  }, [dispatch, debouncedSearch, page]);
+  }, [dispatch, debouncedSearch, page, statusFilter]);
 
   const handleDelete = async (id: number) => {
     await dispatch(handleDeleteUser(id));
   };
 
-  const displayUsers = users; // Now using server-side filtered data
+  const displayUsers = users.filter((user) => {
+    if (statusFilter === "all") return true;
+    
+    const isActive = user.status?.toLowerCase() === "active" || user.status === "Y";
+    
+    if (statusFilter === "active") return isActive;
+    if (statusFilter === "inactive") return !isActive;
+    
+    return true;
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
@@ -229,13 +239,13 @@ export const UserManagement = () => {
                       <td className="px-4 py-5 text-left whitespace-nowrap">
                         <Badge
                           variant="outline"
-                          className={`rounded-lg px-3 py-1 border-0 label-bold transition-colors ${
-                            user.status?.toLowerCase() === "active"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-slate-100 text-slate-500"
+                          className={`rounded-lg px-3 py-1 border-0 label-bold transition-colors uppercase tracking-widest text-[10px] ${
+                            user.status?.toLowerCase() === "active" || user.status === "Y"
+                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                              : "bg-rose-100 text-rose-700 hover:bg-rose-200"
                           }`}
                         >
-                          {user.status}
+                          {user.status === "Y" || user.status?.toLowerCase() === "active" ? "Active" : "Inactive"}
                         </Badge>
                       </td>
                       <td className="px-10 py-5 text-right pr-6">
@@ -314,7 +324,7 @@ export const UserManagement = () => {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="h-10 px-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white flex items-center gap-3 transition-all cursor-default pointer-events-none group shadow-sm"
+                className="h-10 px-4 rounded-xl border border-slate-300 bg-slate-50/50 hover:bg-white flex items-center gap-3 transition-all cursor-default pointer-events-none group shadow-sm"
               >
                 <div className="flex items-center gap-2.5">
                   <span className="label-bold text-slate-400 text-[11px] uppercase tracking-widest font-black leading-none pt-0.5">

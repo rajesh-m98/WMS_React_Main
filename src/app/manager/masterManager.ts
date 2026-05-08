@@ -13,6 +13,7 @@ interface FetchParams {
   size?: number;
   search?: string;
   companyid?: number;
+  status?: string;
 }
 
 interface PaginatedResponse<T> {
@@ -34,6 +35,12 @@ export const handleFetchUsers = (params?: FetchParams) => async (dispatch: AppDi
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.size) queryParams.append('size', params.size.toString());
     if (params?.search) queryParams.append('search', params.search);
+    if (params?.status && params.status !== 'all') {
+      // Trying the Y/N mapping first as discussed, but keeping it flexible
+      const serverStatus = params.status === 'active' ? 'Y' : 'N';
+      queryParams.append('status', serverStatus);
+      // Note: If this doesn't work, we can switch to queryParams.append('status', params.status);
+    }
     
     // Some endpoints use is_paginate for totalCount and items structure
     queryParams.append('is_paginate', 'true');
