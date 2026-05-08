@@ -16,6 +16,7 @@ import {
   Warehouse,
   ChevronDown,
   Activity,
+  Layers,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -55,6 +56,8 @@ import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import { handleFetchAllHST } from "@/app/manager/hstManager";
 import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
 import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
+import { handleFetchFloors } from "@/app/manager/floorManager";
+import { handleFetchGins } from "@/app/manager/ginManager";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -84,6 +87,9 @@ export function AppSidebar() {
       case "/masters/warehouses":
         dispatch(handleFetchAllWarehouses());
         break;
+      case "/masters/floors":
+        dispatch(handleFetchFloors(1));
+        break;
       case "/transactions/dispatch-history":
         dispatch(handleFetchDispatchHistory({ page: 1, size: 15 }));
         break;
@@ -92,6 +98,12 @@ export function AppSidebar() {
         break;
       case "/transactions/outward-history":
         dispatch(handleFetchPutawayHistory("outward", { page: 1, size: 15 }));
+        break;
+      case "/transactions/gin/putaway":
+        dispatch(handleFetchGins({ gin_type: 2 }));
+        break;
+      case "/transactions/gin/flow-through":
+        dispatch(handleFetchGins({ gin_type: 1 }));
         break;
 
       // Transactions
@@ -145,7 +157,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-3.5 py-8 gap-6 scrollbar-hide">
+      <SidebarContent className="px-3.5 py-6 gap-4 scrollbar-hide">
         {/* Dashboard Section */}
         <SidebarMenu>
           <SidebarMenuItem>
@@ -177,7 +189,7 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <Collapsible defaultOpen={true} className="group/collapsible">
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-3.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
+              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
                 <div className="flex items-center gap-3.5">
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
                     <Settings className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
@@ -219,6 +231,44 @@ export function AppSidebar() {
                   url="/masters/packaging"
                   icon={Archive}
                 />
+                <SubMenuItem
+                  title="Floor Master"
+                  url="/masters/floors"
+                  icon={Layers}
+                />
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </Collapsible>
+        </SidebarGroup>
+
+        {/* GIN Management Section */}
+        <SidebarGroup className="p-0">
+          <Collapsible defaultOpen={true} className="group/collapsible">
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
+                    <ClipboardCheck className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
+                  </div>
+                  <span className="body-strong !text-slate-800">
+                    Transactions
+                  </span>
+                </div>
+                <ChevronDown className="icon-sm text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
+              <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
+                <SubMenuItem
+                  title="Putaway"
+                  url="/transactions/gin/putaway"
+                  icon={PackagePlus}
+                />
+                <SubMenuItem
+                  title="Flow Through"
+                  url="/transactions/gin/flow-through"
+                  icon={ArrowLeftRight}
+                />
               </SidebarMenuSub>
             </CollapsibleContent>
           </Collapsible>
@@ -228,7 +278,7 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <Collapsible defaultOpen={true} className="group/collapsible">
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-3.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
+              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
                 <div className="flex items-center gap-3.5">
                   <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
                     <ArrowLeftRight className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
@@ -242,11 +292,6 @@ export function AppSidebar() {
             </CollapsibleTrigger>
             <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
               <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
-                <SubMenuItem
-                  title="Inward Putaway"
-                  url="/transactions/inward-history"
-                  icon={PackagePlus}
-                />
                 <SubMenuItem
                   title="Outward Picklist"
                   url="/transactions/outward-history"
@@ -262,7 +307,7 @@ export function AppSidebar() {
           System Auditing
         </SidebarMenu>
         <SidebarMenu>
-          {/* <SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={isItemActive("/activity-logs")}
@@ -281,13 +326,13 @@ export function AppSidebar() {
                   className={`p-1.5 rounded-xl transition-colors ${isItemActive("/activity-logs") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
                 >
                   <Activity
-                    className={`icon-base shrink-0 ${isItemActive("/activity-logs") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
+                    className={`icon-base shrink-0 ${isItemActive("/activity-logs") ? "text-black" : "text-slate-500 group-hover:text-blue-600"}`}
                   />
                 </div>
                 <span className="body-strong">Activity Logs</span>
               </NavLink>
             </SidebarMenuButton>
-          </SidebarMenuItem> */}
+          </SidebarMenuItem>
 
           <SidebarMenuItem>
             <SidebarMenuButton

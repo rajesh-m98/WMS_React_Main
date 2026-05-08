@@ -42,6 +42,12 @@ export const API_ENDPOINTS = {
       GET_BY_ID: 'packaging/get_package/',
       DELETE: 'packaging/delete_package/',
     },
+    FLOOR: {
+      ALL: 'floor/get_all_floors/',
+      CREATE: 'floor/floor_create/',
+      GET_BY_ID: 'floor/get_floor/',
+      DELETE: 'floor/delete_floor/',
+    },
   },
   TRANSACTIONS: {
     INWARD: {
@@ -61,6 +67,16 @@ export const API_ENDPOINTS = {
     PUTAWAY: {
       GET_ALL: 'putaway/get_all_putaway/',
       GET_BY_ID: 'putaway/get_putaway/',
+    },
+    GIN: {
+      ALL: 'gin/get_all_gin/',
+      GET_BY_ID: 'gin/get_gin/',
+      CREATE: 'gin/create_gin/',
+      UPDATE_HEADER: 'gin/update_header/',
+      UPDATE_LINE: 'gin/update_line/',
+      LINE_STATUS: 'gin/line_status/',
+      DELETE_HEADER: 'gin/delete_header/',
+      DELETE_LINE: 'gin/delete_line/',
     }
   }
 };

@@ -6,7 +6,8 @@ import { Label } from "@/components/ui";
 import { Switch } from "@/components/ui";
 import { toast } from "sonner";
 import { validatePasswordChange } from "@/lib/validators";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PasswordInput = ({ label, value, onChange, placeholder, error }: any) => {
   const [show, setShow] = useState(false);
@@ -42,6 +43,7 @@ const PasswordInput = ({ label, value, onChange, placeholder, error }: any) => {
 };
 
 const SettingsPage = () => {
+  const navigate = useNavigate();
   const [passwords, setPasswords] = useState({
     newPass: "",
     confirm: "",
@@ -77,11 +79,21 @@ const SettingsPage = () => {
   return (
     <div className="space-y-6 max-w-6xl mx-auto animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="heading-section">Settings</h1>
-          <p className="body-main !text-sm mt-1">
-            Application settings and preferences
-          </p>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/dashboard")}
+            className="rounded-full hover:bg-slate-100 h-10 w-10 transition-all border border-slate-100 bg-white shrink-0 shadow-sm"
+          >
+            <ChevronLeft className="h-5 w-5 text-slate-600" />
+          </Button>
+          <div>
+            <h1 className="heading-section">Settings</h1>
+            <p className="body-main !text-sm mt-1">
+              Application settings and preferences
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-xl border border-slate-200 shadow-sm">
           <div className="text-right flex flex-col justify-center">

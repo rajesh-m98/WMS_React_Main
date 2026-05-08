@@ -20,13 +20,12 @@ export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: Ap
     
     const queryParams = new URLSearchParams({
       is_paginate: 'true',
-      companyid: (params?.companyid || 1).toString(),
       page: (params?.page || 1).toString(),
       size: (params?.size || 15).toString(),
     });
     
     if (params?.warehouseid) {
-      queryParams.append('warehouse_id', params.warehouseid.toString());
+      queryParams.append('warehouseid', params.warehouseid.toString());
     }
     
     if (params?.search) {
@@ -76,7 +75,7 @@ export const handleCreateItem = (itemData: Partial<ItemDTO>, editId?: number) =>
       : API_ENDPOINTS.MASTERS.ITEMS.CREATE;
 
     const response = await api.post(url, itemData);
-    if (response.data.status) {
+    if (response.data.status || response.status === 200) {
       return true;
     } else {
       dispatch(itemLoadFailure(response.data.message || (editId ? "Failed to update item" : "Failed to create item")));

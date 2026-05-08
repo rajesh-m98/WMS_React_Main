@@ -224,18 +224,49 @@ const UserEdit = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="caption-small !text-slate-400">
-                  Email Address
-                </Label>
-                <Input
-                  type="email"
-                  value={formData.email_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email_id: e.target.value })
-                  }
-                  className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="caption-small !text-slate-400">
+                    Email Address
+                  </Label>
+                  <Input
+                    type="email"
+                    value={formData.email_id}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email_id: e.target.value })
+                    }
+                    className="rounded-xl h-11 border-slate-200 bg-slate-50/50 focus:bg-white transition-all body-strong !text-slate-900"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="caption-small !text-slate-400">
+                    Phone Number
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 bg-white z-10 text-sm">
+                      +91
+                    </span>
+                    <Input
+                      type="tel"
+                      placeholder="9876543210"
+                      maxLength={10}
+                      className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 pl-14"
+                      required
+                      value={formData.mobile_number}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "");
+                        if (value.length > 0) {
+                          const firstDigit = parseInt(value[0]);
+                          if (firstDigit < 6) return;
+                        }
+                        setFormData({
+                          ...formData,
+                          mobile_number: value,
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -334,20 +365,6 @@ const UserEdit = () => {
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-8">
             <CardTitle className="caption-small !text-slate-500 flex items-center justify-between">
               <span>Module Access Matrix</span>
-              <div className="flex gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-blue-600" />
-                  <span className="text-[10px] uppercase font-bold text-slate-400">
-                    Read Mode
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
-                  <span className="text-[10px] uppercase font-bold text-slate-400">
-                    Write Mode
-                  </span>
-                </div>
-              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -355,9 +372,9 @@ const UserEdit = () => {
               <div className="overflow-x-auto">
                 <div className="min-w-[1000px]">
                   {/* Header Row: Module Names */}
-                  <div className="grid grid-cols-[180px_repeat(8,1fr)] bg-slate-50 border-b border-slate-100 items-center">
+                  <div className="grid grid-cols-[180px_repeat(7,1fr)] bg-slate-50 border-b border-slate-100 items-center">
                     <div className="p-4 border-r border-slate-100">
-                      <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px]">
+                      <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px] whitespace-nowrap">
                         Modules \ Access
                       </span>
                     </div>
@@ -366,16 +383,16 @@ const UserEdit = () => {
                         key={p.key}
                         className="p-4 text-center border-r border-slate-100 last:border-r-0"
                       >
-                        <span className="body-strong !text-[11px] !text-slate-800 uppercase tracking-tighter">
+                        <span className="body-strong text-[14px] !text-slate-800 uppercase whitespace-nowrap">
                           {p.label}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-[180px_repeat(8,1fr)] items-center border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
+                  <div className="grid grid-cols-[180px_repeat(7,1fr)] items-center border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
                     <div className="p-4 bg-slate-50/50 border-r border-slate-100 flex items-center justify-between">
-                      <span className="body-strong !text-blue-600 uppercase tracking-widest !text-[10px]">
+                      <span className="body-strong !text-blue-600 uppercase tracking-widest text-[14px]">
                         Access
                       </span>
                       <Checkbox

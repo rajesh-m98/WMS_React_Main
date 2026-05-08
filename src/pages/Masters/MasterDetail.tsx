@@ -139,24 +139,15 @@ const MasterDetail = () => {
     auditEntries.push(
       { label: "Item Code", value: activeData.item_code },
       { label: "Description", value: activeData.item_description },
-      { label: "Foreign Name", value: activeData.frgnname },
-      { label: "Barcode", value: activeData.barcode },
-      { label: "Group Code", value: activeData.itmsgrpcod },
-      { label: "Warehouse ID", value: activeData.warehouse_id },
-      { label: "Sell UOM", value: activeData.salunitmsr },
-      { label: "Purchase UOM", value: activeData.purunitmsr },
-      { label: "Inventory UOM", value: activeData.invntryuom },
-      { label: "Current Stock", value: activeData.current_stock },
+      { label: "EAN Barcode", value: activeData.ean_barcode },
+      { label: "SAP Barcode", value: activeData.sap_barcode },
       { label: "Batch Number", value: activeData.batch_number },
-      { label: "Batch Managed", value: activeData.manbtchnum === "Y" ? "YES" : "NO" },
-      { label: "Serial Managed", value: activeData.mansernum === "Y" ? "YES" : "NO" },
-      { label: "Active Status", value: activeData.active === "Y" ? "ENABLED" : "DISABLED" },
-      { label: "Layer 1 (Zone)", value: activeData.layer1 },
-      { label: "Layer 2 (Bay)", value: activeData.layer2 },
-      { label: "Layer 3 (Rack)", value: activeData.layer3 },
-      { label: "Layer 4 (Shelf)", value: activeData.layer4 },
-      { label: "Layer 5 (Bin)", value: activeData.layer5 },
-      { label: "Layer 6 (Sub-Bin)", value: activeData.layer6 }
+      { label: "Open Quantity", value: activeData.open_quantity },
+      { label: "Active Status", value: activeData.active },
+      { label: "Warehouse ID", value: activeData.warehouse_id },
+      { label: "Location IDs", value: activeData.location?.join(", ") },
+      { label: "Floor IDs", value: activeData.floor?.join(", ") },
+      { label: "Device IDs", value: activeData.device?.join(", ") }
     );
   } else if (type === "warehouse") {
     auditEntries.push(

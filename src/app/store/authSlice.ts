@@ -71,6 +71,7 @@ const authSlice = createSlice({
     },
 
     setSignIn: (state, action: PayloadAction<{ token: string; refresh_token?: string; userData: UserData }>) => {
+      state.loading = false;
       state.token = action.payload.token;
       state.refresh_token = action.payload.refresh_token || null;
       state.userData = action.payload.userData;

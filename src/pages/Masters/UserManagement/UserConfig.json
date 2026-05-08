@@ -86,14 +86,13 @@
       "cancelBtn": "Cancel"
     },
     "permissions": [
-      { "label": "Live Dashboard", "key": "dashboard" },
-      { "label": "Stock Inventory", "key": "inventory" },
-      { "label": "Orders & Dispatch", "key": "orders" },
-      { "label": "Stock Updates", "key": "stock_update" },
-      { "label": "System Reports", "key": "reports" },
-      { "label": "Master Records", "key": "master_data" },
-      { "label": "User Management", "key": "user_management" },
-      { "label": "System Settings", "key": "settings" }
+      { "label": "Home", "key": "home" },
+      { "label": "GRPO Create", "key": "grpo_create" },
+      { "label": "Sorting", "key": "sorting" },
+      { "label": "Putaway", "key": "putaway" },
+      { "label": "Picking", "key": "picking" },
+      { "label": "Dispatch", "key": "dispatch" },
+      { "label": "Bin Transfer", "key": "bin_transfer" }
     ]
   }
 }

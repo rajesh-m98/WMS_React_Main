@@ -1,0 +1,35 @@
+{
+  "strings": {
+    "putaway": {
+      "title": "Putaway GIN",
+      "subtitle": "Manage Goods Inward Putaway Entries",
+      "emptyState": "No Putaway GIN records found"
+    },
+    "flowThrough": {
+      "title": "Flow Through GIN",
+      "subtitle": "Manage Goods Inward Flow Through Entries",
+      "emptyState": "No Flow Through GIN records found"
+    },
+    "detail": {
+      "title": "GIN Details",
+      "headerSection": "Header Info",
+      "linesSection": "Transaction Lines",
+      "backBtn": "Back to List"
+    },
+    "edit": {
+      "title": "Edit GIN Entry",
+      "saveBtn": "Update Line",
+      "discardBtn": "Cancel Changes"
+    }
+  },
+  "table": {
+    "headers": [
+      { "key": "item_code", "label": "Item Code" },
+      { "key": "item_desc", "label": "Description" },
+      { "key": "open_qty", "label": "Open Qty" },
+      { "key": "received_qty", "label": "Received Qty" },
+      { "key": "mrp", "label": "MRP" },
+      { "key": "status", "label": "Status" }
+    ]
+  }
+}

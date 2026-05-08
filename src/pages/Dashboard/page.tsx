@@ -20,6 +20,7 @@ import {
   Server,
   Zap,
   Loader2,
+  ChevronRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { Badge } from "@/components/ui";
@@ -40,6 +41,7 @@ import { handleFetchAllHST } from "@/app/manager/hstManager";
 import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import { handleFetchAllItems } from "@/app/manager/itemManager";
 import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
+import { handleFetchGins } from "@/app/manager/ginManager";
 
 const iconMap: Record<string, any> = {
   Users,
@@ -78,6 +80,8 @@ export const Dashboard = () => {
   const { totalCount: itemCount } = useAppSelector((state) => state.item);
   const inward = useAppSelector((state) => state.putaway.inward);
   const outward = useAppSelector((state) => state.putaway.outward);
+  const { totalFlowThrough, totalPutaway, flowThroughItems, putawayItems } =
+    useAppSelector((state) => state.gin);
 
   const [deltas, setDeltas] = useState<Record<string, string>>({});
   const [dataReady, setDataReady] = useState(false);
@@ -90,6 +94,22 @@ export const Dashboard = () => {
           dispatch(handleFetchAllHST()),
           dispatch(handleFetchAllWarehouses()),
           dispatch(handleFetchAllItems()),
+          dispatch(
+            handleFetchGins({
+              gin_type: 1,
+              page: 1,
+              size: 20,
+              is_paginate: true,
+            }),
+          ),
+          dispatch(
+            handleFetchGins({
+              gin_type: 2,
+              page: 1,
+              size: 20,
+              is_paginate: true,
+            }),
+          ),
           dispatch(
             handleFetchPutawayHistory("inward", {
               page: 1,
@@ -109,22 +129,40 @@ export const Dashboard = () => {
 
   // Combined and sorted transactions for the real-time ledger
   const activeTransactions = useMemo(() => {
-    return [...inward.data, ...outward.data]
+    const combined = [
+      ...inward.data.map((tx) => ({ ...tx, origin: "putaway" })),
+      ...outward.data.map((tx) => ({ ...tx, origin: "putaway" })),
+      ...flowThroughItems.map((tx) => ({
+        ...tx,
+        origin: "gin",
+        putaway_type: 1,
+      })),
+      ...putawayItems.map((tx) => ({ ...tx, origin: "gin", putaway_type: 1 })),
+    ];
+
+    return combined
       .sort((a, b) => {
-        const idA = typeof a.id === "number" ? a.id : parseInt(a.id) || 0;
-        const idB = typeof b.id === "number" ? b.id : parseInt(b.id) || 0;
-        return idB - idA;
+        const timeA = new Date(a.docdate || a.created_at || 0).getTime() || 0;
+        const timeB = new Date(b.docdate || b.created_at || 0).getTime() || 0;
+        return timeB - timeA;
       })
-      .slice(0, 10);
-  }, [inward.data, outward.data]);
+      .slice(0, 5);
+  }, [inward.data, outward.data, flowThroughItems, putawayItems]);
 
   const displayTransactions = useMemo(() => {
     return activeTransactions.map((tx) => ({
-      id: tx.id?.toString(),
-      type: tx.putaway_type === 1 ? "Inward" : "Outward",
-      item: tx.item_code,
-      qty: tx.quantity,
-      date: tx.docdate,
+      id: tx.id?.toString() || "---",
+      headerId: tx.header_id,
+      origin: tx.origin,
+      type:
+        tx.origin === "gin"
+          ? "Inward (GIN)"
+          : tx.putaway_type === 1
+            ? "Inward"
+            : "Outward",
+      item: tx.item_code || "Unknown Item",
+      qty: tx.quantity || tx.received_qty || 0,
+      date: (tx.docdate || tx.created_at || "").toString().split("T")[0] || "---",
     }));
   }, [activeTransactions]);
 
@@ -133,6 +171,9 @@ export const Dashboard = () => {
     const days = analysisType === "week" ? 7 : 30;
     const dataPoints: any[] = [];
     const today = new Date();
+
+    const allInward = [...inward.data, ...flowThroughItems, ...putawayItems];
+    const allOutward = [...outward.data];
 
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date();
@@ -149,45 +190,55 @@ export const Dashboard = () => {
           ? d.toLocaleDateString("en-US", { weekday: "short" })
           : `${month}/${day}`;
 
-      // Using .length for "how many" transactions instead of quantity sum
-      const dayInward = inward.data.filter((tx) =>
-        tx.docdate?.includes(dateStr),
+      const dayInward = allInward.filter((tx) =>
+        (tx.docdate || tx.created_at)?.includes(dateStr),
       ).length;
-      const dayOutward = outward.data.filter((tx) =>
-        tx.docdate?.includes(dateStr),
+
+      const dayOutward = allOutward.filter((tx) =>
+        (tx.docdate || tx.created_at)?.includes(dateStr),
       ).length;
 
       dataPoints.push({ name, inward: dayInward, outward: dayOutward });
     }
     return dataPoints;
-  }, [analysisType, inward.data, outward.data]);
+  }, [analysisType, inward.data, outward.data, flowThroughItems, putawayItems]);
 
   useEffect(() => {
     if (dataReady) {
-      const lastSeen = JSON.parse(
-        localStorage.getItem("dashboard_last_seen_metrics") || "{}",
-      );
+      const today = new Date().toISOString().split("T")[0];
+      const baselineStr = localStorage.getItem("dashboard_baseline_metrics");
+      let baseline = baselineStr ? JSON.parse(baselineStr) : null;
+
+      // Initialize or reset baseline if it's a new day
+      if (!baseline || baseline.date !== today) {
+        baseline = {
+          date: today,
+          counts: {
+            hst: hstCount,
+            warehouse: warehouseCount,
+            users: realUserCount,
+            items: itemCount,
+          },
+        };
+        localStorage.setItem(
+          "dashboard_baseline_metrics",
+          JSON.stringify(baseline),
+        );
+      }
+
       const calculateDelta = (current: number, field: string) => {
-        const last = lastSeen[field];
-        if (last === undefined) return "+0";
-        const diff = current - last;
+        const baseValue = baseline.counts[field];
+        if (baseValue === undefined) return "+0";
+        const diff = current - baseValue;
         return diff >= 0 ? `+${diff}` : `${diff}`;
       };
+
       setDeltas({
         hst: calculateDelta(hstCount, "hst"),
         warehouse: calculateDelta(warehouseCount, "warehouse"),
         users: calculateDelta(realUserCount, "users"),
         items: calculateDelta(itemCount, "items"),
       });
-      localStorage.setItem(
-        "dashboard_last_seen_metrics",
-        JSON.stringify({
-          hst: hstCount,
-          warehouse: warehouseCount,
-          users: realUserCount,
-          items: itemCount,
-        }),
-      );
     }
   }, [dataReady, hstCount, warehouseCount, realUserCount, itemCount]);
 
@@ -247,7 +298,7 @@ export const Dashboard = () => {
     },
     {
       title: "Inward Pending",
-      value: inward.totalCount.toString(),
+      value: (inward.totalCount + totalFlowThrough + totalPutaway).toString(),
       icon: "ArrowUpRight",
       change: "+Today",
       up: true,
@@ -408,6 +459,14 @@ export const Dashboard = () => {
                 Global Movement History
               </p>
             </div>
+            <Button 
+              variant="outline" 
+              className="rounded-2xl h-12 px-6 label-bold border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all group shadow-sm"
+              onClick={() => navigate("/activity-logs")}
+            >
+              VIEW ALL
+              <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -437,14 +496,20 @@ export const Dashboard = () => {
                   <tr
                     key={tx.id}
                     className="hover:bg-blue-50/30 transition-all duration-300 group cursor-pointer border-b border-slate-50 last:border-0"
-                    onClick={() => navigate(`/transactions/tasks/${tx.id}`)}
+                    onClick={() => {
+                      if (tx.origin === "gin") {
+                        navigate(`/transactions/gin/view/${tx.headerId}`);
+                      } else {
+                        navigate(`/transactions/tasks/${tx.id}`);
+                      }
+                    }}
                   >
                     <td className="px-10 py-6 text-sm font-black text-slate-400 font-mono">
                       #{tx.id}
                     </td>
                     <td className="px-10 py-6">
                       <Badge
-                        className={`rounded-lg px-3 py-1.5 border-0 font-black text-[10px] tracking-widest text-white ${tx.type === "Inward" ? "bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.3)]" : "bg-indigo-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]"}`}
+                        className={`rounded-lg px-3 py-1.5 border-0 font-black text-[10px] tracking-widest text-white ${tx.type === "Inward" || tx.type === "Inward (GIN)" ? "bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.3)]" : "bg-indigo-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]"}`}
                       >
                         {tx.type.toUpperCase()}
                       </Badge>
@@ -460,7 +525,7 @@ export const Dashboard = () => {
                       </div>
                     </td>
                     <td className="px-10 py-6 text-right">
-                      <span className="bg-slate-900 px-4 py-2 rounded-xl text-white font-black text-xs shadow-lg">
+                      <span className="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-slate-600 font-black text-xs shadow-sm">
                         {tx.qty}
                       </span>
                     </td>

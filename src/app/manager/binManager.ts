@@ -106,11 +106,11 @@ export const handleExportBins = () => async (dispatch: AppDispatch, getState: ()
   const extract = (nodes: BinLayerDTO[], level = 1, parentValues: string[] = []) => {
     nodes.forEach(node => {
       const currentRow = {
-         id: node.id,
-         layer: node.layer,
-         value: node.value,
-         barcode: node.barcode,
-         full_path: [...parentValues, node.value].join(' > ')
+         "ID": node.id,
+         "Level": `layer${node.layer}`,
+         "Name": node.value,
+         "Barcode": node.barcode || "-",
+         "Path": [...parentValues, node.value].join(' > ')
       };
       flattened.push(currentRow);
       if (node.children && node.children.length > 0) {

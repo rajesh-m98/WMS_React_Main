@@ -1,7 +1,7 @@
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { AppDispatch, RootState } from '../store/index';
-import { loginStart, loginSuccess, loginFailure, UserData } from '../store/authSlice';
+import { loginStart, setSignIn, loginFailure } from '../store/authSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 
 export const handleLoginSubmit = () => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -29,15 +29,14 @@ export const handleLoginSubmit = () => async (dispatch: AppDispatch, getState: (
     });
 
     if (response.data.status) {
-      const access_token = response.data.access_token;
-      const refresh_token = response.data.refresh_token;
+      const { access_token, refresh_token, data: userData } = response.data;
 
-      
+      dispatch(setSignIn({
+        token: access_token,
+        refresh_token: refresh_token,
+        userData: userData || {}
+      }));
 
-      localStorage.setItem('token', access_token);
-      if (refresh_token) {
-        localStorage.setItem('refresh_token', refresh_token);
-      }
       toast.success(response.data.message || 'Authentication successful');
       return true;
     } else {

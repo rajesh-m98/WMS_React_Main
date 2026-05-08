@@ -1,0 +1,38 @@
+{
+  "strings": {
+    "title": "Floor Master",
+    "subtitle": "Manage warehouse floors and levels",
+    "addBtn": "Add New Floor",
+    "exportBtn": "Export CSV",
+    "searchPlaceholder": "Search by floor name or barcode...",
+    "table": {
+      "id": "ID",
+      "floor1": "Level 1",
+      "floor2": "Level 2",
+      "floor3": "Level 3",
+      "floor4": "Level 4",
+      "floor5": "Level 5",
+      "floor6": "Level 6",
+      "barcode": "Barcode",
+      "actions": "Actions"
+    },
+    "create": {
+      "title": "Create New Floor",
+      "subtitle": "Define floor levels and barcode",
+      "saveBtn": "Save Floor",
+      "discardBtn": "Discard"
+    },
+    "edit": {
+      "title": "Edit Floor",
+      "subtitle": "Update floor levels and configuration",
+      "saveBtn": "Update Floor",
+      "discardBtn": "Cancel"
+    },
+    "deleteAlert": {
+      "title": "Delete Floor",
+      "descriptionTemplate": "Are you sure you want to delete floor {value}? This action cannot be undone.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Delete"
+    }
+  }
+}

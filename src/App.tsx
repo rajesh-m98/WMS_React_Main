@@ -17,12 +17,22 @@ import { LocationMaster } from "./pages/Masters/BinMaster/page";
 import { HSTMaster } from "./pages/Masters/HSTMaster/page";
 import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
 import { PackageMaster } from "./pages/Masters/PackageMaster/page";
+import { FloorMaster } from "./pages/Masters/FloorMaster/page";
+import FloorCreate from "./pages/Masters/FloorMaster/Create";
+import FloorEdit from "./pages/Masters/FloorMaster/Edit";
 import MasterDetail from "./pages/Masters/MasterDetail";
 import SettingsPage from "./pages/SettingsPage";
 import { DispatchHistory } from "./pages/DispatchHistory/DispatchHistory";
 import { InwardHistory } from "./pages/Transactions/InwardHistory";
 import { OutwardHistory } from "./pages/Transactions/OutwardHistory";
 import { Login } from "./pages/Login/page";
+import PutawayPage from "./pages/Transactions/GinManagement/PutawayPage";
+import FlowThroughPage from "./pages/Transactions/GinManagement/FlowThroughPage";
+import GinDetail from "./pages/Transactions/GinManagement/Detail";
+import GinEdit from "./pages/Transactions/GinManagement/Edit";
+import GinHeaderEdit from "./pages/Transactions/GinManagement/HeaderEdit";
+import GinCreate from "./pages/Transactions/GinManagement/Create";
+import GinCreateLine from "./pages/Transactions/GinManagement/CreateLine";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +78,34 @@ const App = () => (
                       path="/transactions/outward-history"
                       element={<OutwardHistory />}
                     />
+                    <Route
+                      path="/transactions/gin/putaway"
+                      element={<PutawayPage />}
+                    />
+                    <Route
+                      path="/transactions/gin/flow-through"
+                      element={<FlowThroughPage />}
+                    />
+                    <Route
+                      path="/transactions/gin/view/:headerId/:lineId"
+                      element={<GinDetail />}
+                    />
+                     <Route
+                        path="/transactions/gin/edit/:headerId/:lineId"
+                        element={<GinEdit />}
+                      />
+                      <Route
+                        path="/transactions/gin/edit-header/:id"
+                        element={<GinHeaderEdit />}
+                      />
+                      <Route
+                        path="/transactions/gin/create"
+                        element={<GinCreate />}
+                      />
+                      <Route
+                        path="/transactions/gin/create-line"
+                        element={<GinCreateLine />}
+                      />
                     <Route path="/masters/users" element={<UserManagement />} />
                     <Route
                       path="/masters/users/create"
@@ -93,6 +131,9 @@ const App = () => (
                     />
                     <Route path="/masters/packaging" element={<PackageMaster />} />
                     <Route path="/masters/packaging/:id" element={<MasterDetail />} />
+                    <Route path="/masters/floors" element={<FloorMaster />} />
+                    <Route path="/masters/floors/create" element={<FloorCreate />} />
+                    <Route path="/masters/floors/:id/edit" element={<FloorEdit />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

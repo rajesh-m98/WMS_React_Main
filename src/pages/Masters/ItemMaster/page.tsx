@@ -87,19 +87,17 @@ export const ItemMaster = () => {
 
   // Form state
   const [formData, setFormData] = useState<Partial<ItemDTO>>({
-    companyid: 1,
     warehouse_id: 1,
     item_code: "",
     item_description: "",
-    itmsgrpcod: "Items",
-    manbtchnum: "N",
-    mansernum: "N",
-    invntryuom: "Items",
+    batch_number: "",
     active: "Y",
-    barcode: "",
-    opening_stock: 0,
-    current_stock: 0,
-    location_mapping: "Single",
+    ean_barcode: "",
+    sap_barcode: "",
+    open_quantity: 0,
+    location: [0],
+    floor: [0],
+    device: [0],
   });
 
   useEffect(() => {
@@ -130,19 +128,17 @@ export const ItemMaster = () => {
     } else {
       setEditingItem(null);
       setFormData({
-        companyid: 1,
         warehouse_id: 1,
         item_code: "",
         item_description: "",
-        itmsgrpcod: "Items",
-        manbtchnum: "N",
-        mansernum: "N",
-        invntryuom: "Items",
+        batch_number: "",
         active: "Y",
-        barcode: "",
-        opening_stock: 0,
-        current_stock: 0,
-        location_mapping: "Single",
+        ean_barcode: "",
+        sap_barcode: "",
+        open_quantity: 0,
+        location: [0],
+        floor: [0],
+        device: [0],
       });
     }
     setIsDialogOpen(true);
@@ -235,15 +231,16 @@ export const ItemMaster = () => {
                     DESCRIPTION
                   </TableHead>
                   <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[150px]">
-                    BATCH NUMBER
+                    EAN BARCODE
                   </TableHead>
-                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-auto">
-                    BARCODE
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[120px]">
+                    OPEN QTY
                   </TableHead>
                   <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap text-right w-[150px]">
                     ACTIONS
                   </TableHead>
                 </TableRow>
+
               </TableHeader>
               <TableBody>
                 {loading ? (
@@ -279,16 +276,17 @@ export const ItemMaster = () => {
                         {item.item_description}
                       </TableCell>
                       <TableCell className="px-5 py-4 font-mono text-[12px] font-bold text-slate-600 whitespace-nowrap">
-                        {item.batch_number || "BATCH-N/A"}
+                        {item.ean_barcode || "—"}
                       </TableCell>
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <Badge
                           variant="outline"
-                          className="rounded-lg border border-slate-200 bg-white font-mono text-[11px] font-bold px-3 py-1 text-slate-600 shadow-sm whitespace-nowrap"
+                          className="rounded-lg border border-blue-200 bg-blue-50/30 font-mono text-[11px] font-bold px-3 py-1 text-blue-700 shadow-sm whitespace-nowrap"
                         >
-                          {item.barcode || "—"}
+                          {item.open_quantity ?? 0}
                         </Badge>
                       </TableCell>
+
                       <TableCell className="text-right px-5 py-4">
                         <div className="flex items-center justify-end gap-2 text-left transition-all">
                           <Button
@@ -483,30 +481,31 @@ export const ItemMaster = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
                     <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.groupCode}
+                      {config.strings.dialog.batchNumber}
                     </Label>
                     <Input
-                      value={formData.itmsgrpcod}
+                      value={formData.batch_number}
                       onChange={(e) =>
-                        setFormData({ ...formData, itmsgrpcod: e.target.value })
+                        setFormData({ ...formData, batch_number: e.target.value })
                       }
+                      placeholder="Batch-001"
                       className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
                     />
                   </div>
                   <div className="space-y-2.5">
                     <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.barcode}
+                      {config.strings.dialog.ean_barcode}
                     </Label>
                     <Input
-                      value={formData.barcode}
+                      value={formData.ean_barcode}
                       onChange={(e) =>
-                        setFormData({ ...formData, barcode: e.target.value })
+                        setFormData({ ...formData, ean_barcode: e.target.value })
                       }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 font-mono transition-all disabled:opacity-50"
-                      disabled={!!editingItem}
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 font-mono transition-all"
                     />
                   </div>
                 </div>
+
               </div>
 
               {/* Section 2: Logistics & Configuration */}
@@ -521,12 +520,12 @@ export const ItemMaster = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
                     <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.uom}
+                      {config.strings.dialog.sap_barcode}
                     </Label>
                     <Input
-                      value={formData.invntryuom}
+                      value={formData.sap_barcode}
                       onChange={(e) =>
-                        setFormData({ ...formData, invntryuom: e.target.value })
+                        setFormData({ ...formData, sap_barcode: e.target.value })
                       }
                       className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all text-center"
                     />
@@ -540,10 +539,9 @@ export const ItemMaster = () => {
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          active: e.target.value.toUpperCase(),
+                          active: e.target.value,
                         })
                       }
-                      maxLength={1}
                       className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 text-center transition-all"
                     />
                   </div>
@@ -552,77 +550,22 @@ export const ItemMaster = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2.5">
                     <Label className="caption-small !text-slate-400">
-                      {config.strings.table.opening}
+                      {config.strings.dialog.open_quantity}
                     </Label>
                     <Input
                       type="number"
-                      value={formData.opening_stock}
+                      value={formData.open_quantity}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          opening_stock: Number(e.target.value),
+                          open_quantity: Number(e.target.value),
                         })
                       }
                       className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
                     />
                   </div>
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.table.location}
-                    </Label>
-                    <Select
-                      value={formData.location_mapping}
-                      onValueChange={(val) =>
-                        setFormData({ ...formData, location_mapping: val })
-                      }
-                    >
-                      <SelectTrigger className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all">
-                        <SelectValue placeholder="Select Mapping" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-slate-200 shadow-2xl p-2 bg-white">
-                        <SelectItem
-                          value="Single"
-                          className="rounded-xl font-bold py-3"
-                        >
-                          Single Location
-                        </SelectItem>
-                        <SelectItem
-                          value="Multiple"
-                          className="rounded-xl font-bold py-3"
-                        >
-                          Multiple Locations
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase  ml-1">
-                      {config.strings.dialog.batch}
-                    </Label>
-                    <Input
-                      value={formData.manbtchnum}
-                      onChange={(e) =>
-                        setFormData({ ...formData, manbtchnum: e.target.value })
-                      }
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-bold transition-all"
-                    />
-                  </div>
-                  <div className="space-y-2.5">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase  ml-1">
-                      {config.strings.dialog.serial}
-                    </Label>
-                    <Input
-                      value={formData.mansernum}
-                      onChange={(e) =>
-                        setFormData({ ...formData, mansernum: e.target.value })
-                      }
-                      className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-bold transition-all"
-                    />
-                  </div>
-                </div>
               </div>
 
               <Separator className="col-span-1 md:col-span-2 bg-slate-100 my-4" />
@@ -632,58 +575,58 @@ export const ItemMaster = () => {
                 <div className="flex items-center gap-3 mb-4">
                   <Settings className="h-5 w-5 text-slate-400" />
                   <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">
-                    {config.strings.dialog.attributes} (1-10)
+                    {config.strings.dialog.attributes}
                   </h3>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  {[...Array(10)].map((_, i) => (
-                    <div key={i} className="space-y-1.5">
-                      <Label className="label-bold !text-slate-600 !tracking-tighter !font-semibold">
-                        Attr {i + 1}
-                      </Label>
-                      <Input
-                        value={(formData as any)[`attribute${i + 1}`] || ""}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            [`attribute${i + 1}`]: e.target.value,
-                          })
-                        }
-                        className="h-10 rounded-xl bg-slate-50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 text-xs font-bold transition-all"
-                      />
-                    </div>
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2.5">
+                    <Label className="caption-small !text-slate-400">
+                      {config.strings.dialog.location}
+                    </Label>
+                    <Input
+                      value={formData.location?.join(", ") || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          location: e.target.value.split(",").map((v) => parseInt(v.trim()) || 0),
+                        })
+                      }
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2.5">
+                    <Label className="caption-small !text-slate-400">
+                      {config.strings.dialog.floor}
+                    </Label>
+                    <Input
+                      value={formData.floor?.join(", ") || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          floor: e.target.value.split(",").map((v) => parseInt(v.trim()) || 0),
+                        })
+                      }
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2.5">
+                    <Label className="caption-small !text-slate-400">
+                      {config.strings.dialog.device}
+                    </Label>
+                    <Input
+                      value={formData.device?.join(", ") || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          device: e.target.value.split(",").map((v) => parseInt(v.trim()) || 0),
+                        })
+                      }
+                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Section 4: Structural Layers */}
-              <div className="space-y-6 md:col-span-2">
-                <div className="flex items-center gap-3 mb-4 mt-8">
-                  <Layers className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">
-                    {config.strings.dialog.layers} (1-6)
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="space-y-1.5">
-                      <Label className="label-bold !text-slate-600 !tracking-tighter !font-semibold">
-                        Layer {i + 1}
-                      </Label>
-                      <Input
-                        value={(formData as any)[`layer${i + 1}`] || ""}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            [`layer${i + 1}`]: e.target.value,
-                          })
-                        }
-                        className="h-10 rounded-xl bg-blue-50/50 border-blue-100 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-500 text-xs font-black text-blue-700 transition-all"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
               <div className="pb-10 col-span-1 md:col-span-2" />
             </div>
           </ScrollArea>

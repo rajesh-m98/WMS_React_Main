@@ -56,42 +56,23 @@ export interface HSTDeviceDTO {
 
 export interface ItemDTO {
   id: number;
-  companyid: number;
   warehouse_id: number;
   item_code: string;
-  batch_number: string;
   item_description: string;
-  frgnname?: string | null;
-  itmsgrpcod?: string | null;
-  manbtchnum?: string | null;
-  mansernum?: string | null;
-  salunitmsr?: string | null;
-  invntryuom?: string | null;
-  purunitmsr?: string | null;
-  active?: string | null;
-  barcode?: string | null;
-  attribute1?: string | null;
-  attribute2?: string | null;
-  attribute3?: string | null;
-  attribute4?: string | null;
-  attribute5?: string | null;
-  attribute6?: string | null;
-  attribute7?: string | null;
-  attribute8?: string | null;
-  attribute9?: string | null;
-  attribute10?: string | null;
-  layer1?: string | null;
-  layer2?: string | null;
-  layer3?: string | null;
-  layer4?: string | null;
-  layer5?: string | null;
-  layer6?: string | null;
-  opening_stock?: number;
-  current_stock?: number;
-  location_mapping?: string;
+  batch_number: string;
+  active: string;
+  ean_barcode: string;
+  sap_barcode: string;
+  open_quantity: number;
+  location: number[];
+  floor: number[];
+  device: number[];
   created_at?: string;
   updated_at?: string;
+  deleted_at?: string | null;
+  is_deleted?: boolean;
 }
+
 
 export interface WarehouseDTO {
   id: number;
@@ -138,4 +119,29 @@ export interface CreatePackagePayload {
   package_code: string;
   description: string;
   status: string;
+}
+
+export interface FloorDTO {
+  id: number;
+  warehouse_id: number;
+  floor1: string;
+  floor2: string;
+  floor3: string;
+  floor4: string;
+  floor5: string;
+  floor6: string;
+  barcode: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreateFloorPayload {
+  warehouse_id: number;
+  floor1: string;
+  floor2: string;
+  floor3: string;
+  floor4: string;
+  floor5: string;
+  floor6: string;
+  barcode: string;
 }
