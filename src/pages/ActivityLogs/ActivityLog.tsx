@@ -159,48 +159,15 @@ export const ActivityLog = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
-            <Activity className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="heading-section !text-2xl uppercase">
-              Global Activity Logs
-            </h1>
-            <p className="body-main !text-sm mt-1 uppercase tracking-widest text-slate-400">
-              Master Audit Ledger
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all font-bold gap-2 h-12 px-6"
-            onClick={() => window.location.reload()}
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
-            />
-            Sync Logs
-          </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-200 px-6 h-12 font-bold gap-2 transition-all active:scale-95">
-            <Download className="w-4 h-4" />
-            Export Audit
-          </Button>
-        </div>
-      </div>
-
-      {/* Independent Filter Bar */}
-      <Card className="border-0 shadow-sm rounded-2xl bg-white overflow-hidden">
+      {/* Search and Filter Row */}
+      <Card className="border-0 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-[2.5rem] bg-white overflow-hidden">
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row items-center gap-4">
-            <div className="relative w-full lg:w-1/3 shrink-0">
+            <div className="relative w-full lg:w-1/4 shrink-0">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
               <Input
                 placeholder="Search items, partners or docs..."
-                className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all"
+                className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -223,7 +190,7 @@ export const ActivityLog = () => {
                       setTypeFilter(t as any);
                       setPage(1);
                     }}
-                    className={`relative z-10 px-6 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all duration-300 ${
+                    className={`relative z-10 px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                       typeFilter === t
                         ? "text-blue-600"
                         : "text-slate-400 hover:text-slate-600"
@@ -243,11 +210,11 @@ export const ActivityLog = () => {
               className="hidden lg:block h-8 bg-slate-100"
             />
 
-            <div className="flex items-center gap-2 w-full lg:w-auto flex-1">
+            <div className="flex items-center gap-2 w-full lg:w-auto">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">
                 Date:
               </span>
-              <div className="relative flex-1 lg:max-w-[200px]">
+              <div className="relative w-full lg:w-40">
                 <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   type="date"
@@ -259,6 +226,9 @@ export const ActivityLog = () => {
                   }}
                 />
               </div>
+            </div>
+
+            <div className="flex items-center gap-2 ml-auto">
               {dateFilter && (
                 <Button
                   variant="ghost"
@@ -269,13 +239,23 @@ export const ActivityLog = () => {
                   CLEAR DATE
                 </Button>
               )}
+              <Button
+                variant="outline"
+                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all font-black text-[10px] uppercase tracking-widest gap-2 h-11 px-5 bg-white shadow-sm hover:shadow-md active:scale-95"
+                onClick={() => window.location.reload()}
+              >
+                <RefreshCw
+                  className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
+                />
+                Sync
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Main Table */}
-      <Card className="border-0 shadow-sm rounded-2xl bg-white overflow-hidden">
+      <Card className="border-0 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-[3rem] bg-white overflow-hidden relative">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -320,7 +300,7 @@ export const ActivityLog = () => {
                       className="hover:bg-blue-50/30 transition-all duration-300 group cursor-pointer border-b border-slate-50 last:border-0"
                       onClick={() => {
                         if (tx.origin === "gin") {
-                          navigate(`/transactions/gin/view/${tx.headerId}`);
+                          navigate(`/transactions/gin/view/${tx.headerId}/${tx.id}`);
                         } else {
                           navigate(`/transactions/tasks/${tx.id}`);
                         }
@@ -399,34 +379,36 @@ export const ActivityLog = () => {
           {/* Pagination Footer */}
           <div className="p-8 bg-slate-50/30 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <Badge className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-slate-400 label-bold uppercase tracking-widest text-[11px]">
+              <div className="h-10 px-4 rounded-xl border border-slate-200 bg-white/50 text-slate-400 label-bold uppercase tracking-widest text-[11px] flex items-center shadow-sm">
                 Records Found:{" "}
-                <span className="text-blue-600 ml-2 font-black">
+                <span className="text-blue-600 ml-2 font-black tabular-nums">
                   {filteredData.length}
                 </span>
-              </Badge>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                Page {page} of {totalPages || 1}
-              </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-200 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95 hover:bg-white hover:border-blue-500 hover:text-blue-600"
-                disabled={page === 1 || isLoading}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-200 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95 hover:bg-white hover:border-blue-500 hover:text-blue-600"
-                disabled={page >= totalPages || isLoading}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
+            <div className="flex items-center gap-6">
+              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest tabular-nums">
+                Page {page} of {totalPages || 1}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="h-12 w-12 rounded-2xl border-2 border-slate-200 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95 hover:bg-white hover:border-blue-500 hover:text-blue-600 shadow-sm"
+                  disabled={page === 1 || isLoading}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-12 w-12 rounded-2xl border-2 border-slate-200 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95 hover:bg-white hover:border-blue-500 hover:text-blue-600 shadow-sm"
+                  disabled={page >= totalPages || isLoading}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>

@@ -70,20 +70,7 @@ export const handleFetchFloorById = (floorId: number) => async (dispatch: AppDis
     });
     
     if (response.data.status) {
-      const data = response.data.data;
-      if (Array.isArray(data)) {
-        // Group if it's an array of levels
-        const grouped = data.reduce((acc: any, curr: any) => {
-          if (!acc.barcode) {
-            acc = { id: curr.id, warehouse_id: curr.warehouse_id, barcode: curr.barcode, floor1: "", floor2: "", floor3: "", floor4: "", floor5: "", floor6: "" };
-          }
-          if (curr.floor && curr.value) acc[curr.floor] = curr.value;
-          return acc;
-        }, {});
-        dispatch(setCurrentFloor(grouped));
-      } else {
-        dispatch(setCurrentFloor(data));
-      }
+      dispatch(setCurrentFloor(response.data.data));
       dispatch(floorFetchFailure("")); 
     } else {
       toast.error("Failed to fetch floor details");

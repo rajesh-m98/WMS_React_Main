@@ -1,46 +1,34 @@
-import { useEffect, useState } from "react";
+import {
+  handleDeleteGinHeader,
+  handleDeleteGinLine,
+  handleFetchGins,
+} from "@/app/manager/ginManager";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
-  handleFetchGins,
-  handleDeleteGinLine,
-  handleDeleteGinHeader,
-} from "@/app/manager/ginManager";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-  Input,
-  Badge,
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Input,
 } from "@/components/ui";
 import {
-  Search,
-  Eye,
-  Edit2,
-  Trash2,
-  Download,
-  Plus,
-  Filter,
-  RefreshCw,
-  MoreVertical,
-  ChevronRight,
   ChevronLeft,
+  ChevronRight,
   ClipboardCheck,
   Loader2,
-  User,
+  RefreshCw,
+  Search,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import config from "./GinConfig.json";
-import { toast } from "sonner";
 
 interface GinListPageProps {
   type: "putaway" | "flow-through";
@@ -57,8 +45,6 @@ const GinListPage = ({ type }: GinListPageProps) => {
   const [deleteId, setDeleteId] = useState<any | null>(null);
 
   const ginType = type === "putaway" ? 2 : 1;
-  const strings =
-    type === "putaway" ? config.strings.putaway : config.strings.flowThrough;
 
   useEffect(() => {
     dispatch(
@@ -92,7 +78,14 @@ const GinListPage = ({ type }: GinListPageProps) => {
           </Badge>
         );
       default:
-        return <Badge variant="outline" className="font-black uppercase tracking-widest text-[9px]">Unknown</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className="font-black uppercase tracking-widest text-[9px]"
+          >
+            Unknown
+          </Badge>
+        );
     }
   };
 
@@ -130,36 +123,58 @@ const GinListPage = ({ type }: GinListPageProps) => {
     }
   };
 
-  const filteredItems = items.filter(
-    (item) =>
-      item.item_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.item_desc.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.header?.card_name || "")
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "---";
+    const date = new Date(dateString);
+    return date
+      .toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+      .toUpperCase();
+  };
+
+  const formatTime = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  // Group items by Gate Pass Number to show unique gate passes
+  const uniqueHeaders = useMemo(() => {
+    const gpMap = new Map();
+    items.forEach((item: any) => {
+      const gpNumber = item.gate_pass_number || item.header?.gate_pass_number;
+      if (gpNumber && !gpMap.has(gpNumber)) {
+        gpMap.set(gpNumber, item.header || item);
+      }
+    });
+    return Array.from(gpMap.values());
+  }, [items]);
+
+  const filteredHeaders = uniqueHeaders.filter(
+    (header) =>
+      (header?.gate_pass_number || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (header?.card_name || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (header?.card_code || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()),
   );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
-            <ClipboardCheck className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="heading-section !text-2xl">{strings.title}</h1>
-            <p className="body-main !text-sm mt-1">{strings.subtitle}</p>
-          </div>
-        </div>
-      </div>
-
       <Card className="border-0 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden bg-white">
         <CardHeader className="p-3 border-b border-slate-100/50">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="relative w-full lg:w-2/5 shrink-0">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
               <Input
-                placeholder="Search by SKU, Description or Vendor..."
+                placeholder="Search by Gate Pass, Vendor or Card Code..."
                 className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -168,7 +183,7 @@ const GinListPage = ({ type }: GinListPageProps) => {
             <div className="flex items-center gap-3 justify-end w-full lg:w-auto">
               <Button
                 variant="outline"
-                className="rounded-xl border-slate-200 hover:bg-slate-50 transition-all font-bold gap-2 h-12 px-6 bg-white shadow-sm hover:shadow-md active:scale-95"
+                className="rounded-2xl border-indigo-100 hover:bg-indigo-50 transition-all font-black gap-3 h-12 px-8 bg-white shadow-sm hover:shadow-indigo-100/50 active:scale-95 text-indigo-600 uppercase tracking-widest text-xs"
                 onClick={() =>
                   dispatch(
                     handleFetchGins({
@@ -180,7 +195,9 @@ const GinListPage = ({ type }: GinListPageProps) => {
                   )
                 }
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                />
                 Refresh
               </Button>
             </div>
@@ -189,173 +206,106 @@ const GinListPage = ({ type }: GinListPageProps) => {
         <CardContent className="p-0 overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-3 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  ID
+              <tr className="bg-indigo-50/40">
+                <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
+                  SL NO
                 </th>
-                <th className="px-3 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  Item Details
+                <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
+                  Gate Pass Details
                 </th>
-                <th className="px-3 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
+                <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
                   Supplier / Vendor
                 </th>
-                <th className="px-3 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  MRP
-                </th>
-                <th className="px-3 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  Quantities
-                </th>
-                <th className="px-3 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  Created Date
-                </th>
-                <th className="px-3 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
+                {type === "flow-through" && (
+                  <th className="px-6 py-6 text-center text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
+                    GRPO Doc Entry
+                  </th>
+                )}
+                <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
                   Created By
                 </th>
-                <th className="px-3 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  Status
+                <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
+                  Sync Info
                 </th>
-                <th className="px-3 py-5 text-center pr-6 text-[11px] font-black text-slate-500 uppercase tracking-widest border-b-2 border-slate-900/10 whitespace-nowrap">
-                  Actions
+                <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
+                  Status
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-indigo-50/30">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center gap-4">
                       <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
                       <p className="label-bold !text-slate-400">
-                        Loading GIN Transactions...
+                        Loading Master Data...
                       </p>
                     </div>
                   </td>
                 </tr>
-              ) : filteredItems.length > 0 ? (
-                filteredItems.map((item, idx) => (
+              ) : filteredHeaders.length > 0 ? (
+                filteredHeaders.map((header, idx) => (
                   <tr
-                    key={item.id}
-                    className="hover:bg-blue-50/50 transition-all duration-300 group cursor-default border-b border-slate-200 hover:shadow-[0_10px_30px_rgba(59,130,246,0.05)] relative z-0 hover:z-10"
+                    key={header.id}
+                    className="hover:bg-blue-50/50 transition-all duration-300 group cursor-pointer border-b border-slate-200 hover:shadow-[0_10px_30px_rgba(59,130,246,0.05)] relative z-0 hover:z-10"
+                    onClick={() =>
+                      navigate(
+                        `/transactions/gin/view/gp/${header.gate_pass_number}`,
+                      )
+                    }
                   >
-                    <td className="px-3 py-5 label-bold !text-slate-400 whitespace-nowrap">
+                    <td className="px-6 py-6 font-black text-black whitespace-nowrap">
                       {(page - 1) * PAGE_SIZE + idx + 1}
                     </td>
-                    <td className="px-3 py-5">
+                    <td className="px-6 py-6">
                       <div className="flex flex-col">
-                        <span className="body-strong !text-slate-800 text-sm  line-clamp-1">
-                          {item.item_desc}
-                        </span>
-                        <span className="caption-small !text-blue-600 mt-0.5 text-sm">
-                          {item.item_code}
+                        <span className="font-black text-slate-800 text-sm tracking-tight">
+                          GATE PASS #{header.gate_pass_number}
                         </span>
                       </div>
                     </td>
-                    <td className="px-3 py-5">
+                    <td className="px-6 py-6">
                       <div className="flex flex-col">
-                        <span className="body-strong !text-slate-800 text-sm">
-                          {item.header?.card_name || "Unknown Vendor"}
+                        <span className="font-black text-slate-700 text-sm">
+                          {header.card_name} - {header.card_code}
                         </span>
                       </div>
                     </td>
-                    <td className="px-3 py-5 text-center">
-                      <span className="text-sm font-black text-slate-900">
-                        ₹{item.mrp || "0"}
+                    {type === "flow-through" && (
+                      <td className="px-6 py-6 text-center">
+                        <Badge className="text-white border-indigo-100 font-black rounded-lg">
+                          {header.grpo_docentry || "---"}
+                        </Badge>
+                      </td>
+                    )}
+                    <td className="px-6 py-6">
+                      <span className="font-black text-slate-600 text-xs tracking-wider transition-all">
+                        {header.created_by || "System"}
                       </span>
                     </td>
-                    <td className="px-3 py-5">
-                      <div className="inline-flex items-center bg-slate-100/50 rounded-xl px-3 py-2 gap-4 border border-slate-300 shadow-sm">
-                        <div className="flex flex-col items-center">
-                          <span className="text-[9px] uppercase font-black text-slate-600 tracking-tighter">
-                            Open
-                          </span>
-                          <span className="body-strong !text-slate-700">
-                            {item.open_qty}
-                          </span>
-                        </div>
-                        <div className="w-px h-7 bg-slate-700" />
-                        <div className="flex flex-col items-center">
-                          <span className="text-[9px] uppercase font-black text-blue-500 tracking-tighter">
-                            Recv
-                          </span>
-                          <span className="body-strong !text-blue-700">
-                            {item.received_qty}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-5">
+                    <td className="px-6 py-6">
                       <div className="flex flex-col">
-                        <span className="body-strong !text-slate-800 text-xs">
-                          {item.created_at
-                            ? new Date(item.created_at).toLocaleDateString()
-                            : "N/A"}
+                        <span className="font-black text-indigo-900/80 text-xs tracking-tight">
+                          {formatDate(header.sync_date)}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
-                          {item.created_at
-                            ? new Date(item.created_at).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : ""}
+                        <span className="text-[10px] text-indigo-400 font-black uppercase tracking-tight mt-1">
+                          {formatTime(header.sync_date)}
                         </span>
                       </div>
                     </td>
-                    <td className="px-3 py-5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-                          <User className="w-3.5 h-3.5 text-slate-500" />
-                        </div>
-                        <span className="body-strong !text-slate-700 text-xs uppercase tracking-wider">
-                          {item.header?.created_by || "System"}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-5">{getStatusBadge(item.status)}</td>
-                    <td className="px-3 py-5 text-right pr-6">
-                      <div className="flex items-center justify-end gap-2 transition-all">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-10 w-10 rounded-2xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white shadow-sm border border-slate-100 hover:border-blue-500 transition-all duration-300 active:scale-95"
-                          onClick={() =>
-                            navigate(
-                              `/transactions/gin/view/${item.header_id || item.header?.id}/${item.id}`,
-                            )
-                          }
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-10 w-10 rounded-2xl bg-slate-50 text-slate-400 hover:bg-orange-500 hover:text-white shadow-sm border border-slate-100 hover:border-orange-400 transition-all duration-300 active:scale-95"
-                          onClick={() =>
-                            navigate(
-                              `/transactions/gin/edit/${item.header_id || item.header?.id}/${item.id}`,
-                            )
-                          }
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-10 w-10 rounded-2xl bg-slate-50 text-slate-400 hover:bg-rose-600 hover:text-white shadow-sm border border-slate-100 hover:border-rose-500 transition-all duration-300 active:scale-95"
-                          onClick={() => setDeleteId(item)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                    <td className="px-6 py-6">
+                      {getStatusBadge(header.status)}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-20 text-center">
-                    <div className="flex flex-col items-center justify-center gap-4 opacity-20">
-                      <ClipboardCheck className="w-20 h-20 text-slate-400" />
-                      <p className="text-xl font-black text-slate-400 uppercase">
-                        {strings.emptyState}
+                  <td colSpan={8} className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4 opacity-30">
+                      <ClipboardCheck className="w-16 h-16 text-slate-400" />
+                      <p className="text-lg font-black text-slate-400 uppercase tracking-widest">
+                        No Master Records Found
                       </p>
                     </div>
                   </td>
@@ -365,27 +315,54 @@ const GinListPage = ({ type }: GinListPageProps) => {
           </table>
 
           {/* Pagination Footer */}
-          <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <Badge className="h-10 px-4 rounded-xl border text-blue-600 border-slate-600 bg-slate-50/50 label-bold uppercase tracking-widest text-[11px] hover:text-white hover:font-bold">
-              Total Records: <span className=" ml-2 font-black ">{total}</span>
-            </Badge>
+          <div className="p-6 border-t border-indigo-50/50 flex flex-col md:flex-row items-center justify-between gap-6 bg-indigo-50/10">
+            <div className="flex items-center gap-3">
+              <Badge className="h-10 px-6 rounded-2xl border-blue-200 bg-blue-600 text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-blue-100 flex items-center gap-2">
+                <ClipboardCheck className="w-4 h-4" />
+                GATE PASSES: {filteredHeaders.length}
+              </Badge>
+            </div>
 
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page === 1 || loading}
+                size="sm"
+                disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
+                className="h-10 px-5 rounded-2xl border-indigo-100 bg-white hover:bg-indigo-50 font-black uppercase text-[10px] tracking-widest gap-2 transition-all active:scale-95 disabled:opacity-30 text-indigo-600"
               >
-                <ChevronLeft className="h-6 w-6 text-slate-600" />
+                <ChevronLeft className="w-4 h-4" />
+                Prev
               </Button>
+
+              <div className="flex items-center gap-1 mx-2">
+                {[...Array(Math.ceil(filteredHeaders.length / PAGE_SIZE))]
+                  .slice(0, 5)
+                  .map((_, i) => (
+                    <Button
+                      key={i}
+                      variant={page === i + 1 ? "default" : "ghost"}
+                      size="icon"
+                      className={`w-10 h-10 rounded-2xl font-black text-xs ${page === i + 1 ? "bg-indigo-600 text-white shadow-xl shadow-indigo-100" : "text-indigo-900/40 hover:bg-white hover:text-indigo-600 hover:shadow-sm"}`}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                {Math.ceil(filteredHeaders.length / PAGE_SIZE) > 5 && (
+                  <span className="text-indigo-200 font-black px-2">...</span>
+                )}
+              </div>
+
               <Button
                 variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page * PAGE_SIZE >= total || loading}
+                size="sm"
+                disabled={page * PAGE_SIZE >= filteredHeaders.length}
                 onClick={() => setPage((p) => p + 1)}
+                className="h-10 px-5 rounded-2xl border-indigo-100 bg-white hover:bg-indigo-50 font-black uppercase text-[10px] tracking-widest gap-2 transition-all active:scale-95 disabled:opacity-30 text-indigo-600"
               >
-                <ChevronRight className="h-6 w-6 text-slate-600" />
+                Next
+                <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
           </div>

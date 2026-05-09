@@ -63,6 +63,7 @@ import {
   handleDeleteItem,
   handleRefreshItems,
 } from "@/app/manager/itemManager";
+import { handleFetchBins } from "@/app/manager/binManager";
 import { useDebounce } from "@/hooks/use-debounce";
 import config from "./ItemConfig.json";
 import { ItemDTO } from "@/core/models/master.model";
@@ -82,28 +83,12 @@ export const ItemMaster = () => {
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<ItemDTO | null>(null);
-
-  // Form state
-  const [formData, setFormData] = useState<Partial<ItemDTO>>({
-    warehouse_id: 1,
-    item_code: "",
-    item_description: "",
-    batch_number: "",
-    active: "Y",
-    ean_barcode: "",
-    sap_barcode: "",
-    open_quantity: 0,
-    location: [0],
-    floor: [0],
-    device: [0],
-  });
 
   useEffect(() => {
     dispatch(
       handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
     );
+    dispatch(handleFetchBins({ warehouseid: 1 }));
     return () => {
       dispatch({ type: "item/clearItems" }); // Reset core state on navigate out
     };
@@ -123,49 +108,16 @@ export const ItemMaster = () => {
 
   const handleOpenDialog = (item: ItemDTO | null = null) => {
     if (item) {
-      setEditingItem(item);
-      setFormData(item);
+      navigate(`/masters/items/${item.id}/edit`);
     } else {
-      setEditingItem(null);
-      setFormData({
-        warehouse_id: 1,
-        item_code: "",
-        item_description: "",
-        batch_number: "",
-        active: "Y",
-        ean_barcode: "",
-        sap_barcode: "",
-        open_quantity: 0,
-        location: [0],
-        floor: [0],
-        device: [0],
-      });
+      navigate("/masters/items/create");
     }
-    setIsDialogOpen(true);
   };
 
   const handleView = (id: number) => {
     navigate(`/masters/items/${id}?type=item`);
   };
 
-  const handleSubmit = async () => {
-    if (!formData.item_code || !formData.item_description) {
-      toast.error("Code and Description are required");
-      return;
-    }
-
-    const success = await dispatch(
-      handleCreateItem(formData, editingItem?.id || undefined),
-    );
-    if (success) {
-      toast.success(editingItem ? "Item updated" : "Item created");
-      setIsDialogOpen(false);
-      // Trigger a smart refetch on the current page to keep context
-      dispatch(
-        handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
-      );
-    }
-  };
 
   const handleRemove = async (id: number) => {
     const success = await dispatch(handleDeleteItem(id));
@@ -422,234 +374,6 @@ export const ItemMaster = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-6xl p-0 overflow-hidden border-0 shadow-3xl bg-white rounded-[2rem]">
-          <DialogHeader className="p-8 bg-slate-900 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl" />
-            <DialogTitle className="text-3xl font-black tracking-tighter flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Plus className="icon-base text-white" />
-              </div>
-              {editingItem
-                ? config.strings.dialog.edit
-                : config.strings.dialog.create}
-            </DialogTitle>
-          </DialogHeader>
-
-          <ScrollArea className="max-h-[60vh] p-8 px-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 px-4">
-              {/* Section 1: Core Identification */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-8 w-1 bg-blue-600 rounded-full" />
-                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-lg">
-                    {config.strings.dialog.coreInfo}
-                  </h3>
-                </div>
-
-                <div className="space-y-2.5">
-                  <Label className="caption-small !text-slate-400">
-                    {config.strings.dialog.itemCode}
-                  </Label>
-                  <Input
-                    value={formData.item_code}
-                    onChange={(e) =>
-                      setFormData({ ...formData, item_code: e.target.value })
-                    }
-                    placeholder="E.g. SKU-7402"
-                    className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all"
-                  />
-                </div>
-
-                <div className="space-y-2.5">
-                  <Label className="caption-small !text-slate-400">
-                    {config.strings.dialog.description}
-                  </Label>
-                  <Input
-                    value={formData.item_description}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        item_description: e.target.value,
-                      })
-                    }
-                    placeholder="Detailed item name..."
-                    className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.batchNumber}
-                    </Label>
-                    <Input
-                      value={formData.batch_number}
-                      onChange={(e) =>
-                        setFormData({ ...formData, batch_number: e.target.value })
-                      }
-                      placeholder="Batch-001"
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
-                    />
-                  </div>
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.ean_barcode}
-                    </Label>
-                    <Input
-                      value={formData.ean_barcode}
-                      onChange={(e) =>
-                        setFormData({ ...formData, ean_barcode: e.target.value })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 font-mono transition-all"
-                    />
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Section 2: Logistics & Configuration */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-8 w-1 bg-amber-500 rounded-full" />
-                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest bg-amber-50 px-3 py-1.5 rounded-lg">
-                    {config.strings.dialog.logistics}
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.sap_barcode}
-                    </Label>
-                    <Input
-                      value={formData.sap_barcode}
-                      onChange={(e) =>
-                        setFormData({ ...formData, sap_barcode: e.target.value })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all text-center"
-                    />
-                  </div>
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.status}
-                    </Label>
-                    <Input
-                      value={formData.active}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          active: e.target.value,
-                        })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 text-center transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.open_quantity}
-                    </Label>
-                    <Input
-                      type="number"
-                      value={formData.open_quantity}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          open_quantity: Number(e.target.value),
-                        })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
-                    />
-                  </div>
-                </div>
-
-              </div>
-
-              <Separator className="col-span-1 md:col-span-2 bg-slate-100 my-4" />
-
-              {/* Section 3: Extended Attributes */}
-              <div className="space-y-6 md:col-span-2">
-                <div className="flex items-center gap-3 mb-4">
-                  <Settings className="h-5 w-5 text-slate-400" />
-                  <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">
-                    {config.strings.dialog.attributes}
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.location}
-                    </Label>
-                    <Input
-                      value={formData.location?.join(", ") || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          location: e.target.value.split(",").map((v) => parseInt(v.trim()) || 0),
-                        })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
-                    />
-                  </div>
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.floor}
-                    </Label>
-                    <Input
-                      value={formData.floor?.join(", ") || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          floor: e.target.value.split(",").map((v) => parseInt(v.trim()) || 0),
-                        })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
-                    />
-                  </div>
-                  <div className="space-y-2.5">
-                    <Label className="caption-small !text-slate-400">
-                      {config.strings.dialog.device}
-                    </Label>
-                    <Input
-                      value={formData.device?.join(", ") || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          device: e.target.value.split(",").map((v) => parseInt(v.trim()) || 0),
-                        })
-                      }
-                      className="h-11 rounded-xl bg-slate-50/50 border-slate-200 focus:bg-white body-strong !text-slate-900 transition-all font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="pb-10 col-span-1 md:col-span-2" />
-            </div>
-          </ScrollArea>
-
-          <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-4 rounded-b-[2rem]">
-            <Button
-              variant="outline"
-              className="h-14 px-8 rounded-2xl border-2 border-slate-200 font-black text-slate-600 hover:bg-white transition-all active:scale-95"
-              onClick={() => setIsDialogOpen(false)}
-            >
-              {config.strings.dialog.cancel}
-            </Button>
-            <Button
-              className="h-14 px-12 rounded-2xl bg-blue-600 hover:bg-slate-900 text-white font-black transition-all shadow-xl shadow-blue-100 hover:shadow-slate-200 active:scale-95"
-              onClick={handleSubmit}
-            >
-              {editingItem
-                ? config.strings.dialog.submitEdit
-                : config.strings.dialog.submitCreate}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

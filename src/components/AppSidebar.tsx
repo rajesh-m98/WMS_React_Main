@@ -58,6 +58,7 @@ import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
 import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
 import { handleFetchFloors } from "@/app/manager/floorManager";
 import { handleFetchGins } from "@/app/manager/ginManager";
+import { handleFetchAllPackages } from "@/app/manager/packageManager";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -90,6 +91,9 @@ export function AppSidebar() {
       case "/masters/floors":
         dispatch(handleFetchFloors(1));
         break;
+      case "/masters/packaging":
+        dispatch(handleFetchAllPackages({ page: 1, size: 15 }));
+        break;
       case "/transactions/dispatch-history":
         dispatch(handleFetchDispatchHistory({ page: 1, size: 15 }));
         break;
@@ -109,7 +113,8 @@ export function AppSidebar() {
       // Transactions
       case "/transactions/InwardRequest":
         break;
-      case "/transactions/OutwardRequest":
+      case "/transactions/gin/picklist":
+        dispatch(handleFetchOutwardRequests({ page: 1, size: 10 }));
         break;
       default:
         break;
@@ -269,33 +274,10 @@ export function AppSidebar() {
                   url="/transactions/gin/flow-through"
                   icon={ArrowLeftRight}
                 />
-              </SidebarMenuSub>
-            </CollapsibleContent>
-          </Collapsible>
-        </SidebarGroup>
-
-        {/* Transactions Section */}
-        <SidebarGroup className="p-0">
-          <Collapsible defaultOpen={true} className="group/collapsible">
-            <CollapsibleTrigger asChild>
-              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
-                <div className="flex items-center gap-3.5">
-                  <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
-                    <ArrowLeftRight className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
-                  </div>
-                  <span className="body-strong !text-slate-800">
-                    Transactions
-                  </span>
-                </div>
-                <ChevronDown className="icon-sm text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
-              </SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
-              <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
                 <SubMenuItem
-                  title="Outward Picklist"
-                  url="/transactions/outward-history"
-                  icon={PackageMinus}
+                  title="Pick List"
+                  url="/transactions/gin/picklist"
+                  icon={ClipboardCheck}
                 />
               </SidebarMenuSub>
             </CollapsibleContent>

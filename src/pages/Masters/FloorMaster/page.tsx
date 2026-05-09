@@ -68,8 +68,7 @@ export const FloorMaster = () => {
   const filteredFloors = floors.filter(
     (f) =>
       f.barcode?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      f.floor1?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      f.floor2?.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      f.floor_name?.toLowerCase().includes(debouncedSearch.toLowerCase()),
   );
 
   const totalCount = filteredFloors.length;
@@ -81,12 +80,7 @@ export const FloorMaster = () => {
   const handleExport = () => {
     const exportData = filteredFloors.map((f) => ({
       ID: f.id,
-      "Level 1": f.floor1,
-      "Level 2": f.floor2,
-      "Level 3": f.floor3,
-      "Level 4": f.floor4,
-      "Level 5": f.floor5,
-      "Level 6": f.floor6,
+      "Floor Name": f.floor_name,
       Barcode: f.barcode,
     }));
     downloadCSV(
@@ -137,13 +131,7 @@ export const FloorMaster = () => {
                     {config.strings.table.id}
                   </TableHead>
                   <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
-                    {config.strings.table.floor1}
-                  </TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
-                    {config.strings.table.floor2}
-                  </TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
-                    {config.strings.table.floor3}
+                    Floor Name
                   </TableHead>
                   <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
                     {config.strings.table.barcode}
@@ -186,13 +174,7 @@ export const FloorMaster = () => {
                         {(page - 1) * PAGE_SIZE + idx + 1}
                       </td>
                       <td className="px-4 py-5 text-sm font-black text-slate-800 whitespace-nowrap text-left">
-                        {floor.floor1}
-                      </td>
-                      <td className="px-4 py-5 text-sm font-black text-slate-600 text-left whitespace-nowrap">
-                        {floor.floor2 || "-"}
-                      </td>
-                      <td className="px-4 py-5 text-sm font-bold text-slate-500 text-left whitespace-nowrap">
-                        {floor.floor3 || "-"}
+                        {floor.floor_name || "-"}
                       </td>
                       <td className="px-4 py-5 text-sm font-black text-blue-600 rounded-lg whitespace-nowrap text-left">
                         {floor.barcode}
@@ -242,7 +224,7 @@ export const FloorMaster = () => {
                                   <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
                                     {config.strings.deleteAlert.descriptionTemplate.replace(
                                       "{value}",
-                                      floor.floor1,
+                                      floor.floor_name || floor.barcode,
                                     )}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>

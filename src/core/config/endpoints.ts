@@ -54,7 +54,8 @@ export const API_ENDPOINTS = {
       // Use PUTAWAY common endpoint
     },
     OUTWARD: {
-      // Use PUTAWAY common endpoint
+      GET_ALL: 'outward/get_all_outward/',
+      GENERATE: 'outward/generate_picklist/',
     },
     TASKS: {
       GET_BY_ID: 'picklist/get_picklist',

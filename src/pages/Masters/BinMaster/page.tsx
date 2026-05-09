@@ -479,9 +479,11 @@ export const LocationMaster: React.FC = () => {
                 <p className="label-bold !text-slate-500 mb-0.5">
                   {config.strings.activeFocus}
                 </p>
-                <p className="body-strong text-white !text-sm">
-                  {selectedPath[selectedPath.length - 1].value}
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="body-strong text-white !text-sm">
+                    {selectedPath[selectedPath.length - 1].value}
+                  </p>
+                </div>
               </div>
             </div>
             <div className="h-8 w-px bg-slate-800" />

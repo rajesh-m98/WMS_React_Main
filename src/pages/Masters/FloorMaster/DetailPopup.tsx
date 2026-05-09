@@ -54,12 +54,8 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ isOpen, onClose, floor }) => 
 
         <div className="p-10 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DetailRow label="Level 1" value={floor.floor1} icon={Building2} />
-            <DetailRow label="Level 2" value={floor.floor2} icon={Building2} />
-            <DetailRow label="Level 3" value={floor.floor3} icon={Building2} />
-            <DetailRow label="Level 4" value={floor.floor4} icon={Building2} />
-            <DetailRow label="Level 5" value={floor.floor5} icon={Building2} />
-            <DetailRow label="Level 6" value={floor.floor6} icon={Building2} />
+            <DetailRow label="Floor Name" value={floor.floor_name} icon={Building2} />
+            <DetailRow label="Max Capacity" value={floor.capacity} icon={Building2} />
           </div>
 
           <div className="p-8 bg-blue-50/30 rounded-[2rem] border border-blue-100/50 flex flex-col items-center gap-6 group hover:bg-blue-50 transition-all duration-500">

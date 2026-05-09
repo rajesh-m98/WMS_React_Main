@@ -7,12 +7,7 @@
     "searchPlaceholder": "Search by floor name or barcode...",
     "table": {
       "id": "ID",
-      "floor1": "Level 1",
-      "floor2": "Level 2",
-      "floor3": "Level 3",
-      "floor4": "Level 4",
-      "floor5": "Level 5",
-      "floor6": "Level 6",
+      "floor1": "Floor Name",
       "barcode": "Barcode",
       "actions": "Actions"
     },

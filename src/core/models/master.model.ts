@@ -124,12 +124,7 @@ export interface CreatePackagePayload {
 export interface FloorDTO {
   id: number;
   warehouse_id: number;
-  floor1: string;
-  floor2: string;
-  floor3: string;
-  floor4: string;
-  floor5: string;
-  floor6: string;
+  floor_name: string;
   barcode: string;
   created_at?: string;
   updated_at?: string;
@@ -137,11 +132,6 @@ export interface FloorDTO {
 
 export interface CreateFloorPayload {
   warehouse_id: number;
-  floor1: string;
-  floor2: string;
-  floor3: string;
-  floor4: string;
-  floor5: string;
-  floor6: string;
+  floor_name: string;
   barcode: string;
 }

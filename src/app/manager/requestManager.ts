@@ -94,5 +94,57 @@ export const handleFetchInwardRequests =
 export const handleFetchOutwardRequests =
   (params?: FetchParams) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
-    return fetchUnifiedRequests(dispatch, getState, params);
+    try {
+      dispatch(requestLoadStart("outward"));
+
+      const queryParams = new URLSearchParams({
+        is_paginate: "true",
+        page: (params?.page || 1).toString(),
+        size: (params?.size || 50).toString(),
+      });
+
+      const response = await api.get(
+        `${API_ENDPOINTS.TRANSACTIONS.OUTWARD.GET_ALL}?${queryParams.toString()}`,
+      );
+
+      if (response.data.status) {
+        dispatch(
+          outwardLoadSuccess({
+            data: response.data.data.items || [],
+            total: response.data.data.total,
+          }),
+        );
+        return true;
+      } else {
+        dispatch(
+          requestLoadFailure({
+            type: "outward",
+            error: response.data.message || "Failed to fetch outward requests",
+          }),
+        );
+        return false;
+      }
+    } catch (err: any) {
+      dispatch(
+        requestLoadFailure({
+          type: "outward",
+          error: err.message || "Error fetching outward requests",
+        }),
+      );
+      return false;
+    }
+  };
+
+export const handleGeneratePicklist =
+  (docEntry: number) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      const response = await api.post(API_ENDPOINTS.TRANSACTIONS.OUTWARD.GENERATE, {
+        doc_entry: docEntry
+      });
+      return response.data.status;
+    } catch (err) {
+      console.error("Error generating picklist:", err);
+      return false;
+    }
   };

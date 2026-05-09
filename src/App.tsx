@@ -13,6 +13,8 @@ import UserCreate from "./pages/Masters/UserManagement/Create";
 import UserDetail from "./pages/Masters/UserManagement/Detail";
 import UserEdit from "./pages/Masters/UserManagement/Edit";
 import { ItemMaster } from "./pages/Masters/ItemMaster/page";
+import ItemCreate from "./pages/Masters/ItemMaster/Create";
+import ItemEdit from "./pages/Masters/ItemMaster/Edit";
 import { LocationMaster } from "./pages/Masters/BinMaster/page";
 import { HSTMaster } from "./pages/Masters/HSTMaster/page";
 import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
@@ -33,6 +35,9 @@ import GinEdit from "./pages/Transactions/GinManagement/Edit";
 import GinHeaderEdit from "./pages/Transactions/GinManagement/HeaderEdit";
 import GinCreate from "./pages/Transactions/GinManagement/Create";
 import GinCreateLine from "./pages/Transactions/GinManagement/CreateLine";
+import OutwardListPage from "./pages/Transactions/Outward/OutwardListPage";
+import OutwardPicklistPage from "./pages/Transactions/OutwardPicklist/page";
+import OutwardPicklistDetail from "./pages/Transactions/OutwardPicklist/Detail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +64,10 @@ const App = () => (
                       element={<InwardRequest />}
                     />
                     <Route
+                      path="/transactions/gin/picklist"
+                      element={<OutwardListPage />}
+                    />
+                    <Route
                       path="/transactions/OutwardRequest"
                       element={<OutwardRequest />}
                     />
@@ -79,6 +88,14 @@ const App = () => (
                       element={<OutwardHistory />}
                     />
                     <Route
+                      path="/transactions/gin/picklist"
+                      element={<OutwardListPage />}
+                    />
+                    <Route
+                      path="/transactions/gin/picklist/:docEntry"
+                      element={<OutwardPicklistDetail />}
+                    />
+                    <Route
                       path="/transactions/gin/putaway"
                       element={<PutawayPage />}
                     />
@@ -87,17 +104,25 @@ const App = () => (
                       element={<FlowThroughPage />}
                     />
                     <Route
+                      path="/transactions/gin/view/:headerId"
+                      element={<GinDetail />}
+                    />
+                    <Route
+                      path="/transactions/gin/view/gp/:gpNumber"
+                      element={<GinDetail />}
+                    />
+                    <Route
                       path="/transactions/gin/view/:headerId/:lineId"
                       element={<GinDetail />}
                     />
-                     <Route
-                        path="/transactions/gin/edit/:headerId/:lineId"
-                        element={<GinEdit />}
-                      />
-                      <Route
-                        path="/transactions/gin/edit-header/:id"
-                        element={<GinHeaderEdit />}
-                      />
+                    <Route
+                      path="/transactions/gin/edit/:headerId"
+                      element={<GinEdit />}
+                    />
+                    <Route
+                      path="/transactions/gin/edit/:headerId/:lineId"
+                      element={<GinEdit />}
+                    />
                       <Route
                         path="/transactions/gin/create"
                         element={<GinCreate />}
@@ -117,6 +142,14 @@ const App = () => (
                       element={<UserEdit />}
                     />
                     <Route path="/masters/items" element={<ItemMaster />} />
+                    <Route
+                      path="/masters/items/create"
+                      element={<ItemCreate />}
+                    />
+                    <Route
+                      path="/masters/items/:id/edit"
+                      element={<ItemEdit />}
+                    />
                     <Route path="/masters/items/:id" element={<MasterDetail />} />
                     <Route path="/masters/bins" element={<LocationMaster />} />
                     <Route path="/masters/hst" element={<HSTMaster />} />

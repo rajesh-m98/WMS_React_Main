@@ -27,11 +27,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const initials = userEmail.charAt(0).toUpperCase();
 
   const getPageInfo = (path: string) => {
-    if (path.includes("/masters/users/create"))
+    // Normalize path: remove trailing slash if it's not the root
+    const normalizedPath =
+      path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
+
+    if (normalizedPath.includes("/masters/users/create"))
       return { title: "Add User", description: "Create a new system user" };
-    if (path.includes("/masters/users/"))
+    if (normalizedPath.includes("/masters/users/"))
       return { title: "User Details", description: "View system user details" };
-    if (path.includes("/transactions/tasks/"))
+    if (normalizedPath.includes("/masters/items/create"))
+      return { title: "Register Item", description: "Create a new inventory master record" };
+    if (normalizedPath.includes("/masters/items/") && normalizedPath.endsWith("/edit"))
+      return { title: "Edit Item", description: "Modify existing item registry and mappings" };
+    if (normalizedPath.includes("/masters/items/"))
+      return { title: "Item Detail", description: "Deep dive into item specifications and bin assignments" };
+    if (normalizedPath.includes("/transactions/tasks/"))
       return {
         title: "Task Details",
         description: "Comprehensive View of Execution and Item Audit",
@@ -43,10 +53,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           title: "Dashboard",
           description: "Overview of warehouse operations and activity",
         },
-        // "/activity-logs": {
-        //   title: "Activity Logs",
-        //   description: "Complete system-wide movement history and audit trail",
-        // },
+        "/activity-logs": {
+          title: "Global Activity Logs",
+          description: "Complete system-wide movement history and audit trail",
+        },
         "/masters/users": {
           title: "User Master",
           description: "Manage application users and their roles",
@@ -66,6 +76,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         "/masters/warehouses": {
           title: "Warehouse Master",
           description: "Manage warehouse facilities",
+        },
+        "/masters/packaging": {
+          title: "Package Master",
+          description: "Manage packaging types and dimensions",
+        },
+        "/masters/floors": {
+          title: "Floor Master",
+          description: "Manage warehouse floor levels and barcodes",
         },
         "/transactions/InwardRequest": {
           title: "Inward Putaway",
@@ -88,7 +106,34 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           title: "Outward Picklist History",
           description: "Archive of processed outward picklist transactions",
         },
+        "/transactions/gin/putaway": {
+          title: "Putaway Management",
+          description:
+            "High-precision tracking for warehouse GIN inward movements",
+        },
+        "/transactions/gin/flow-through": {
+          title: "Flow-Through Management",
+          description: "Direct transit and cross-docking operations dashboard",
+        },
+        "/transactions/gin/picklist": {
+          title: "Pick List",
+          description:
+            "Consolidated view for outward transactions and picklist generation",
+        },
+        "/transactions/outward-picklist": {
+          title: "Outward Picklist",
+          description: "Manage sales order picking & warehouse distribution",
+        },
       };
+
+    if (normalizedPath.includes("/transactions/outward-picklist/"))
+      return { title: "Generated Picklist", description: "Deep-dive into picking locations and item verification" };
+    if (normalizedPath.includes("/transactions/gin/view/"))
+      return { title: "Transaction Details", description: "Comprehensive view of transaction line details" };
+    if (normalizedPath.includes("/transactions/gin/edit/"))
+      return { title: "Edit Transaction", description: "Modify transaction quantities and details" };
+    if (path.includes("/transactions/gin/edit-header/"))
+      return { title: "Edit Header", description: "Update transaction header information" };
     return (
       pageData[path] || {
         title: "WMS",

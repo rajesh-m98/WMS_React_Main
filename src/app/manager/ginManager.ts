@@ -96,39 +96,100 @@ export const handleUpdateLineStatus = (lineId: number, status: number) => async 
 /**
  * Smart selector that picks a GIN from the existing slice data or fetches it if missing (e.g., on refresh)
  */
-export const handleSelectGin = (headerId: number, lineId: number, ginType?: number) => async (dispatch: AppDispatch, getState: () => any) => {
+export const handleSelectGin = (headerId: number, lineId?: number, ginType?: number) => async (dispatch: AppDispatch, getState: () => any) => {
   const { items } = getState().gin;
   
-  console.log(`[GIN Manager] Attempting to select Line ID: ${lineId} from local slice (${items.length} items available)...`);
-
-  // 1. Try to find the item in the current Redux slice first (Instant)
-  const localMatch = items.find((l: any) => 
-    Number(l.id) === Number(lineId) && 
-    (Number(l.header_id) === Number(headerId) || Number(l.header?.id) === Number(headerId))
+  // If we already have items and one of them matches the header, we can filter locally
+  const headerLines = items.filter((l: any) => 
+    Number(l.header_id) === Number(headerId) || Number(l.header?.id) === Number(headerId)
   );
 
-  if (localMatch) {
-    console.log("[GIN Manager] Local Match Found! Updating UI state instantly.");
-    
-    // Map header data
-    const headerData = localMatch.header || {
-      id: localMatch.header_id,
-      gate_pass_number: localMatch.gate_pass_number,
-      grpo_docentry: localMatch.grpo_docentry,
-      card_code: localMatch.card_code,
-      card_name: localMatch.card_name,
-      sync_date: localMatch.sync_date,
-      sync_status: localMatch.sync_status
-    };
-
-    dispatch(setCurrentGinHeader(headerData));
-    dispatch(setCurrentGinLines([localMatch]));
+  if (headerLines.length > 0 && !lineId) {
+    console.log(`[GIN Manager] Found ${headerLines.length} lines locally for Header ID: ${headerId}`);
+    dispatch(setCurrentGinHeader(headerLines[0].header));
+    dispatch(setCurrentGinLines(headerLines));
     return true;
   }
 
-  // 2. If not found in slice (e.g., page refresh), fetch it from the server
-  console.log("[GIN Manager] Item not in local slice. Falling back to server fetch...");
-  return await dispatch(handleFetchGinLine(headerId, lineId, ginType));
+  if (lineId) {
+    const localMatch = headerLines.find((l: any) => Number(l.id) === Number(lineId));
+    if (localMatch) {
+      dispatch(setCurrentGinHeader(localMatch.header));
+      dispatch(setCurrentGinLines([localMatch])); // or headerLines if you want full table
+      return true;
+    }
+  }
+  // Fallback: Fetch everything and filter
+  try {
+    dispatch(ginFetchStart());
+    const response = await api.get<{ status: boolean; data: { items: any[] } }>(
+      API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
+      { params: { gin_type: ginType, is_paginate: false } }
+    );
+    
+    if (response.data.status) {
+      const allItems = response.data.data.items || [];
+      const matchLines = allItems.filter((l: any) => 
+        Number(l.header_id) === Number(headerId) || Number(l.header?.id) === Number(headerId)
+      );
+
+      if (matchLines.length > 0) {
+        dispatch(setCurrentGinHeader(matchLines[0].header));
+        dispatch(setCurrentGinLines(matchLines));
+        return true;
+      }
+      dispatch(ginFetchFailure("Header not found"));
+      return false;
+    }
+  } catch (err) {
+    dispatch(ginFetchFailure("Network error"));
+    return false;
+  }
+};
+
+/**
+ * Aggregates all lines for a specific Gate Pass across potentially different headers
+ */
+export const handleSelectByGatePass = (gatePassNumber: string, ginType?: number) => async (dispatch: AppDispatch, getState: () => any) => {
+  const { items } = getState().gin;
+  
+  // Try local filter first from existing items in store
+  const matchLines = items.filter((l: any) => 
+    (l.gate_pass_number === gatePassNumber) || (l.header?.gate_pass_number === gatePassNumber)
+  );
+
+  if (matchLines.length > 0) {
+    dispatch(setCurrentGinHeader(matchLines[0].header || matchLines[0]));
+    dispatch(setCurrentGinLines(matchLines));
+    return true;
+  }
+
+  // Fallback: Fetch everything and filter by Gate Pass
+  try {
+    dispatch(ginFetchStart());
+    const response = await api.get<{ status: boolean; data: { items: any[] } }>(
+      API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
+      { params: { gin_type: ginType, is_paginate: false } }
+    );
+    
+    if (response.data.status) {
+      const allItems = response.data.data.items || [];
+      const filteredLines = allItems.filter((l: any) => 
+        (l.gate_pass_number === gatePassNumber) || (l.header?.gate_pass_number === gatePassNumber)
+      );
+
+      if (filteredLines.length > 0) {
+        dispatch(setCurrentGinHeader(filteredLines[0].header || filteredLines[0]));
+        dispatch(setCurrentGinLines(filteredLines));
+        return true;
+      }
+      dispatch(ginFetchFailure("Gate Pass not found"));
+      return false;
+    }
+  } catch (err) {
+    dispatch(ginFetchFailure("Network error"));
+    return false;
+  }
 };
 
 /**
