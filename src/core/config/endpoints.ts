@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
     BINS_GET: 'layerconfig/get_all_layerconfig/',
     BINS_CREATE: 'layerconfig/layerconfig_create/',
     BINS_DELETE: 'layerconfig/delete_layerconfig/',
+    LAYER_CONFIG_DB: 'layerconfig/get_all_layerconfig_db/',
     ITEMS: {
       ALL: 'items/get_all_item/',
       CREATE: 'items/item_create/',

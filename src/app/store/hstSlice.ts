@@ -11,6 +11,7 @@ export interface HSTDevice {
   device_status: number;
   companyid: number;
   warehouse_id: number;
+  locations?: number[];
 }
 
 interface HSTType {

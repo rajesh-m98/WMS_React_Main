@@ -13,10 +13,10 @@ import UserCreate from "./pages/Masters/UserManagement/Create";
 import UserDetail from "./pages/Masters/UserManagement/Detail";
 import UserEdit from "./pages/Masters/UserManagement/Edit";
 import { ItemMaster } from "./pages/Masters/ItemMaster/page";
-import ItemCreate from "./pages/Masters/ItemMaster/Create";
 import ItemEdit from "./pages/Masters/ItemMaster/Edit";
 import { LocationMaster } from "./pages/Masters/BinMaster/page";
 import { HSTMaster } from "./pages/Masters/HSTMaster/page";
+import HSTEdit from "./pages/Masters/HSTMaster/Edit";
 import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
 import { PackageMaster } from "./pages/Masters/PackageMaster/page";
 import { FloorMaster } from "./pages/Masters/FloorMaster/page";
@@ -123,14 +123,14 @@ const App = () => (
                       path="/transactions/gin/edit/:headerId/:lineId"
                       element={<GinEdit />}
                     />
-                      <Route
-                        path="/transactions/gin/create"
-                        element={<GinCreate />}
-                      />
-                      <Route
-                        path="/transactions/gin/create-line"
-                        element={<GinCreateLine />}
-                      />
+                    <Route
+                      path="/transactions/gin/create"
+                      element={<GinCreate />}
+                    />
+                    <Route
+                      path="/transactions/gin/create-line"
+                      element={<GinCreateLine />}
+                    />
                     <Route path="/masters/users" element={<UserManagement />} />
                     <Route
                       path="/masters/users/create"
@@ -142,17 +142,21 @@ const App = () => (
                       element={<UserEdit />}
                     />
                     <Route path="/masters/items" element={<ItemMaster />} />
-                    <Route
-                      path="/masters/items/create"
-                      element={<ItemCreate />}
-                    />
+
                     <Route
                       path="/masters/items/:id/edit"
                       element={<ItemEdit />}
                     />
-                    <Route path="/masters/items/:id" element={<MasterDetail />} />
+                    <Route
+                      path="/masters/items/:id"
+                      element={<MasterDetail />}
+                    />
                     <Route path="/masters/bins" element={<LocationMaster />} />
                     <Route path="/masters/hst" element={<HSTMaster />} />
+                    <Route
+                      path="/masters/hst/:id/edit"
+                      element={<HSTEdit />}
+                    />
                     <Route path="/masters/hst/:id" element={<MasterDetail />} />
                     <Route
                       path="/masters/warehouses"
@@ -162,11 +166,23 @@ const App = () => (
                       path="/masters/warehouses/:id"
                       element={<MasterDetail />}
                     />
-                    <Route path="/masters/packaging" element={<PackageMaster />} />
-                    <Route path="/masters/packaging/:id" element={<MasterDetail />} />
+                    <Route
+                      path="/masters/packaging"
+                      element={<PackageMaster />}
+                    />
+                    <Route
+                      path="/masters/packaging/:id"
+                      element={<MasterDetail />}
+                    />
                     <Route path="/masters/floors" element={<FloorMaster />} />
-                    <Route path="/masters/floors/create" element={<FloorCreate />} />
-                    <Route path="/masters/floors/:id/edit" element={<FloorEdit />} />
+                    <Route
+                      path="/masters/floors/create"
+                      element={<FloorCreate />}
+                    />
+                    <Route
+                      path="/masters/floors/:id/edit"
+                      element={<FloorEdit />}
+                    />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

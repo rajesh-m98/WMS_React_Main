@@ -150,13 +150,6 @@ export const ItemMaster = () => {
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Button
-              className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white body-strong transition-all shadow-lg shadow-blue-100 active:scale-95 flex-1 md:flex-none"
-              onClick={() => handleOpenDialog()}
-            >
-              <Plus className="icon-sm mr-2" />
-              {config.strings.dialog.create}
-            </Button>
-            <Button
               variant="outline"
               className="h-12 px-5 rounded-xl border border-slate-200 body-strong text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
               onClick={handleSync}
@@ -165,6 +158,15 @@ export const ItemMaster = () => {
               <RefreshCw
                 className={`icon-sm ${isRefreshing ? "animate-spin" : ""}`}
               />
+              <span className="ml-2 uppercase tracking-widest text-[10px] font-black">Sync Catalog</span>
+            </Button>
+            
+            <Button
+              className="h-12 px-6 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 transition-all active:scale-95 shadow-xl shadow-blue-100 flex items-center gap-2"
+              onClick={() => handleOpenDialog(null)}
+            >
+              <Plus className="h-5 w-5" />
+              <span className="uppercase tracking-widest text-[10px]">Create New Item</span>
             </Button>
           </div>
         </CardContent>
