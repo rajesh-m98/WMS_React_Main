@@ -63,13 +63,17 @@ const masterSlice = createSlice({
       state.packages.loading = false;
       state.packages.error = action.payload;
     },
-
+    clearAllPackages: (state) => {
+      state.packages.data = [];
+      state.packages.totalCount = 0;
+      state.packages.error = null;
+    },
   },
 });
 
 export const { 
   userLoadStart, userLoadSuccess, userDetailSuccess, userLoadFailure, clearCurrentUser,
-  packageLoadStart, packageLoadSuccess, packageLoadFailure
+  packageLoadStart, packageLoadSuccess, packageLoadFailure, clearAllPackages
 } = masterSlice.actions;
 
 export default masterSlice.reducer;

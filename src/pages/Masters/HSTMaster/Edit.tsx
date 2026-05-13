@@ -61,7 +61,7 @@ const HSTEdit = () => {
   useEffect(() => {
     dispatch(handleFetchAllLayerConfigs(1));
     if (!isNew) {
-      dispatch(handleFetchAllHST({ size: 1000 }));
+      dispatch(handleFetchAllHST({ size: 100 }));
     }
   }, [dispatch, isNew]);
 
@@ -80,30 +80,36 @@ const HSTEdit = () => {
         warehouse_id: device.warehouse_id || 1,
       });
 
-      // Handle legacy locations array
-      if (device.locations && device.locations.length > 0) {
-        // Try to find the path label from layerConfigs
-        const initialAssignments = device.locations.map((locId: number) => {
-          const config = layerConfigs.find((lc) => lc.id === locId);
-          return {
-            locationId: locId,
-            path: config
-              ? [
-                  config.layer1,
-                  config.layer2,
-                  config.layer3,
-                  config.layer4,
-                  config.layer5,
-                ]
-                  .filter(Boolean)
-                  .join(" > ")
-              : "Direct Assignment",
-          };
-        });
-        setAssignments(initialAssignments);
+        // Deduplicate by locationId and map to path
+        if (device.locations && device.locations.length > 0) {
+          const seen = new Set<number>();
+          const initialAssignments = device.locations
+            .filter((locId: number) => {
+              if (seen.has(locId)) return false;
+              seen.add(locId);
+              return true;
+            })
+            .map((locId: number) => {
+              const config = layerConfigs.find((lc) => lc.id === locId);
+              return {
+                locationId: locId,
+                path: config
+                  ? [
+                      config.layer1,
+                      config.layer2,
+                      config.layer3,
+                      config.layer4,
+                      config.layer5,
+                    ]
+                      .filter(Boolean)
+                      .join(" > ")
+                  : "Direct Assignment",
+              };
+            });
+          setAssignments(initialAssignments);
+        }
+        setIsInitialized(true);
       }
-      setIsInitialized(true);
-    }
   }, [devices, id, isNew, loading, isInitialized, layerConfigs]);
 
   const handleSubmit = async () => {
@@ -139,19 +145,10 @@ const HSTEdit = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/masters/hst")}
-            className="h-12 w-12 rounded-xl bg-white shadow-sm border border-slate-100 hover:bg-slate-50 transition-all p-0"
+            className="h-10 w-10 rounded-xl bg-white shadow-md shadow-slate-600 border border-slate-100 hover:bg-slate-50 transition-all p-0"
           >
             <ChevronLeft className="h-6 w-6 text-slate-600" />
           </Button>
-          <div>
-            <h1 className="text-4xl font-black tracking-tighter text-slate-900 uppercase">
-              {isNew ? "Provision Terminal" : "Configure Handheld"}
-            </h1>
-            <p className="text-slate-500 font-bold flex items-center gap-2 mt-1 uppercase text-[10px] tracking-widest opacity-60">
-              <Smartphone className="h-3 w-3 text-blue-600" />
-              Network Hardware & Asset Management
-            </p>
-          </div>
         </div>
       </div>
 
@@ -200,7 +197,8 @@ const HSTEdit = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, device_id: e.target.value })
                     }
-                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm"
+                    disabled={!isNew}
+                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
                     placeholder="DEV-001"
                   />
                 </div>
@@ -213,7 +211,8 @@ const HSTEdit = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, device_name: e.target.value })
                     }
-                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm"
+                    disabled={!isNew}
+                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
                     placeholder="Scanner Unit Name"
                   />
                 </div>
@@ -226,7 +225,8 @@ const HSTEdit = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, brand_name: e.target.value })
                     }
-                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm"
+                    disabled={!isNew}
+                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
                     placeholder="Zebra"
                   />
                 </div>
@@ -242,7 +242,8 @@ const HSTEdit = () => {
                         device_serial_number: e.target.value,
                       })
                     }
-                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black font-mono text-[11px] shadow-sm"
+                    disabled={!isNew}
+                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black font-mono text-[11px] shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
                     placeholder="SN123456"
                   />
                 </div>
@@ -251,12 +252,12 @@ const HSTEdit = () => {
 
             <Separator className="bg-slate-100" />
 
-            {/* Section 2: Mapping System */}
+            {/* Section 2: Location Assignment */}
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-1 bg-blue-600 rounded-full" />
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest bg-blue-50 px-4 py-1.5 rounded-lg border border-blue-100">
-                  Hardware Mapping & Zone assignment
+                  Location Assignment
                 </h3>
               </div>
 
@@ -302,6 +303,10 @@ const HSTEdit = () => {
                           );
                           return;
                         }
+                        if (assignments.some((a) => a.locationId === locationId)) {
+                          toast.error("This location is already assigned.");
+                          return;
+                        }
                         setAssignments([
                           ...assignments,
                           { locationId, path: pathLabel },
@@ -316,22 +321,22 @@ const HSTEdit = () => {
                   <div className="space-y-2 pt-2">
                     <div className="flex items-center gap-3">
                       <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                        Active Zone Assignments
+                        Assigned Locations
                       </Label>
                       <div className="h-px flex-1 bg-slate-200" />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
                       {assignments.map((assignment, idx) => (
                         <div
                           key={idx}
                           className="bg-white border-2 border-slate-100 p-2 rounded-[1.5rem] flex items-center justify-between group hover:border-blue-400 hover:shadow-xl transition-all animate-in zoom-in-95"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-black border border-blue-100">
+                            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-sm font-black border border-blue-100">
                               {idx + 1}
                             </div>
                             <div className="space-y-0.5">
-                              <span className="text-[11px] font-bold text-slate-800 block truncate max-w-[150px]">
+                              <span className="text-[13px] font-bold text-slate-800 block truncate max-w-[250px]">
                                 {assignment.path}
                               </span>
                             </div>
@@ -368,7 +373,7 @@ const HSTEdit = () => {
               ) : (
                 <>
                   <CheckCircle2 className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                  {isNew ? "Provision" : "Update"}
+                  {isNew ? "Create" : "Update"}
                 </>
               )}
             </Button>

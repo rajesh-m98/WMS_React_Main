@@ -48,6 +48,10 @@ import {
   Settings2,
   Wifi,
   ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector, useAppDispatch } from "@/app/store";
@@ -56,6 +60,7 @@ import {
   handleCreatePackage,
   handleDeletePackage,
 } from "@/app/manager/packageManager";
+import { clearAllPackages } from "@/app/store/masterSlice";
 import { useDebounce } from "@/hooks/use-debounce";
 import config from "./PackageConfig.json";
 import { PackageDTO } from "@/core/models/master.model";
@@ -64,7 +69,7 @@ import { useReactToPrint } from "react-to-print";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 10;
 
 // Printable component for barcodes
 const PrintableBarcodes = forwardRef<
@@ -224,6 +229,10 @@ export const PackageMaster = () => {
     }
   };
 
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const startPage = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const endPage = Math.min(totalPages, Math.max(page + 2, 5));
+
   useEffect(() => {
     dispatch(
       handleFetchAllPackages({
@@ -232,6 +241,9 @@ export const PackageMaster = () => {
         search: debouncedSearch,
       }),
     );
+    return () => {
+      dispatch(clearAllPackages());
+    };
   }, [dispatch, page, debouncedSearch]);
 
   const handleOpenDialog = (item: PackageDTO | null = null) => {
@@ -376,6 +388,9 @@ export const PackageMaster = () => {
               <TableHeader>
                 <TableRow className="bg-slate-50/80 border-b border-slate-200">
                   <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider">
+                    SL NO
+                  </TableHead>
+                  <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider">
                     CODE
                   </TableHead>
                   <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider">
@@ -392,25 +407,28 @@ export const PackageMaster = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-40 text-center">
+                    <TableCell colSpan={5} className="h-40 text-center">
                       <Loader2 className="h-8 w-8 text-blue-600 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
                 ) : packages.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={4}
+                      colSpan={5}
                       className="h-40 text-center text-slate-400 font-bold uppercase tracking-widest"
                     >
                       {config.strings.noItems}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  packages.map((pkg) => (
+                  packages.map((pkg, index) => (
                     <TableRow
                       key={pkg.id}
                       className="group hover:bg-blue-50/50 transition-all"
                     >
+                      <TableCell className="px-6 py-4 text-[13px] font-black text-slate-950 uppercase">
+                        {(page - 1) * PAGE_SIZE + index + 1}
+                      </TableCell>
                       <TableCell className="px-6 py-4 text-[13px] font-black text-slate-950 uppercase">
                         {pkg.package_code}
                       </TableCell>
@@ -482,6 +500,71 @@ export const PackageMaster = () => {
             </Table>
           </div>
         </CardContent>
+        <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3 bg-blue-600 px-5 py-2.5 rounded-2xl border border-blue-500/20 shadow-lg shadow-blue-100">
+            <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] whitespace-nowrap">
+              {config.strings.totalCatalog}
+            </span>
+            <span className="h-4 w-[2px] bg-blue-400/50 rounded-full mx-1" />
+            <span className="text-sm font-black text-white tabular-nums">
+              {totalCount}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === 1 || loading}
+              onClick={() => setPage(1)}
+            >
+              <ChevronsLeft className="icon-sm text-slate-600" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === 1 || loading}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              <ChevronLeft className="h-6 w-6 text-slate-600" />
+            </Button>
+            <div className="flex items-center gap-2 px-4">
+              {Array.from(
+                { length: Math.min(totalPages, endPage - startPage + 1) },
+                (_, i) => {
+                  const p = startPage + i;
+                  if (p <= 0) return null;
+                  return (
+                    <Button
+                      key={p}
+                      variant={page === p ? "default" : "ghost"}
+                      className={`h-10 w-10 rounded-xl font-black text-xs ${page === p ? "bg-blue-600 text-white shadow-md shadow-blue-100" : "text-slate-400 hover:text-slate-900"}`}
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  );
+                },
+              )}
+            </div>
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === totalPages || loading}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              <ChevronRight className="h-6 w-6 text-slate-600" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === totalPages || loading}
+              onClick={() => setPage(totalPages)}
+            >
+              <ChevronsRight className="icon-sm text-slate-600" />
+            </Button>
+          </div>
+        </div>
       </Card>
 
       {/* Manual Add/Edit Dialog */}

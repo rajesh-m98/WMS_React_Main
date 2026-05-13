@@ -16,7 +16,7 @@ export const handleFetchAllWarehouses = (params?: { page?: number; size?: number
       is_paginate: (params?.is_paginate !== false).toString(),
       companyid: (params?.companyid ?? 1).toString(),
       page: (params?.page ?? 1).toString(),
-      size: (params?.size ?? 50).toString(),
+      size: (params?.size ?? 10).toString(),
     }).toString();
 
     const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.WAREHOUSE.ALL}?${queryParams}`);
@@ -80,7 +80,6 @@ export const handleCreateWarehouse = (data: any, editId?: number) => async (disp
 
 export const handleRefreshWarehouse = () => async (dispatch: AppDispatch) => {
   try {
-    dispatch(warehouseLoadStart());
     const response = await api.get<{ status: boolean; data: any }>(API_ENDPOINTS.MASTERS.WAREHOUSE.REFRESH);
     if (response.data.status) {
       return true;

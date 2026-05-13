@@ -4,6 +4,7 @@
     "importBtn": "Import",
     "addDeviceBtn": "Add HHT",
     "table": {
+      "slNo": "SL NO",
       "deviceId": "Device ID",
       "deviceName": "Device Name",
       "brandName": "Brand Name",

@@ -212,15 +212,16 @@ export function AppSidebar() {
                   icon={Users}
                 />
                 <SubMenuItem
-                  title="HHT Master"
-                  url="/masters/hst"
-                  icon={Smartphone}
-                />
-                <SubMenuItem
                   title="Location Master"
                   url="/masters/bins"
                   icon={Grid3X3}
                 />
+                <SubMenuItem
+                  title="HHT Master"
+                  url="/masters/hst"
+                  icon={Smartphone}
+                />
+
                 <SubMenuItem
                   title="Item Master"
                   url="/masters/items"

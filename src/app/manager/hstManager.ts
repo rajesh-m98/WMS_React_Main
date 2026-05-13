@@ -14,7 +14,7 @@ export const handleFetchAllHST = (params?: { page?: number; size?: number; compa
       companyid: (params?.companyid || 1).toString(),
       is_paginate: 'true',
       page: (params?.page || 1).toString(),
-      size: (params?.size || 50).toString()
+      size: (params?.size || 10).toString()
     });
 
     const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.HST.ALL}?${queryParams.toString()}`);

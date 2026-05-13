@@ -21,7 +21,7 @@ export const handleFetchAllPackages = (params?: FetchParams) => async (dispatch:
       is_paginate: 'true',
       companyid: (params?.companyid || 1).toString(),
       page: (params?.page || 1).toString(),
-      size: (params?.size || 15).toString(),
+      size: (params?.size || 10).toString(),
     });
     
     if (params?.search) {

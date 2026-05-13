@@ -21,6 +21,10 @@ import {
   Loader2,
   Eye,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -36,19 +40,23 @@ import {
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import { handleFetchAllHST, handleDeleteHST } from "@/app/manager/hstManager";
+import { clearAllHST, hstLoadStart } from "@/app/store/hstSlice";
 import config from "./HSTConfig.json";
 
 export const HSTMaster = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { data: devices, loading } = useAppSelector((state) => state.hst);
+  const { data: devices, loading, totalCount } = useAppSelector((state) => state.hst);
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 50;
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     dispatch(handleFetchAllHST({ page, size: PAGE_SIZE }));
+    return () => {
+      dispatch(clearAllHST());
+    };
   }, [dispatch, page]);
 
   const handleView = (id: number) => {
@@ -80,10 +88,15 @@ export const HSTMaster = () => {
       d.device_type.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleRefresh = () => {
-    dispatch(handleFetchAllHST({ page, size: PAGE_SIZE }));
-    toast.success("Device list refreshed");
+  const handleRefresh = async () => {
+    dispatch(hstLoadStart());
+    await dispatch(handleFetchAllHST({ page, size: PAGE_SIZE }));
+    toast.success("Device Master Refreshed Successfully");
   };
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const startPage = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const endPage = Math.min(totalPages, Math.max(page + 2, 5));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -102,10 +115,11 @@ export const HSTMaster = () => {
           <Button
             variant="ghost"
             onClick={handleRefresh}
+            disabled={loading}
             className="h-14 px-6 rounded-2xl bg-white border-2 border-slate-100 text-slate-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-md group flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
           >
-            <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
-            Refresh
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`} />
+            {loading ? "Refreshing..." : "Refresh"}
           </Button>
           <Button
             onClick={handleAdd}
@@ -126,6 +140,9 @@ export const HSTMaster = () => {
           <Table className="min-w-[1000px]">
             <TableHeader>
               <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-300">
+                <TableHead className="px-6 py-5 text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                  {config.strings.table.slNo}
+                </TableHead>
                 <TableHead className="px-6 py-5 text-[10px] font-black text-slate-900 uppercase tracking-widest">
                   {config.strings.table.deviceId}
                 </TableHead>
@@ -150,11 +167,14 @@ export const HSTMaster = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredDevices.map((d: any) => (
+              {filteredDevices.map((d: any, index: number) => (
                 <TableRow
                   key={d.id}
                   className="border-b border-slate-50 hover:bg-blue-50/30 transition-colors group"
                 >
+                  <TableCell className="px-6 py-4 font-mono text-xs font-black text-blue-600">
+                    {(page - 1) * PAGE_SIZE + index + 1}
+                  </TableCell>
                   <TableCell className="px-6 py-4 font-mono text-xs font-black text-blue-600">
                     {d.device_id}
                   </TableCell>
@@ -247,6 +267,71 @@ export const HSTMaster = () => {
             </TableBody>
           </Table>
         </CardContent>
+        <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3 bg-blue-600 px-5 py-2.5 rounded-2xl border border-blue-500/20 shadow-lg shadow-blue-100">
+            <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] whitespace-nowrap">
+              Total Devices
+            </span>
+            <span className="h-4 w-[2px] bg-blue-400/50 rounded-full mx-1" />
+            <span className="text-sm font-black text-white tabular-nums">
+              {totalCount}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === 1 || loading}
+              onClick={() => setPage(1)}
+            >
+              <ChevronsLeft className="icon-sm text-slate-600" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === 1 || loading}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              <ChevronLeft className="h-6 w-6 text-slate-600" />
+            </Button>
+            <div className="flex items-center gap-2 px-4">
+              {Array.from(
+                { length: Math.min(totalPages, endPage - startPage + 1) },
+                (_, i) => {
+                  const p = startPage + i;
+                  if (p <= 0) return null;
+                  return (
+                    <Button
+                      key={p}
+                      variant={page === p ? "default" : "ghost"}
+                      className={`h-10 w-10 rounded-xl font-black text-xs ${page === p ? "bg-blue-600 text-white shadow-md shadow-blue-100" : "text-slate-400 hover:text-slate-900"}`}
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  );
+                },
+              )}
+            </div>
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === totalPages || loading}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              <ChevronRight className="h-6 w-6 text-slate-600" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+              disabled={page === totalPages || loading}
+              onClick={() => setPage(totalPages)}
+            >
+              <ChevronsRight className="icon-sm text-slate-600" />
+            </Button>
+          </div>
+        </div>
       </Card>
     </div>
   );

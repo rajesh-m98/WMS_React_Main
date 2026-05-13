@@ -42,6 +42,7 @@ import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import { handleFetchAllItems } from "@/app/manager/itemManager";
 import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
 import { handleFetchGins } from "@/app/manager/ginManager";
+import { handleFetchAllLayerConfigs } from "@/app/manager/locationManager";
 
 const iconMap: Record<string, any> = {
   Users,
@@ -94,6 +95,7 @@ export const Dashboard = () => {
           dispatch(handleFetchAllHST()),
           dispatch(handleFetchAllWarehouses()),
           dispatch(handleFetchAllItems()),
+          dispatch(handleFetchAllLayerConfigs(1)),
           dispatch(
             handleFetchGins({
               gin_type: 1,
@@ -162,7 +164,8 @@ export const Dashboard = () => {
             : "Outward",
       item: tx.item_code || "Unknown Item",
       qty: tx.quantity || tx.received_qty || 0,
-      date: (tx.docdate || tx.created_at || "").toString().split("T")[0] || "---",
+      date:
+        (tx.docdate || tx.created_at || "").toString().split("T")[0] || "---",
     }));
   }, [activeTransactions]);
 
@@ -230,7 +233,7 @@ export const Dashboard = () => {
         const baseValue = baseline.counts[field];
         if (baseValue === undefined) return "+0";
         const diff = current - baseValue;
-        return diff >= 0 ? `+${diff}` : `${diff}`;
+        return diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : "0";
       };
 
       setDeltas({
@@ -338,9 +341,17 @@ export const Dashboard = () => {
                     <Icon className="icon-base" />
                   </div>
                   <Badge
-                    className={`rounded-full px-2 py-0.5 border-0 caption-small !text-white ${kpi.up ? "bg-emerald-500" : "bg-rose-500"}`}
+                    className={`rounded-full px-2 py-0.5 border-0 caption-small !text-white ${
+                      kpi.change.startsWith("+")
+                        ? "bg-emerald-500"
+                        : kpi.change.startsWith("-")
+                          ? "bg-rose-500"
+                          : kpi.change === "0"
+                            ? "bg-slate-400"
+                            : "bg-emerald-500" // Default for +Today / +Live
+                    }`}
                   >
-                    {kpi.change}
+                    {kpi.change === "0" ? "+0" : kpi.change}
                   </Badge>
                 </div>
                 <h3 className="caption-small mb-1 opacity-60 uppercase">
@@ -459,8 +470,8 @@ export const Dashboard = () => {
                 Global Movement History
               </p>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="rounded-2xl h-12 px-6 label-bold border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all group shadow-sm"
               onClick={() => navigate("/activity-logs")}
             >

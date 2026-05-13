@@ -29,6 +29,10 @@ import {
   Fingerprint,
   Loader2,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -53,6 +57,7 @@ import {
   handleRefreshWarehouse,
   handleClearCurrentWarehouse,
 } from "@/app/manager/warehouseManager";
+import { clearAllWarehouses, warehouseLoadStart } from "@/app/store/warehouseSlice";
 import config from "./WarehouseConfig.json";
 
 export const WarehouseMaster = () => {
@@ -64,7 +69,7 @@ export const WarehouseMaster = () => {
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const pageSize = 15;
+  const pageSize = 10;
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loadingAction, setLoadingAction] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -72,10 +77,17 @@ export const WarehouseMaster = () => {
 
   const { totalCount } = useAppSelector((state) => state.warehouse);
 
+  const totalPages = Math.ceil(totalCount / pageSize);
+  const startPage = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const endPage = Math.min(totalPages, Math.max(page + 2, 5));
+
   useEffect(() => {
     dispatch(
       handleFetchAllWarehouses({ page, size: pageSize, is_paginate: true }),
     );
+    return () => {
+      dispatch(clearAllWarehouses());
+    };
   }, [dispatch, page]);
 
   const handleView = (id: number) => {
@@ -97,9 +109,13 @@ export const WarehouseMaster = () => {
   };
 
   const handleRefresh = async () => {
+    dispatch(warehouseLoadStart());
     const success = await dispatch(handleRefreshWarehouse());
     if (success) {
-      toast.success("Warehouse list refreshed from source");
+      await dispatch(
+        handleFetchAllWarehouses({ page, size: pageSize, is_paginate: true }),
+      );
+      toast.success("Facility List Refreshed Successfully");
     }
   };
 
@@ -145,11 +161,11 @@ export const WarehouseMaster = () => {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-500">
-      <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white mb-4">
-        <CardContent className="p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div className="relative w-full lg:w-2/3 shrink-0">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
+    <div className="space-y-6 animate-in fade-in duration-700">
+      <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
+        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative w-full md:flex-1 group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <Input
               placeholder={config.strings.searchPlaceholder}
               className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
@@ -158,17 +174,19 @@ export const WarehouseMaster = () => {
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 justify-end w-full lg:w-auto">
+          <div className="flex items-center gap-3 w-full md:w-auto">
             <Button
               variant="outline"
+              className="h-12 px-5 rounded-xl border border-slate-200 body-strong text-slate-600 hover:bg-slate-50 transition-all active:scale-95 group"
               onClick={handleRefresh}
-              className="rounded-xl h-12 px-4 border-slate-200 hover:bg-slate-50 transition-all body-strong group"
               disabled={loading}
             >
               <RefreshCw
-                className={`icon-sm mr-2 ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
+                className={`icon-sm ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
               />
-              Sync
+              <span className="ml-2 uppercase tracking-widest text-[10px] font-black">
+                {loading ? "Syncing..." : "Sync Facilities"}
+              </span>
             </Button>
 
             <Dialog
@@ -179,7 +197,7 @@ export const WarehouseMaster = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-8 body-strong text-white flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95">
+                <Button className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white body-strong transition-all shadow-lg shadow-blue-100 active:scale-95 flex items-center gap-2">
                   <Plus className="icon-sm" /> {config.strings.addWarehouseBtn}
                 </Button>
               </DialogTrigger>
@@ -199,7 +217,6 @@ export const WarehouseMaster = () => {
                 <div className="p-10 bg-white overflow-y-auto max-h-[70vh]">
                   <form onSubmit={handleSubmit} className="space-y-10">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                      {/* Section 1: Core Identification */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3">
                           <div className="h-6 w-1 bg-blue-600 rounded-full" />
@@ -245,7 +262,6 @@ export const WarehouseMaster = () => {
                         </div>
                       </div>
 
-                      {/* Section 2: Precise Location */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3">
                           <div className="h-6 w-1 bg-indigo-600 rounded-full" />
@@ -303,9 +319,7 @@ export const WarehouseMaster = () => {
                               </Label>
                               <Input
                                 name="country"
-                                defaultValue={
-                                  editingWarehouse?.country || "India"
-                                }
+                                defaultValue={editingWarehouse?.country || "India"}
                                 className="h-11 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
                               />
                             </div>
@@ -313,7 +327,6 @@ export const WarehouseMaster = () => {
                         </div>
                       </div>
 
-                      {/* Section 3: Technical & GST */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3">
                           <div className="h-6 w-1 bg-emerald-600 rounded-full" />
@@ -370,12 +383,8 @@ export const WarehouseMaster = () => {
                         className="rounded-xl bg-blue-600 hover:bg-slate-900 text-white px-12 h-12 body-strong transition-all shadow-xl shadow-blue-100 active:scale-95 flex items-center gap-2"
                         disabled={loadingAction}
                       >
-                        {loadingAction && (
-                          <Loader2 className="icon-sm animate-spin" />
-                        )}
-                        {editingWarehouse
-                          ? "Commit Sync"
-                          : "Initialize Facility"}
+                        {loadingAction && <Loader2 className="icon-sm animate-spin" />}
+                        {editingWarehouse ? "Commit Sync" : "Initialize Facility"}
                       </Button>
                     </div>
                   </form>
@@ -385,7 +394,6 @@ export const WarehouseMaster = () => {
           </div>
         </CardContent>
       </Card>
-
       <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
         <CardContent className="p-0">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
@@ -427,17 +435,17 @@ export const WarehouseMaster = () => {
                       colSpan={5}
                       className="h-40 text-center text-slate-400 font-bold uppercase tracking-widest"
                     >
-                      No Facilities Match Search
+                      No Warehouse Data Found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((wh: any) => (
+                  filtered.map((wh: any, index: number) => (
                     <TableRow
                       key={wh.id}
                       className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-bold"
                     >
                       <TableCell className="px-5 py-4 text-[11px] font-mono text-black text-center">
-                        {wh.id}
+                        {(page - 1) * pageSize + index + 1}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight">
                         {wh.warehouse_name}
@@ -524,12 +532,12 @@ export const WarehouseMaster = () => {
           </div>
 
           <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">
-                {config.strings.totalFacilities}
+            <div className="flex items-center gap-3 bg-blue-600 px-5 py-2.5 rounded-2xl border border-blue-500/20 shadow-lg shadow-blue-100">
+              <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] whitespace-nowrap">
+                {config.strings.totalWarehouses}
               </span>
-              <span className="h-4 w-[2px] bg-slate-200 rounded-full mx-1" />
-              <span className="text-sm font-black text-slate-900 tabular-nums">
+              <span className="h-4 w-[2px] bg-blue-400/50 rounded-full mx-1" />
+              <span className="text-sm font-black text-white tabular-nums">
                 {totalCount}
               </span>
             </div>
@@ -537,27 +545,54 @@ export const WarehouseMaster = () => {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="h-12 border-2 border-slate-100 body-strong px-4 rounded-xl disabled:opacity-30 transition-all active:scale-95"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
                 disabled={page === 1 || loading}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(1)}
               >
-                Previous
+                <ChevronsLeft className="icon-sm text-slate-600" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === 1 || loading}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                <ChevronLeft className="h-6 w-6 text-slate-600" />
               </Button>
               <div className="flex items-center gap-2 px-4">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Page
-                </span>
-                <span className="h-10 w-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-lg shadow-blue-100">
-                  {page}
-                </span>
+                {Array.from(
+                  { length: Math.min(totalPages, endPage - startPage + 1) },
+                  (_, i) => {
+                    const p = startPage + i;
+                    if (p <= 0) return null;
+                    return (
+                      <Button
+                        key={p}
+                        variant={page === p ? "default" : "ghost"}
+                        className={`h-10 w-10 rounded-xl font-black text-xs ${page === p ? "bg-blue-600 text-white shadow-md shadow-blue-100" : "text-slate-400 hover:text-slate-900"}`}
+                        onClick={() => setPage(p)}
+                      >
+                        {p}
+                      </Button>
+                    );
+                  },
+                )}
               </div>
               <Button
                 variant="outline"
-                className="h-12 border-2 border-slate-100 body-strong px-4 rounded-xl disabled:opacity-30 transition-all active:scale-95"
-                disabled={warehouses.length < pageSize || loading}
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === totalPages || loading}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next Page
+                <ChevronRight className="h-6 w-6 text-slate-600" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
+                disabled={page === totalPages || loading}
+                onClick={() => setPage(totalPages)}
+              >
+                <ChevronsRight className="icon-sm text-slate-600" />
               </Button>
             </div>
           </div>

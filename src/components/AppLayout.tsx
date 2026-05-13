@@ -41,6 +41,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       return { title: "Edit Item", description: "Modify existing item registry and mappings" };
     if (normalizedPath.includes("/masters/items/"))
       return { title: "Item Detail", description: "Deep dive into item specifications and bin assignments" };
+    if (normalizedPath.includes("/masters/hst/new"))
+      return { title: "Add New Device", description: "Register a new handheld terminal device" };
+    if (normalizedPath.endsWith("/edit") && normalizedPath.includes("/masters/hst/"))
+      return { title: "Edit Device", description: "Update handheld terminal details and location assignments" };
+    if (normalizedPath.includes("/masters/hst/"))
+      return { title: "Device Detail", description: "View handheld terminal specifications and location assignments" };
     if (normalizedPath.includes("/transactions/tasks/"))
       return {
         title: "Task Details",
@@ -135,9 +141,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     if (path.includes("/transactions/gin/edit-header/"))
       return { title: "Edit Header", description: "Update transaction header information" };
     return (
-      pageData[path] || {
-        title: "WMS",
-        description: "Warehouse Management System",
+      pageData[normalizedPath] || {
+        title: "Warehouse Management",
+        description: "Manage your warehouse operations",
       }
     );
   };

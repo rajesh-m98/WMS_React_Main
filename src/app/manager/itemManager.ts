@@ -21,7 +21,7 @@ export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: Ap
     const queryParams = new URLSearchParams({
       is_paginate: 'true',
       page: (params?.page || 1).toString(),
-      size: (params?.size || 15).toString(),
+      size: (params?.size || 10).toString(),
     });
     
     if (params?.warehouseid) {
@@ -106,7 +106,6 @@ export const handleDeleteItem = (id: number) => async (dispatch: AppDispatch) =>
 
 export const handleRefreshItems = () => async (dispatch: AppDispatch) => {
   try {
-    dispatch(itemLoadStart());
     const response = await api.get(API_ENDPOINTS.MASTERS.ITEMS.REFRESH);
     if (response.data.status) {
       return true;

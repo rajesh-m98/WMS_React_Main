@@ -62,6 +62,11 @@ const warehouseSlice = createSlice({
     clearCurrentWarehouse: (state) => {
       state.currentWarehouse = null;
     },
+    clearAllWarehouses: (state) => {
+      state.data = [];
+      state.totalCount = 0;
+      state.error = null;
+    },
   },
 });
 
@@ -70,7 +75,8 @@ export const {
   warehouseLoadSuccess, 
   warehouseDetailSuccess, 
   warehouseLoadFailure,
-  clearCurrentWarehouse 
+  clearCurrentWarehouse,
+  clearAllWarehouses
 } = warehouseSlice.actions;
 
 export default warehouseSlice.reducer;

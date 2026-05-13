@@ -67,8 +67,9 @@ import { handleFetchBins } from "@/app/manager/binManager";
 import { useDebounce } from "@/hooks/use-debounce";
 import config from "./ItemConfig.json";
 import { ItemDTO } from "@/core/models/master.model";
+import { clearItems, itemLoadStart } from "@/app/store/itemSlice";
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 10;
 
 export const ItemMaster = () => {
   const dispatch = useAppDispatch();
@@ -90,18 +91,20 @@ export const ItemMaster = () => {
     );
     dispatch(handleFetchBins({ warehouseid: 1 }));
     return () => {
-      dispatch({ type: "item/clearItems" }); // Reset core state on navigate out
+      dispatch(clearItems()); // Reset core state on navigate out
     };
   }, [dispatch, page, debouncedSearch]);
 
   const handleSync = async () => {
     setIsRefreshing(true);
+    // Explicitly start loading to show the table spinner as requested
+    dispatch(itemLoadStart());
     const success = await dispatch(handleRefreshItems());
     if (success) {
-      dispatch(
+      await dispatch(
         handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
       );
-      toast.success(config.strings.syncSuccess);
+      toast.success("Item Master Refreshed Successfully");
     }
     setIsRefreshing(false);
   };
@@ -117,7 +120,6 @@ export const ItemMaster = () => {
   const handleView = (id: number) => {
     navigate(`/masters/items/${id}?type=item`);
   };
-
 
   const handleRemove = async (id: number) => {
     const success = await dispatch(handleDeleteItem(id));
@@ -151,22 +153,16 @@ export const ItemMaster = () => {
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Button
               variant="outline"
-              className="h-12 px-5 rounded-xl border border-slate-200 body-strong text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
+              className="h-12 px-5 rounded-xl border border-slate-200 body-strong text-slate-600 hover:bg-slate-50 transition-all active:scale-95 group"
               onClick={handleSync}
               disabled={isRefreshing}
             >
               <RefreshCw
-                className={`icon-sm ${isRefreshing ? "animate-spin" : ""}`}
+                className={`icon-sm ${isRefreshing ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
               />
-              <span className="ml-2 uppercase tracking-widest text-[10px] font-black">Sync Catalog</span>
-            </Button>
-            
-            <Button
-              className="h-12 px-6 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 transition-all active:scale-95 shadow-xl shadow-blue-100 flex items-center gap-2"
-              onClick={() => handleOpenDialog(null)}
-            >
-              <Plus className="h-5 w-5" />
-              <span className="uppercase tracking-widest text-[10px]">Create New Item</span>
+              <span className="ml-2 uppercase tracking-widest text-[10px] font-black">
+                {isRefreshing ? "Refreshing..." : "Refresh"}
+              </span>
             </Button>
           </div>
         </CardContent>
@@ -178,6 +174,9 @@ export const ItemMaster = () => {
             <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-slate-50/80 border-b border-slate-200 hover:bg-slate-50/80">
+                  <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[50px]">
+                    SL NO
+                  </TableHead>
                   <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[150px]">
                     ITEM CODE
                   </TableHead>
@@ -194,7 +193,6 @@ export const ItemMaster = () => {
                     ACTIONS
                   </TableHead>
                 </TableRow>
-
               </TableHeader>
               <TableBody>
                 {loading ? (
@@ -218,11 +216,14 @@ export const ItemMaster = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  items.map((item) => (
+                  items.map((item, idx) => (
                     <TableRow
                       key={item.id}
                       className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-bold"
                     >
+                      <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight whitespace-nowrap">
+                        {(page - 1) * PAGE_SIZE + idx + 1}
+                      </TableCell>
                       <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight whitespace-nowrap">
                         {item.item_code}
                       </TableCell>
@@ -309,12 +310,12 @@ export const ItemMaster = () => {
           </div>
 
           <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">
+            <div className="flex items-center gap-3 bg-blue-600 px-5 py-2.5 rounded-2xl border border-blue-500/20 shadow-lg shadow-blue-100">
+              <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] whitespace-nowrap">
                 {config.strings.totalCatalog}
               </span>
-              <span className="h-4 w-[2px] bg-slate-200 rounded-full mx-1" />
-              <span className="text-sm font-black text-slate-900 tabular-nums">
+              <span className="h-4 w-[2px] bg-blue-400/50 rounded-full mx-1" />
+              <span className="text-sm font-black text-white tabular-nums">
                 {totalCount}
               </span>
             </div>
@@ -375,7 +376,6 @@ export const ItemMaster = () => {
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 };

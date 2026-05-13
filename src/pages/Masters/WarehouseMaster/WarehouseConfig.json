@@ -21,7 +21,7 @@
       
       "submitBtn": "Commit Facility"
     },
-    "totalFacilities": "Total Facilities",
+    "totalWarehouses": "Total Warehouses",
     "table": {
       "identification": "Facility Identification",
       "location": "Location",

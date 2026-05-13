@@ -71,11 +71,16 @@ const hstSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    clearAllHST: (state) => {
+      state.data = [];
+      state.totalCount = 0;
+      state.error = null;
+    },
   },
 });
 
 export const { 
-  hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure, hstDetailSuccess, clearCurrentHST
+  hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure, hstDetailSuccess, clearCurrentHST, clearAllHST
 } = hstSlice.actions;
 
 export default hstSlice.reducer;

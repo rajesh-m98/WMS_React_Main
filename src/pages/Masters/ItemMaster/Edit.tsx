@@ -92,18 +92,45 @@ const ItemEdit = () => {
     if (isInitialized) return;
 
     const item = items.find((i) => i.id === Number(id));
-    if (item) {
+    // Wait until both item and layerConfigs are available before initialising
+    if (item && layerConfigs.length > 0) {
       setFormData({
         ...item,
         warehouse_id: 1,
       });
+
+      // Populate existing location assignments — deduplicated by locationId
+      if (Array.isArray(item.location) && item.location.length > 0) {
+        const seen = new Set<number>();
+        const initialAssignments: Assignment[] = item.location
+          .filter((loc: any) => {
+            if (seen.has(loc.location_id)) return false;
+            seen.add(loc.location_id);
+            return true;
+          })
+          .map((loc: any) => {
+            const config = layerConfigs.find((lc) => lc.id === loc.location_id);
+            const path = config
+              ? [config.layer1, config.layer2, config.layer3, config.layer4, config.layer5]
+                  .filter(Boolean)
+                  .join(" > ")
+              : `Location #${loc.location_id}`;
+            return {
+              locationId: loc.location_id,
+              path,
+              qty: loc.total_capacity ?? loc.available_capacity ?? 0,
+            };
+          });
+        setAssignments(initialAssignments);
+      }
+
       setIsLoading(false);
       setIsInitialized(true);
-    } else if (!loading && items.length > 0) {
-      // If items are loaded but this ID isn't found
+    } else if (!loading && items.length > 0 && layerConfigs.length > 0) {
+      // Item not found after load
       setIsLoading(false);
     }
-  }, [id, items, isInitialized, loading]);
+  }, [id, items, isInitialized, loading, layerConfigs]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -306,6 +333,10 @@ const ItemEdit = () => {
                         toast.error(
                           "Only one location allowed in Single mode. Delete existing to change.",
                         );
+                        return;
+                      }
+                      if (assignments.some((a) => a.locationId === locationId)) {
+                        toast.error("This location is already assigned.");
                         return;
                       }
                       setPendingMapping({ locationId, fullPath: pathLabel });
