@@ -12,19 +12,6 @@ import {
   TableHeader,
   TableRow,
   Badge,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Label,
-  ScrollArea,
-  Separator,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@/components/ui";
 import {
   AlertDialog,
@@ -32,7 +19,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
@@ -47,19 +33,12 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Plus,
   Edit2,
-  Package,
-  Layers,
-  Settings,
-  X,
-  Box,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector, useAppDispatch } from "@/app/store";
 import {
   handleFetchAllItems,
-  handleCreateItem,
   handleDeleteItem,
   handleRefreshItems,
 } from "@/app/manager/itemManager";
@@ -85,24 +64,46 @@ export const ItemMaster = () => {
   const [page, setPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Determine if we should perform a global search
+  const isSearchActive = debouncedSearch.length >= 5;
+
   useEffect(() => {
+    // Determine search term and target page
+    const searchTerm = isSearchActive ? debouncedSearch : "";
+    const targetPage = isSearchActive && page !== 1 ? 1 : page;
+
     dispatch(
-      handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
+      handleFetchAllItems({
+        page: targetPage,
+        size: PAGE_SIZE,
+        search: searchTerm,
+        warehouseid: 1,
+      }),
     );
+
+    // If we determined we need to be on page 1 for a new search, update state
+    if (isSearchActive && page !== 1) {
+      setPage(1);
+    }
+
     dispatch(handleFetchBins({ warehouseid: 1 }));
     return () => {
-      dispatch(clearItems()); // Reset core state on navigate out
+      dispatch(clearItems());
     };
-  }, [dispatch, page, debouncedSearch]);
+  }, [dispatch, page, debouncedSearch, isSearchActive]);
 
   const handleSync = async () => {
     setIsRefreshing(true);
-    // Explicitly start loading to show the table spinner as requested
     dispatch(itemLoadStart());
     const success = await dispatch(handleRefreshItems());
     if (success) {
       await dispatch(
-        handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
+        handleFetchAllItems({
+          page,
+          size: PAGE_SIZE,
+          search: isSearchActive ? debouncedSearch : "",
+          warehouseid: 1,
+        }),
       );
       toast.success("Item Master Refreshed Successfully");
     }
@@ -125,9 +126,13 @@ export const ItemMaster = () => {
     const success = await dispatch(handleDeleteItem(id));
     if (success) {
       toast.success("Item removed successfully");
-      // Trigger a smart refetch on the current page to keep context
       dispatch(
-        handleFetchAllItems({ page, size: PAGE_SIZE, search: debouncedSearch }),
+        handleFetchAllItems({
+          page,
+          size: PAGE_SIZE,
+          search: isSearchActive ? debouncedSearch : "",
+          warehouseid: 1,
+        }),
       );
     }
   };
@@ -140,14 +145,24 @@ export const ItemMaster = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="relative w-full md:flex-1">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
+          <div className="relative w-full md:flex-1 group">
+            <Search
+              className={`absolute left-5 top-1/2 -translate-y-1/2 icon-sm transition-colors ${search.length > 0 && !isSearchActive ? "text-orange-400" : "text-slate-400"}`}
+            />
             <Input
               placeholder={config.strings.searchPlaceholder}
               className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            {search.length > 0 && !isSearchActive && (
+              <div className="absolute -bottom-6 left-2 flex items-center gap-1 animate-in fade-in slide-in-from-top-1">
+                <div className="h-1 w-1 rounded-full bg-orange-400 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-orange-500">
+                  Type atleast 5 characters to search in entire catalog
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -197,11 +212,11 @@ export const ItemMaster = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-40 text-center">
+                    <TableCell colSpan={6} className="h-40 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="icon-xl text-blue-600 animate-spin" />
                         <p className="caption-small !text-slate-400">
-                          Loading Items...
+                          Searching Catalog...
                         </p>
                       </div>
                     </TableCell>
@@ -209,10 +224,12 @@ export const ItemMaster = () => {
                 ) : items.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={6}
                       className="h-40 text-center text-slate-400 font-bold uppercase tracking-widest"
                     >
-                      {config.strings.noItems}
+                      {search
+                        ? `No results found for "${search}"`
+                        : config.strings.noItems}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -243,11 +260,11 @@ export const ItemMaster = () => {
                       </TableCell>
 
                       <TableCell className="text-right px-5 py-4">
-                        <div className="flex items-center justify-end gap-2 text-left transition-all">
+                        <div className="flex items-center justify-end gap-2">
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            className="h-9 w-9 rounded-xl text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                             onClick={() => handleView(item.id)}
                           >
                             <Eye className="h-4 w-4" />
@@ -255,7 +272,7 @@ export const ItemMaster = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                            className="h-9 w-9 rounded-xl text-slate-400 hover:bg-orange-500 hover:text-white transition-all shadow-sm"
                             onClick={() => handleOpenDialog(item)}
                           >
                             <Edit2 className="h-4 w-4" />
@@ -265,33 +282,31 @@ export const ItemMaster = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
+                                className="h-9 w-9 rounded-xl text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
-                              <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 shadow-inner relative overflow-hidden">
-                                <Trash2 className="icon-xl text-white animate-in zoom-in-50 duration-500 relative z-10" />
+                              <div className="bg-rose-600 py-8 w-full flex items-center justify-center gap-2 relative">
+                                <Trash2 className="icon-xl text-white relative z-10" />
                                 <AlertDialogTitle className="text-2xl font-black text-white tracking-tight relative z-10">
                                   {config.strings.deleteDialog.title}
                                 </AlertDialogTitle>
                               </div>
                               <div className="p-10 text-center flex flex-col items-center">
-                                <AlertDialogHeader className="flex flex-col items-center">
-                                  <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto text-center">
-                                    {config.strings.deleteDialog.descriptionTemplate.replace(
-                                      "{itemcode}",
-                                      item.item_code,
-                                    )}
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
+                                <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed mx-auto text-center">
+                                  {config.strings.deleteDialog.descriptionTemplate.replace(
+                                    "{itemcode}",
+                                    item.item_code,
+                                  )}
+                                </AlertDialogDescription>
                                 <div className="flex gap-4 w-full mt-10">
                                   <AlertDialogCancel className="rounded-xl border-slate-200 body-strong flex-1 h-12 text-slate-600 hover:bg-slate-50">
                                     {config.strings.deleteDialog.cancelBtn}
                                   </AlertDialogCancel>
                                   <AlertDialogAction
-                                    className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
+                                    className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white transition-all active:scale-95"
                                     onClick={() => handleRemove(item.id)}
                                   >
                                     {config.strings.deleteDialog.confirmBtn}

@@ -16,6 +16,7 @@ import putawayReducer from './putawaySlice';
 import floorReducer from './floorSlice';
 import ginReducer from './ginSlice';
 import layerConfigReducer from './layerConfigSlice';
+import packageReducer from './packageSlice';
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ export const store = configureStore({
     floor: floorReducer,
     gin: ginReducer,
     layerConfig: layerConfigReducer,
+    package: packageReducer,
   },
 });
 

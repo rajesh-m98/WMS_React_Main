@@ -1,7 +1,7 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
-import { 
-  itemLoadStart, itemLoadSuccess, itemLoadFailure, itemDetailSuccess 
+import {
+  itemLoadStart, itemLoadSuccess, itemLoadFailure, itemDetailSuccess
 } from '../store/itemSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 import { ItemDTO } from '@/core/models/master.model';
@@ -17,23 +17,23 @@ interface FetchParams {
 export const handleFetchAllItems = (params?: FetchParams) => async (dispatch: AppDispatch) => {
   try {
     dispatch(itemLoadStart());
-    
+
     const queryParams = new URLSearchParams({
       is_paginate: 'true',
       page: (params?.page || 1).toString(),
       size: (params?.size || 10).toString(),
     });
-    
+
     if (params?.warehouseid) {
       queryParams.append('warehouseid', params.warehouseid.toString());
     }
-    
+
     if (params?.search) {
       queryParams.append('search', params.search);
     }
-    
+
     const response = await api.get(`${API_ENDPOINTS.MASTERS.ITEMS.ALL}?${queryParams.toString()}`);
-    
+
     if (response.data.status) {
       const respData = response.data.data;
       dispatch(itemLoadSuccess({
@@ -70,7 +70,7 @@ export const handleFetchItemById = (itemId: number) => async (dispatch: AppDispa
 export const handleCreateItem = (itemData: Partial<ItemDTO>, editId?: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(itemLoadStart());
-    const url = editId 
+    const url = editId
       ? `${API_ENDPOINTS.MASTERS.ITEMS.CREATE}?item_id=${editId}`
       : API_ENDPOINTS.MASTERS.ITEMS.CREATE;
 

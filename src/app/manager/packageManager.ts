@@ -1,35 +1,34 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
-import { 
+import {
   packageLoadStart, packageLoadSuccess, packageLoadFailure
-} from '../store/masterSlice';
+} from '../store/packageSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
-import { PackageDTO } from '@/core/models/master.model';
+import { CreatePackagePayload } from '@/core/models/master.model';
 
 interface FetchParams {
   page?: number;
   size?: number;
   search?: string;
-  companyid?: number;
+  is_paginate?: boolean;
 }
 
 export const handleFetchAllPackages = (params?: FetchParams) => async (dispatch: AppDispatch) => {
   try {
     dispatch(packageLoadStart());
-    
+
     const queryParams = new URLSearchParams({
-      is_paginate: 'true',
-      companyid: (params?.companyid || 1).toString(),
+      is_paginate: (params?.is_paginate ?? true).toString(),
       page: (params?.page || 1).toString(),
       size: (params?.size || 10).toString(),
     });
-    
+
     if (params?.search) {
       queryParams.append('search', params.search);
     }
-    
+
     const response = await api.get(`${API_ENDPOINTS.MASTERS.PACKAGING.ALL}?${queryParams.toString()}`);
-    
+
     if (response.data.status) {
       const respData = response.data.data;
       dispatch(packageLoadSuccess({
@@ -42,27 +41,25 @@ export const handleFetchAllPackages = (params?: FetchParams) => async (dispatch:
       return false;
     }
   } catch (err: any) {
-    dispatch(packageLoadFailure(err.message || "Error fetching packaging data"));
+    dispatch(packageLoadFailure(err.message || "Error fetching package data"));
     return false;
   }
 };
 
-export const handleCreatePackage = (packageData: Partial<PackageDTO>, editId?: number) => async (dispatch: AppDispatch) => {
+export const handleCreatePackage = (packageData: CreatePackagePayload) => async (dispatch: AppDispatch) => {
   try {
     dispatch(packageLoadStart());
-    const url = editId 
-      ? `${API_ENDPOINTS.MASTERS.PACKAGING.CREATE}?package_id=${editId}`
-      : API_ENDPOINTS.MASTERS.PACKAGING.CREATE;
+    const url = API_ENDPOINTS.MASTERS.PACKAGING.CREATE;
 
     const response = await api.post(url, packageData);
-    if (response.data.status) {
+    if (response.data.status || response.status === 200) {
       return true;
     } else {
-      dispatch(packageLoadFailure(response.data.message || (editId ? "Failed to update package" : "Failed to create package")));
+      dispatch(packageLoadFailure(response.data.message || "Failed to create package"));
       return false;
     }
   } catch (err: any) {
-    const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || (editId ? "Error updating package" : "Error creating package");
+    const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || "Error creating package";
     dispatch(packageLoadFailure(errorMsg));
     return false;
   }
@@ -71,7 +68,7 @@ export const handleCreatePackage = (packageData: Partial<PackageDTO>, editId?: n
 export const handleDeletePackage = (id: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(packageLoadStart());
-    const response = await api.delete(`${API_ENDPOINTS.MASTERS.PACKAGING.DELETE}?package_id=${id}`);
+    const response = await api.delete(`${API_ENDPOINTS.MASTERS.PACKAGING.DELETE}?packaging_id=${id}`);
     if (response.data.status) {
       return true;
     } else {

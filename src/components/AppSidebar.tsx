@@ -91,7 +91,7 @@ export function AppSidebar() {
       case "/masters/floors":
         dispatch(handleFetchFloors(1));
         break;
-      case "/masters/packaging":
+      case "/masters/packages":
         dispatch(handleFetchAllPackages({ page: 1, size: 15 }));
         break;
       case "/transactions/dispatch-history":
@@ -234,7 +234,7 @@ export function AppSidebar() {
                 />
                 <SubMenuItem
                   title="Package Master"
-                  url="/masters/packaging"
+                  url="/masters/packages"
                   icon={Archive}
                 />
                 <SubMenuItem
@@ -266,19 +266,24 @@ export function AppSidebar() {
             <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
               <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
                 <SubMenuItem
-                  title="Putaway"
+                  title="Putaway GRN"
                   url="/transactions/gin/putaway"
                   icon={PackagePlus}
                 />
                 <SubMenuItem
-                  title="Flow Through"
+                  title="Flow Through GRN"
                   url="/transactions/gin/flow-through"
                   icon={ArrowLeftRight}
                 />
                 <SubMenuItem
-                  title="Pick List"
-                  url="/transactions/gin/picklist"
-                  icon={ClipboardCheck}
+                  title="OutwardPutaway"
+                  url="/transactions/gin/putaway"
+                  icon={PackagePlus}
+                />
+                <SubMenuItem
+                  title="Dispatch History"
+                  url="/transactions/dispatch-history"
+                  icon={History}
                 />
               </SidebarMenuSub>
             </CollapsibleContent>
@@ -313,35 +318,6 @@ export function AppSidebar() {
                   />
                 </div>
                 <span className="body-strong">Activity Logs</span>
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={isItemActive("/transactions/dispatch-history")}
-            >
-              <NavLink
-                to="/transactions/dispatch-history"
-                className={`flex items-center gap-3.5 px-4 py-4 rounded-lg transition-all duration-300 ${
-                  isItemActive("/transactions/dispatch-history")
-                    ? "bg-blue-600 text-white font-bold shadow-xl shadow-blue-200/80 scale-[1.02]"
-                    : "text-slate-600 hover:bg-blue-50 hover:text-blue-600"
-                }`}
-                activeClassName=""
-                onClick={() =>
-                  handleSidebarClick("/transactions/dispatch-history")
-                }
-              >
-                <div
-                  className={`p-1.5 rounded-xl transition-colors ${isItemActive("/transactions/dispatch-history") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
-                >
-                  <ClipboardList
-                    className={`icon-base shrink-0 ${isItemActive("/transactions/dispatch-history") ? "text-slate-700" : "text-slate-500 group-hover:text-blue-600"}`}
-                  />
-                </div>
-                <span className="body-strong">Dispatch History</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>

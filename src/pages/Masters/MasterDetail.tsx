@@ -263,7 +263,7 @@ const MasterDetail = () => {
           <span className="text-[15px] font-black text-slate-900 uppercase tracking-tighter">
             Record ID:
           </span>
-          <span className="text-[12px] w-7 h-7 bg-blue-600 rounded-md text-white rounded-full flex items-center justify-center font-black text-blue-600 font-mono tracking-tighter">
+          <span className="text-[12px] px-2 py-1 bg-blue-600 rounded-md text-white font-bold flex items-center justify-center">
             {id}
           </span>
         </div>
@@ -271,7 +271,7 @@ const MasterDetail = () => {
           <span className="text-[15px] font-black text-slate-900 uppercase tracking-tighter">
             Entity Node:
           </span>
-          <span className="text-[15px] font-black text-slate-500 uppercase tracking-tighter underline decoration-slate-200 underline-offset-4 decoration-2">
+          <span className="text-[15px] font-black text-slate-600 uppercase underline decoration-slate-200 underline-offset-4 decoration-2">
             {subtitle}
           </span>
         </div>

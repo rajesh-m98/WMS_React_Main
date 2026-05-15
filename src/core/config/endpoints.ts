@@ -38,9 +38,9 @@ export const API_ENDPOINTS = {
       DELETE: 'warehouse/delete_warehouse/',
     },
     PACKAGING: {
-      ALL: 'packaging/get_all_package/',
-      CREATE: 'packaging/package_create/',
-      GET_BY_ID: 'packaging/get_package/',
+      ALL: 'packaging/get_all_packagings/',
+      CREATE: 'packaging/packaging_create/',
+      GET_BY_ID: 'packaging/get_packaging/',
       DELETE: 'packaging/delete_package/',
     },
     FLOOR: {
@@ -63,8 +63,8 @@ export const API_ENDPOINTS = {
       GET_ITEMS: 'picklist/get_all_picklist',
     },
     DISPATCH: {
-      GET_HISTORY: 'dispatch/get_all_dispatch/',
-      GET_DETAIL: 'dispatch/get_dispatch/',
+      GET_HISTORY: 'outward/get_all_dispatch/',
+      GET_DETAIL: 'outward/get_dispatch/',
     },
     PUTAWAY: {
       GET_ALL: 'putaway/get_all_putaway/',

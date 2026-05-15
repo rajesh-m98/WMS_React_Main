@@ -83,9 +83,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           title: "Warehouse Master",
           description: "Manage warehouse facilities",
         },
-        "/masters/packaging": {
+        "/masters/packages": {
           title: "Package Master",
           description: "Manage packaging types and dimensions",
+        },
+        "/masters/packages/create": {
+          title: "Barcode Generation",
+          description: "Generate and register new barcodes",
         },
         "/masters/floors": {
           title: "Floor Master",
@@ -101,8 +105,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         },
         "/transactions/dispatch-history": {
           title: "Dispatch History",
-          description:
-            "Archive of processed transactions and document auditing",
+          description: "Review and track all package dispatches",
+        },
+        "/transactions/dispatch/:id": {
+          title: "Dispatch Details",
+          description: "Detailed information for specific dispatch",
         },
         "/transactions/inward-history": {
           title: "Inward Putaway History",

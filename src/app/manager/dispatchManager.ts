@@ -1,65 +1,77 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
-import { 
-  dispatchLoadStart, 
-  dispatchLoadSuccess, 
+import {
+  dispatchLoadStart,
+  dispatchLoadSuccess,
   dispatchDetailSuccess,
-  dispatchLoadFailure 
+  dispatchLoadFailure,
+  setDispatchFilters,
 } from '../store/dispatchSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 
 interface FetchParams {
   page?: number;
   size?: number;
-  search?: string;
-  from_date?: string;
-  to_date?: string;
+  whscode?: string;
+  carton_barcode?: string;
+  is_paginate?: boolean;
 }
 
 export const handleFetchDispatchHistory = (params?: FetchParams) => async (dispatch: AppDispatch) => {
   try {
     dispatch(dispatchLoadStart());
-    
-    const queryParams = {
-      page: params?.page || 1,
-      size: params?.size || 15,
-      is_paginate: true,
-      search: params?.search || "",
-    };
 
-    const response = await api.get(API_ENDPOINTS.TRANSACTIONS.DISPATCH.GET_HISTORY, { params: queryParams });
+    const queryParams = new URLSearchParams({
+      is_paginate: (params?.is_paginate ?? true).toString(),
+      page: (params?.page || 1).toString(),
+      size: (params?.size || 50).toString(),
+    });
 
-    if (response.data.status) {
-      dispatch(dispatchLoadSuccess({ 
-        data: response.data.data.items || [], 
-        total: response.data.data.total || 0 
+    if (params?.whscode) {
+      queryParams.append('whscode', params.whscode);
+    }
+    if (params?.carton_barcode) {
+      queryParams.append('carton_barcode', params.carton_barcode);
+    }
+
+    const response = await api.get(`${API_ENDPOINTS.TRANSACTIONS.DISPATCH.GET_HISTORY}?${queryParams.toString()}`);
+
+    if (response.data.status || response.status === 200) {
+      const respData = response.data.data;
+      // Handle different response structures if necessary
+      const items = Array.isArray(respData) ? respData : (respData.items || []);
+      const total = respData.total || items.length;
+      
+      dispatch(dispatchLoadSuccess({
+        data: items,
+        total: total
       }));
+      return true;
     } else {
-      dispatch(dispatchLoadFailure(response.data.message || "Failed to retrieve Dispatch History"));
+      dispatch(dispatchLoadFailure(response.data.message || "Failed to retrieve dispatch history"));
+      return false;
     }
   } catch (err: any) {
-    dispatch(dispatchLoadFailure(
-      err.response?.data?.message || err.message || "Error fetching Dispatch History"
-    ));
+    dispatch(dispatchLoadFailure(err.message || "Error fetching dispatch history"));
+    return false;
   }
 };
 
-export const handleFetchDispatchDetail = (dispatchId: string | number) => async (dispatch: AppDispatch) => {
+export const handleFetchDispatchDetail = (dispatchId: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(dispatchLoadStart());
-    
-    const response = await api.get(API_ENDPOINTS.TRANSACTIONS.DISPATCH.GET_DETAIL, { 
-      params: { dispatch_id: dispatchId } 
-    });
 
-    if (response.data.status) {
+    const response = await api.get(`${API_ENDPOINTS.TRANSACTIONS.DISPATCH.GET_DETAIL}?dispatch_id=${dispatchId}`);
+
+    if (response.data.status || response.status === 200) {
       dispatch(dispatchDetailSuccess(response.data.data));
+      return true;
     } else {
-      dispatch(dispatchLoadFailure(response.data.message || "Failed to retrieve Dispatch Detail"));
+      dispatch(dispatchLoadFailure(response.data.message || "Failed to retrieve dispatch details"));
+      return false;
     }
   } catch (err: any) {
-    dispatch(dispatchLoadFailure(
-      err.response?.data?.message || err.message || "Error fetching Dispatch Detail"
-    ));
+    dispatch(dispatchLoadFailure(err.message || "Error fetching dispatch details"));
+    return false;
   }
 };

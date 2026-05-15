@@ -18,13 +18,15 @@ import { LocationMaster } from "./pages/Masters/BinMaster/page";
 import { HSTMaster } from "./pages/Masters/HSTMaster/page";
 import HSTEdit from "./pages/Masters/HSTMaster/Edit";
 import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
-import { PackageMaster } from "./pages/Masters/PackageMaster/page";
+import MasterDetail from "./pages/Masters/MasterDetail";
+import { PackageList } from "./pages/Masters/PackageMaster/PackageList";
+import { CreatePackage } from "./pages/Masters/PackageMaster/CreatePackage";
 import { FloorMaster } from "./pages/Masters/FloorMaster/page";
 import FloorCreate from "./pages/Masters/FloorMaster/Create";
 import FloorEdit from "./pages/Masters/FloorMaster/Edit";
-import MasterDetail from "./pages/Masters/MasterDetail";
 import SettingsPage from "./pages/SettingsPage";
-import { DispatchHistory } from "./pages/DispatchHistory/DispatchHistory";
+import { DispatchHistory } from "./pages/Transactions/Dispatch/History";
+import { DispatchDetail } from "./pages/Transactions/Dispatch/Detail";
 import { InwardHistory } from "./pages/Transactions/InwardHistory";
 import { OutwardHistory } from "./pages/Transactions/OutwardHistory";
 import { Login } from "./pages/Login/page";
@@ -78,6 +80,10 @@ const App = () => (
                     <Route
                       path="/transactions/dispatch-history"
                       element={<DispatchHistory />}
+                    />
+                    <Route
+                      path="/transactions/dispatch/:id"
+                      element={<DispatchDetail />}
                     />
                     <Route
                       path="/transactions/inward-history"
@@ -167,11 +173,15 @@ const App = () => (
                       element={<MasterDetail />}
                     />
                     <Route
-                      path="/masters/packaging"
-                      element={<PackageMaster />}
+                      path="/masters/packages"
+                      element={<PackageList />}
                     />
                     <Route
-                      path="/masters/packaging/:id"
+                      path="/masters/packages/create"
+                      element={<CreatePackage />}
+                    />
+                    <Route
+                      path="/masters/packages/:id"
                       element={<MasterDetail />}
                     />
                     <Route path="/masters/floors" element={<FloorMaster />} />

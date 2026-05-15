@@ -156,10 +156,10 @@ const GinDetail = () => {
               </span>
             </h1>
             <div className="flex items-center gap-4 mt-2">
-              <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
-                <User className="w-3 h-3 text-slate-400" />
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                  {currentHeader?.created_by || "System"}
+              <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                <User className="w-3 h-3 text-slate-600" />
+                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                  Created by: {currentHeader?.created_by || "System"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -199,26 +199,6 @@ const GinDetail = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="h-11 px-6 rounded-2xl border-slate-200 bg-white hover:bg-orange-50 hover:border-orange-200 text-orange-600 font-black uppercase tracking-widest text-[11px] gap-2 shadow-sm transition-all active:scale-95"
-            onClick={() => navigate(`/transactions/gin/edit/${headerId}`)}
-          >
-            <Edit2 className="w-4 h-4" />
-            Edit Header
-          </Button>
-          <Button
-            variant="outline"
-            className="h-11 px-6 rounded-2xl border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-rose-600 font-black uppercase tracking-widest text-[11px] gap-2 shadow-sm transition-all active:scale-95"
-            onClick={() =>
-              setDeleteTarget({ type: "header", id: Number(headerId) })
-            }
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete Header
-          </Button>
         </div>
       </div>
 
@@ -265,7 +245,7 @@ const GinDetail = () => {
                       Quantity Breakup
                     </th>
                     <th className="px-8 py-6 text-center text-[11px] font-black text-black uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
-                      Status
+                      Dispatch Status
                     </th>
                     <th className="px-8 py-6 text-right pr-10 text-[11px] font-black text-black uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
                       Actions
@@ -350,26 +330,14 @@ const GinDetail = () => {
                       <td className="px-8 py-6 text-right pr-10">
                         <div className="flex items-center justify-end gap-2">
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 rounded-xl bg-slate-50 text-slate-400 shadow-md shadow-slate-400 hover:bg-orange-500 hover:text-white transition-all shadow-sm active:scale-95"
+                            className="rounded-xl bg-blue-500 text-white transition-all shadow-sm active:scale-95"
                             onClick={() =>
                               navigate(
-                                `/transactions/gin/edit/${headerId}/${line.id}`,
+                                `/transactions/gin/picklist/${headerId}/${line.id}`,
                               )
                             }
                           >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 rounded-xl shadow-md shadow-slate-400 bg-slate-50 text-slate-400 hover:bg-rose-600 hover:text-white transition-all shadow-sm active:scale-95"
-                            onClick={() =>
-                              setDeleteTarget({ type: "line", id: line.id })
-                            }
-                          >
-                            <Trash2 className="w-4 h-4" />
+                            Picklist
                           </Button>
                         </div>
                       </td>
