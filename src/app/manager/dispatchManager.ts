@@ -14,6 +14,7 @@ interface FetchParams {
   size?: number;
   whscode?: string;
   carton_barcode?: string;
+  search?: string;
   is_paginate?: boolean;
 }
 
@@ -32,6 +33,9 @@ export const handleFetchDispatchHistory = (params?: FetchParams) => async (dispa
     }
     if (params?.carton_barcode) {
       queryParams.append('carton_barcode', params.carton_barcode);
+    }
+    if (params?.search) {
+      queryParams.append('search', params.search);
     }
 
     const response = await api.get(`${API_ENDPOINTS.TRANSACTIONS.DISPATCH.GET_HISTORY}?${queryParams.toString()}`);

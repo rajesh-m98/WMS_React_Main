@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -44,6 +44,7 @@ import {
   Settings2,
   Download,
   ImageIcon,
+  Warehouse,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector, useAppDispatch } from "@/app/store";
@@ -91,7 +92,7 @@ const PrintableBarcodes = forwardRef<
           />
         </div>
         <div className="text-center font-black text-xl uppercase tracking-widest text-slate-900 border-t-2 border-slate-900 pt-4 w-full">
-            {typeName}
+          {typeName}
         </div>
       </div>
     ))}
@@ -117,7 +118,8 @@ export const PackageList = () => {
   const [generatePrefix, setGeneratePrefix] = useState<string>("PKG");
   const [generatedBarcodes, setGeneratedBarcodes] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [typeNameForBatch, setTypeNameForBatch] = useState<string>("Standard Package");
+  const [typeNameForBatch, setTypeNameForBatch] =
+    useState<string>("Standard Package");
 
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -185,7 +187,14 @@ export const PackageList = () => {
           xPos = pageWidth / 2 + margin / 2;
         }
 
-        pdf.addImage(imgData, "PNG", xPos, currentHeight, targetWidth, targetHeight);
+        pdf.addImage(
+          imgData,
+          "PNG",
+          xPos,
+          currentHeight,
+          targetWidth,
+          targetHeight,
+        );
 
         if (i % 2 !== 0 || i === imgDatas.length - 1) {
           currentHeight += targetHeight + 10;
@@ -201,17 +210,19 @@ export const PackageList = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      handleFetchAllPackages({
-        page,
-        size: PAGE_SIZE,
-        search: debouncedSearch,
-      }),
-    );
     return () => {
       dispatch(clearPackages());
     };
-  }, [dispatch, page, debouncedSearch]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      handleFetchAllPackages({
+        is_paginate: false,
+        search: debouncedSearch,
+      }),
+    );
+  }, [dispatch, debouncedSearch]);
 
   const handleRemove = async (id: number) => {
     const success = await dispatch(handleDeletePackage(id));
@@ -219,8 +230,7 @@ export const PackageList = () => {
       toast.success("Package removed successfully");
       dispatch(
         handleFetchAllPackages({
-          page,
-          size: PAGE_SIZE,
+          is_paginate: false,
           search: debouncedSearch,
         }),
       );
@@ -248,159 +258,178 @@ export const PackageList = () => {
     for (const code of generatedBarcodes) {
       await dispatch(
         handleCreatePackage({
-          barcode: code,
+          package_type_name: typeNameForBatch,
+          package_code: code,
           package_type: 1, // Default to 1
-          status: 1, // Active
+          status: "Active",
         }),
       );
     }
     toast.success("Batch saved to master");
     setIsGenerateOpen(false);
     setGeneratedBarcodes([]);
-    dispatch(handleFetchAllPackages({ page, size: PAGE_SIZE }));
+    dispatch(handleFetchAllPackages({ is_paginate: false }));
   };
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-  const startPage = Math.max(1, Math.min(page - 2, totalPages - 4));
-  const endPage = Math.min(totalPages, Math.max(page + 2, 5));
+  // Group packages by whscode
+  const groupedPackages = useMemo(() => {
+    const groups: Record<
+      string,
+      { whscode: string; name: string; count: number; id: number }
+    > = {};
+    packages.forEach((pkg: any) => {
+      const whsCode = pkg.whscode || "---";
+      const whsName =
+        pkg.whsname || pkg.name || (pkg.whscode ? "Warehouse" : "---");
+
+      if (!groups[whsCode]) {
+        groups[whsCode] = {
+          whscode: whsCode,
+          name: whsName,
+          count: 0,
+          id: pkg.id,
+        };
+      }
+      groups[whsCode].count++;
+    });
+    return Object.values(groups);
+  }, [packages]);
+
+  const totalPages = Math.ceil(groupedPackages.length / PAGE_SIZE);
+  const paginatedGroups = useMemo(() => {
+    return groupedPackages.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  }, [groupedPackages, page]);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
-        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="relative w-full md:flex-1 group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-[#f8fafc]/50 p-4 min-h-screen">
+      {/* HEADER SECTION */}
+      <div className="shrink-0 flex items-center justify-between px-8 py-6 bg-white border-1 border-slate-50 shadow-lg shadow-slate-400 rounded-[32px] w-full">
+        <div className="flex items-center gap-6">
+          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200 ring-4 ring-blue-50">
+            <Box className="w-7 h-7 text-white" />
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
+              Package <span className="text-blue-600">Master</span>
+            </h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+              Warehouse Asset & Barcode Management
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="relative group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <Input
-              placeholder={config.strings.searchPlaceholder}
-              className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
+              placeholder="Search assets..."
+              className="pl-12 h-12 w-80 rounded-lg bg-slate-50 border-1 border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-50 text-sm font-black shadow-lg shadow-slate-300"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <Button
+            className="h-12 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-100 flex gap-2 active:scale-95 transition-all"
+            onClick={() => navigate("/masters/packages/create")}
+          >
+            <Plus className="w-4 h-4" />
+            Add Package
+          </Button>
+        </div>
+      </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <Button
-              className="h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all shadow-md shadow-blue-100 active:scale-95 flex-1 md:flex-none relative group"
-              onClick={() => navigate("/masters/packages/create")}
-            >
-              <div className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-rose-500 text-[8px] font-bold text-white rounded-full shadow-sm animate-bounce">
-                New
-              </div>
-              <Plus className="icon-sm mr-2 group-hover:rotate-90 transition-transform" />
-              Add Package
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
+      <Card className="border-1 border-slate-50 shadow-lg shadow-slate-400 rounded-[40px] overflow-hidden bg-white">
         <CardContent className="p-0">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
-            <Table className="w-full">
+          <div className="overflow-x-auto">
+            <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50/80 border-b border-slate-200 hover:bg-slate-50/80">
-                  <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap">
-                    {config.strings.table.id}
+                <TableRow className="bg-slate-100 border-0">
+                  <TableHead className="px-8 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    SL No
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap">
-                    {config.strings.table.code}
+                  <TableHead className="px-6 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    Warehouse Name
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap">
-                    {config.strings.table.name}
+                  <TableHead className="px-6 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    Whs Code
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap">
-                    {config.strings.table.status}
+                  <TableHead className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    Generated Barcodes
                   </TableHead>
-                  <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap text-right">
-                    {config.strings.table.actions}
-                  </TableHead>
+                  {/* <TableHead className="px-8 py-5 text-right pr-12 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    Actions
+                  </TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-40 text-center">
-                      <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
-                        <p className="caption-small !text-slate-400 uppercase tracking-widest font-black">Loading Packages...</p>
+                    <TableCell colSpan={5} className="py-32 text-center">
+                      <div className="flex flex-col items-center justify-center gap-4">
+                        <Loader2 className="h-14 w-14 text-blue-600 animate-spin" />
+                        <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">
+                          Syncing Master Assets...
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : packages.length === 0 ? (
+                ) : paginatedGroups.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="h-40 text-center text-slate-400 font-bold uppercase tracking-widest"
+                      className="py-32 text-center text-slate-400 font-black uppercase tracking-widest"
                     >
-                      {config.strings.noItems}
+                      No Assets Found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  packages.map((pkg, index) => (
+                  paginatedGroups.map((pkg, idx) => (
                     <TableRow
-                      key={pkg.id}
-                      className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-semibold text-slate-700"
+                      key={pkg.whscode}
+                      className="hover:bg-blue-50/30 transition-all duration-300 border-b border-slate-100 last:border-0 group cursor-pointer"
+                      onClick={() =>
+                        navigate(`/masters/packages/detail/${pkg.whscode}`)
+                      }
                     >
-                      <TableCell className="px-6 py-4 text-xs font-bold text-slate-900">
-                        {(page - 1) * PAGE_SIZE + index + 1}
+                      <TableCell className="px-8 py-5 font-black text-slate-400 font-mono text-xs">
+                        {(page - 1) * PAGE_SIZE + idx + 1}
                       </TableCell>
-                      <TableCell className="px-6 py-4 text-xs font-bold text-slate-900">
-                        {pkg.barcode}
-                      </TableCell>
-                      <TableCell className="px-6 py-4 text-xs font-semibold">
-                        {pkg.name}
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <Badge
-                          variant="outline"
-                          className={`rounded-lg font-black text-[10px] uppercase tracking-widest px-2.5 py-1 ${pkg.status === 1 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-slate-50 text-slate-500 border-slate-100"}`}
-                        >
-                          {pkg.status === 1 ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-xl bg-slate-100/50 text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm border border-slate-200/50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-0 overflow-hidden bg-white">
-                              <div className="bg-rose-600 py-10 w-full flex flex-col items-center justify-center gap-4 relative overflow-hidden">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 to-transparent opacity-50" />
-                                <Trash2 className="h-12 w-12 text-white animate-in zoom-in-50 duration-500 relative z-10" />
-                                <AlertDialogTitle className="text-3xl font-black text-white tracking-tighter relative z-10">
-                                  {config.strings.deleteDialog.title}
-                                </AlertDialogTitle>
-                              </div>
-                              <div className="p-12 text-center flex flex-col items-center">
-                                <AlertDialogDescription className="body-strong text-slate-500 text-[16px] leading-relaxed max-w-[320px]">
-                                  {config.strings.deleteDialog.descriptionTemplate.replace(
-                                    "{code}",
-                                    pkg.barcode,
-                                  )}
-                                </AlertDialogDescription>
-                                <div className="flex gap-4 w-full mt-10">
-                                  <AlertDialogCancel className="rounded-2xl flex-1 h-14 font-black uppercase tracking-widest text-[11px] border-2 border-slate-100">
-                                    {config.strings.deleteDialog.cancelBtn}
-                                  </AlertDialogCancel>
-                                  <AlertDialogAction
-                                    className="bg-rose-600 hover:bg-rose-700 rounded-2xl flex-1 h-14 text-white font-black uppercase tracking-widest text-[11px] shadow-lg shadow-rose-100 active:scale-95"
-                                    onClick={() => handleRemove(pkg.id)}
-                                  >
-                                    {config.strings.deleteDialog.confirmBtn}
-                                  </AlertDialogAction>
-                                </div>
-                              </div>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                      <TableCell className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
+                            <Warehouse className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                          </div>
+                          <span className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                            {pkg.whscode}
+                          </span>
                         </div>
                       </TableCell>
+                      <TableCell className="px-6 py-5">
+                        <Badge
+                          variant="outline"
+                          className="bg-slate-50 text-slate-600 border-slate-200 font-black text-sm px-3 py-1 rounded-lg"
+                        >
+                          {pkg.whscode}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="px-6 py-5 text-center">
+                        <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border-0 font-black text-sm px-4 py-1.5 rounded-xl shadow-sm shadow-blue-100/50">
+                          {pkg.count} Barcodes
+                        </Badge>
+                      </TableCell>
+                      {/* <TableCell className="px-8 py-5 text-right pr-12">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-2xl bg-slate-200 text-slate-700 shadow-lg shadow-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/masters/packages/detail/${pkg.whscode}`);
+                          }}
+                        >
+                          <ImageIcon className="w-4 h-4" />
+                        </Button>
+                      </TableCell> */}
                     </TableRow>
                   ))
                 )}
@@ -408,71 +437,41 @@ export const PackageList = () => {
             </Table>
           </div>
 
-          <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3 bg-blue-600 px-5 py-2.5 rounded-2xl border border-blue-500/20 shadow-lg shadow-blue-100">
-              <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] whitespace-nowrap">
-                {config.strings.totalCatalog}
-              </span>
-              <span className="h-4 w-[2px] bg-blue-400/50 rounded-full mx-1" />
-              <span className="text-sm font-black text-white tabular-nums">
-                {totalCount}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page === 1 || loading}
-                onClick={() => setPage(1)}
-              >
-                <ChevronsLeft className="icon-sm text-slate-600" />
-              </Button>
-              <Button
-                variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page === 1 || loading}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                <ChevronLeft className="h-6 w-6 text-slate-600" />
-              </Button>
-              <div className="flex items-center gap-2 px-4">
-                {Array.from(
-                  { length: Math.min(totalPages, endPage - startPage + 1) },
-                  (_, i) => {
-                    const p = startPage + i;
-                    if (p <= 0) return null;
-                    return (
-                      <Button
-                        key={p}
-                        variant={page === p ? "default" : "ghost"}
-                        className={`h-10 w-10 rounded-xl font-black text-xs ${page === p ? "bg-blue-600 text-white shadow-md shadow-blue-100" : "text-slate-400 hover:text-slate-900"}`}
-                        onClick={() => setPage(p)}
-                      >
-                        {p}
-                      </Button>
-                    );
-                  },
-                )}
+          {/* PAGINATION SECTION */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-10 py-8 bg-slate-50/50 border-t border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <RefreshCw className="w-5 h-5 text-blue-400" />
+                </div>
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                  Showing page <span className="text-blue-600">{page}</span> of{" "}
+                  <span className="text-blue-600">{totalPages}</span>
+                </p>
               </div>
-              <Button
-                variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page === totalPages || loading}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                <ChevronRight className="h-6 w-6 text-slate-600" />
-              </Button>
-              <Button
-                variant="outline"
-                className="h-12 w-12 rounded-2xl border-2 border-slate-100 p-0 flex items-center justify-center disabled:opacity-30 transition-all active:scale-95"
-                disabled={page === totalPages || loading}
-                onClick={() => setPage(totalPages)}
-              >
-                <ChevronsRight className="icon-sm text-slate-600" />
-              </Button>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="h-12 px-8 rounded-2xl border-0 bg-white hover:bg-blue-50 text-blue-600 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-100 transition-all active:scale-95 disabled:opacity-30"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="h-12 px-8 rounded-2xl border-0 bg-white hover:bg-blue-50 text-blue-600 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-100 transition-all active:scale-95 disabled:opacity-30"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -549,7 +548,10 @@ export const PackageList = () => {
                     {isGenerating ? (
                       <Loader2 className="animate-spin mr-2" />
                     ) : (
-                      <RefreshCw className="mr-3 group-hover:rotate-180 transition-transform duration-700" size={24} />
+                      <RefreshCw
+                        className="mr-3 group-hover:rotate-180 transition-transform duration-700"
+                        size={24}
+                      />
                     )}
                     Generate Batch
                   </Button>

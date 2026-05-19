@@ -1,9 +1,9 @@
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { AppDispatch } from '../store';
-import { 
-  ginFetchStart, 
-  ginFetchSuccess, 
+import {
+  ginFetchStart,
+  ginFetchSuccess,
   ginFetchFailure,
   setGinFormLoading,
   setCurrentGinHeader,
@@ -15,26 +15,39 @@ import { GinLineDTO, GinHeaderDTO, UpdateGinLinePayload } from '@/core/models/tr
 /**
  * Fetch all GIN lines with optional pagination and filtering
  */
-export const handleFetchGins = (params: { 
-  gin_type?: number; 
-  page?: number; 
-  size?: number; 
-  is_paginate?: boolean 
-} = {}) => async (dispatch: AppDispatch) => {
+export const handleFetchGins = (params: {
+  gin_type?: number;
+  page?: number;
+  size?: number;
+  is_paginate?: boolean;
+  forceRefresh?: boolean;
+  gate_pass_number?: string;
+} = {}) => async (dispatch: AppDispatch, getState: () => any) => {
+  const { putawayItems, flowThroughItems, loading } = getState().gin;
+
+  // If already loading, don't duplicate
+  if (loading) return;
+
+  // Caching: If we have items and aren't forcing a refresh, skip the network call
+  if (!params.forceRefresh) {
+    if (params.gin_type === 2 && putawayItems.length > 0) return;
+    if (params.gin_type === 1 && flowThroughItems.length > 0) return;
+  }
+
   try {
     dispatch(ginFetchStart());
     const response = await api.get<{ status: boolean; data: { items: GinLineDTO[]; total: number; page: number } }>(
-      API_ENDPOINTS.TRANSACTIONS.GIN.ALL, 
+      API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
       {
-        params: { 
+        params: {
           is_paginate: true,
           page: 1,
-          size: 50,
-          ...params 
+          size: 100, // Reduced from 200 for faster response
+          ...params
         }
       }
     );
-    
+
     if (response.data.status) {
       dispatch(ginFetchSuccess({ ...response.data.data, gin_type: params.gin_type }));
     } else {
@@ -52,7 +65,7 @@ export const handleUpdateGinLine = (lineId: number, payload: UpdateGinLinePayloa
   try {
     dispatch(setGinFormLoading(true));
     const response = await api.post(`${API_ENDPOINTS.TRANSACTIONS.GIN.UPDATE_LINE}?line_id=${lineId}`, payload);
-    
+
     if (response.data.status) {
       toast.success(response.data.message || 'Line updated successfully');
       return true;
@@ -76,7 +89,7 @@ export const handleUpdateLineStatus = (lineId: number, status: number) => async 
     const response = await api.patch(API_ENDPOINTS.TRANSACTIONS.GIN.LINE_STATUS, null, {
       params: { line_id: lineId, status }
     });
-    
+
     if (response.data.status) {
       toast.success('Status updated');
       return true;
@@ -97,17 +110,20 @@ export const handleUpdateLineStatus = (lineId: number, status: number) => async 
  * Smart selector that picks a GIN from the existing slice data or fetches it if missing (e.g., on refresh)
  */
 export const handleSelectGin = (headerId: number, lineId?: number, ginType?: number) => async (dispatch: AppDispatch, getState: () => any) => {
-  const { items } = getState().gin;
-  
+  const { items, putawayItems, flowThroughItems } = getState().gin;
+
+  // Combine all items to search
+  const allAvailable = [...items, ...putawayItems, ...flowThroughItems];
+
   // If we already have items and one of them matches the header, we can filter locally
-  const headerLines = items.filter((l: any) => 
+  const headerLines = allAvailable.filter((l: any) =>
     Number(l.header_id) === Number(headerId) || Number(l.header?.id) === Number(headerId)
   );
 
   if (headerLines.length > 0 && !lineId) {
-    console.log(`[GIN Manager] Found ${headerLines.length} lines locally for Header ID: ${headerId}`);
-    dispatch(setCurrentGinHeader(headerLines[0].header));
-    dispatch(setCurrentGinLines(headerLines));
+    const uniqueLines = Array.from(new Map(headerLines.map((item: any) => [item.id, item])).values()) as any[];
+    dispatch(setCurrentGinHeader(uniqueLines[0].header));
+    dispatch(setCurrentGinLines(uniqueLines));
     return true;
   }
 
@@ -115,7 +131,7 @@ export const handleSelectGin = (headerId: number, lineId?: number, ginType?: num
     const localMatch = headerLines.find((l: any) => Number(l.id) === Number(lineId));
     if (localMatch) {
       dispatch(setCurrentGinHeader(localMatch.header));
-      dispatch(setCurrentGinLines([localMatch])); // or headerLines if you want full table
+      dispatch(setCurrentGinLines([localMatch]));
       return true;
     }
   }
@@ -124,18 +140,19 @@ export const handleSelectGin = (headerId: number, lineId?: number, ginType?: num
     dispatch(ginFetchStart());
     const response = await api.get<{ status: boolean; data: { items: any[] } }>(
       API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
-      { params: { gin_type: ginType, is_paginate: false } }
+      { params: { gin_type: ginType, is_paginate: true, size: 100 } }
     );
-    
+
     if (response.data.status) {
       const allItems = response.data.data.items || [];
-      const matchLines = allItems.filter((l: any) => 
+      const matchLines = allItems.filter((l: any) =>
         Number(l.header_id) === Number(headerId) || Number(l.header?.id) === Number(headerId)
       );
 
       if (matchLines.length > 0) {
-        dispatch(setCurrentGinHeader(matchLines[0].header));
-        dispatch(setCurrentGinLines(matchLines));
+        const uniqueLines = Array.from(new Map(matchLines.map((item: any) => [item.id, item])).values()) as any[];
+        dispatch(setCurrentGinHeader(uniqueLines[0].header));
+        dispatch(setCurrentGinLines(uniqueLines));
         return true;
       }
       dispatch(ginFetchFailure("Header not found"));
@@ -151,36 +168,47 @@ export const handleSelectGin = (headerId: number, lineId?: number, ginType?: num
  * Aggregates all lines for a specific Gate Pass across potentially different headers
  */
 export const handleSelectByGatePass = (gatePassNumber: string, ginType?: number) => async (dispatch: AppDispatch, getState: () => any) => {
-  const { items } = getState().gin;
-  
+  const { putawayItems, flowThroughItems } = getState().gin;
+  const allAvailable = ginType === 2 ? putawayItems : (ginType === 1 ? flowThroughItems : [...putawayItems, ...flowThroughItems]);
+
   // Try local filter first from existing items in store
-  const matchLines = items.filter((l: any) => 
+  const matchLines = allAvailable.filter((l: any) =>
     (l.gate_pass_number === gatePassNumber) || (l.header?.gate_pass_number === gatePassNumber)
   );
 
   if (matchLines.length > 0) {
-    dispatch(setCurrentGinHeader(matchLines[0].header || matchLines[0]));
-    dispatch(setCurrentGinLines(matchLines));
+    const uniqueLines = Array.from(new Map(matchLines.map((item: any) => [item.id, item])).values()) as any[];
+    dispatch(setCurrentGinHeader(uniqueLines[0].header || uniqueLines[0]));
+    dispatch(setCurrentGinLines(uniqueLines));
     return true;
   }
 
-  // Fallback: Fetch everything and filter by Gate Pass
+  // Fallback: Fetch from server with FILTER if possible
   try {
     dispatch(ginFetchStart());
     const response = await api.get<{ status: boolean; data: { items: any[] } }>(
       API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
-      { params: { gin_type: ginType, is_paginate: false } }
+      {
+        params: {
+          gin_type: ginType,
+          gate_pass_number: gatePassNumber, // Try passing filter to API
+          is_paginate: true,
+          size: 100
+        }
+      }
     );
-    
+
     if (response.data.status) {
       const allItems = response.data.data.items || [];
-      const filteredLines = allItems.filter((l: any) => 
+      // Double check filter locally in case API ignored it
+      const filteredLines = allItems.filter((l: any) =>
         (l.gate_pass_number === gatePassNumber) || (l.header?.gate_pass_number === gatePassNumber)
       );
 
       if (filteredLines.length > 0) {
-        dispatch(setCurrentGinHeader(filteredLines[0].header || filteredLines[0]));
-        dispatch(setCurrentGinLines(filteredLines));
+        const uniqueLines = Array.from(new Map(filteredLines.map((item: any) => [item.id, item])).values()) as any[];
+        dispatch(setCurrentGinHeader(uniqueLines[0].header || uniqueLines[0]));
+        dispatch(setCurrentGinLines(uniqueLines));
         return true;
       }
       dispatch(ginFetchFailure("Gate Pass not found"));
@@ -198,18 +226,19 @@ export const handleSelectByGatePass = (gatePassNumber: string, ginType?: number)
 export const handleFetchGinLine = (headerId: number, lineId: number, ginType?: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(ginFetchStart());
-    
+
     // Fetch from the ALL list to ensure we have the data the table uses
     const response = await api.get<{ status: boolean; data: { items: any[] } }>(
       API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
-      { 
-        params: { 
+      {
+        params: {
           gin_type: ginType,
-          is_paginate: false 
-        } 
+          is_paginate: true,
+          size: 100
+        }
       }
     );
-    
+
     if (response.data.status) {
       const allLines = response.data.data.items || [];
       const targetLine = allLines.find((l: any) => Number(l.id) === Number(lineId));
@@ -252,12 +281,12 @@ export const handleFetchGinLines = (ginId: number) => async (dispatch: AppDispat
     const response = await api.get<{ status: boolean; data: any }>(
       `${API_ENDPOINTS.TRANSACTIONS.GIN.GET_BY_ID}?gin_id=${ginId}`
     );
-    
+
     if (response.data.status) {
       // The API returns an object with 'items' containing the lines
       const items = response.data.data.items || [];
       dispatch(setCurrentGinLines(items));
-      
+
       // If we have at least one line, set the header from the first line for consistency
       if (items.length > 0) {
         dispatch(setCurrentGinHeader(items[0].header));
@@ -279,7 +308,7 @@ export const handleFetchGinHeader = (ginId: number) => async (dispatch: AppDispa
     const response = await api.get<{ status: boolean; data: GinHeaderDTO }>(
       `${API_ENDPOINTS.TRANSACTIONS.GIN.GET_BY_ID}?gin_id=${ginId}`
     );
-    
+
     if (response.data.status) {
       dispatch(setCurrentGinHeader(response.data.data));
     } else {
@@ -346,7 +375,7 @@ export const handleUpdateGinHeader = (ginId: number, data: any) => async (dispat
       API_ENDPOINTS.TRANSACTIONS.GIN.UPDATE_HEADER,
       { ...data, gin_id: ginId }
     );
-    
+
     if (response.data.status) {
       toast.success(response.data.message || "Header updated successfully");
       return true;
@@ -372,7 +401,7 @@ export const handleCreateGinHeader = (data: any) => async (dispatch: AppDispatch
       API_ENDPOINTS.TRANSACTIONS.GIN.CREATE,
       data
     );
-    
+
     if (response.data.status) {
       toast.success(response.data.message || "GIN created successfully");
       return true;
@@ -398,7 +427,7 @@ export const handleAddGinLine = (headerId: number, data: any) => async (dispatch
       'gin/create_line/',
       { ...data, header_id: headerId }
     );
-    
+
     if (response.data.status) {
       toast.success(response.data.message || "Line added successfully");
       return true;

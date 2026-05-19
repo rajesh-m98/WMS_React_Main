@@ -16,6 +16,7 @@ import {
   Input,
   Label,
   Separator,
+  Badge,
 } from "@/components/ui";
 import {
   ChevronLeft,
@@ -25,7 +26,6 @@ import {
   Tag,
   Hash,
   FileText,
-  Badge,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,6 +49,7 @@ const GinEdit = () => {
     item_desc: "",
     received_qty: 0,
     mrp: 0,
+    expiry_date: "",
   });
 
   const isLineEdit = !!lineId;
@@ -80,6 +81,7 @@ const GinEdit = () => {
         item_desc: line.item_desc || "",
         received_qty: line.received_qty || 0,
         mrp: line.mrp || 0,
+        expiry_date: line.expiry_date ? line.expiry_date.split("T")[0] : "",
       });
     }
   }, [currentHeader, currentLines, isLineEdit]);
@@ -233,8 +235,8 @@ const GinEdit = () => {
         </Card>
       ) : (
         /* LINE EDIT MODE */
-        <Card className="border-0 shadow-2xl shadow-blue-100/50 rounded-[40px] overflow-hidden bg-white mx-4">
-          <CardHeader className="bg-blue-600 p-10 text-white flex flex-row items-center justify-between">
+        <Card className="border-1 shadow-2xl shadow-blue-100 rounded-[40px] overflow-hidden bg-white mx-4">
+          <CardHeader className="bg-blue-600 p-6 text-white flex flex-row items-center justify-between">
             <div className="flex items-center gap-5">
               <div className="w-14 h-14 rounded-3xl bg-white/20 flex items-center justify-center backdrop-blur-md shadow-inner">
                 <Tag className="w-7 h-7 text-white" />
@@ -255,28 +257,45 @@ const GinEdit = () => {
               <Save className="w-4 h-4" /> Save Line
             </Button>
           </CardHeader>
-          <CardContent className="p-10 space-y-8">
-            <div className="space-y-8">
-              <div className="space-y-2">
-                <Label className="label-bold uppercase tracking-widest text-[10px] text-slate-400">
-                  Item Description
-                </Label>
-                <div className="relative">
-                  <Input
-                    value={lineForm.item_desc}
-                    onChange={(e) =>
-                      setLineForm({ ...lineForm, item_desc: e.target.value })
-                    }
-                    className="h-16 rounded-2xl bg-slate-50/50 border-slate-200 font-black focus:bg-white transition-all text-slate-800 text-lg pl-6"
-                  />
-                  <Badge className="absolute right-4 top-1/2 -translate-y-1/2 bg-blue-100 text-blue-600 border-0 font-black px-3">
-                    {lineForm.item_code}
-                  </Badge>
+          <CardContent className="p-6 space-y-4">
+            <div className="space-y-4">
+              {/* READ-ONLY DETAILS */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 bg-slate-50 rounded-3xl border border-slate-100 items-center">
+                <div className="space-y-1 md:col-span-3">
+                  <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Item Code
+                  </Label>
+                  <div>
+                    <Badge
+                      variant="outline"
+                      className="bg-white border-slate-200 text-slate-600 font-black px-3 py-1 text-sm"
+                    >
+                      {lineForm.item_code || "N/A"}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="space-y-1 md:col-span-6">
+                  <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Item Description
+                  </Label>
+                  <p className="text-sm font-black text-slate-800 line-clamp-1">
+                    {lineForm.item_desc || "N/A"}
+                  </p>
+                </div>
+                <div className="space-y-1 md:col-span-3">
+                  <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    MRP Value
+                  </Label>
+                  <p className="text-xl font-black text-slate-800">
+                    ₹{lineForm.mrp || 0}
+                  </p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-8">
+
+              {/* EDITABLE FIELDS */}
+              <div className="grid grid-cols-2 gap-8 pt-4">
                 <div className="space-y-2">
-                  <Label className="label-bold uppercase tracking-widest text-[10px] text-slate-400">
+                  <Label className="label-bold uppercase tracking-widest text-sm text-slate-500 font-bold">
                     Received Quantity
                   </Label>
                   <Input
@@ -292,16 +311,16 @@ const GinEdit = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="label-bold uppercase tracking-widest text-[10px] text-slate-400">
-                    MRP Value (₹)
+                  <Label className="label-bold uppercase tracking-widest text-sm text-slate-500 font-bold">
+                    Expiry Date
                   </Label>
                   <Input
-                    type="number"
-                    value={lineForm.mrp}
+                    type="date"
+                    value={lineForm.expiry_date}
                     onChange={(e) =>
-                      setLineForm({ ...lineForm, mrp: Number(e.target.value) })
+                      setLineForm({ ...lineForm, expiry_date: e.target.value })
                     }
-                    className="h-16 rounded-2xl bg-slate-50/50 border-slate-200 font-black focus:bg-white transition-all text-slate-800 text-2xl px-6"
+                    className="h-16 rounded-2xl bg-slate-50/50 border-slate-200 font-black focus:bg-white transition-all text-slate-800 text-xl px-6"
                   />
                 </div>
               </div>

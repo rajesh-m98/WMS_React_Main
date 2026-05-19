@@ -11,7 +11,6 @@ import {
   Clock,
   TrendingUp,
   TrendingDown,
-  Activity,
   Package,
   Truck,
   BarChart3,
@@ -55,7 +54,6 @@ const iconMap: Record<string, any> = {
   Clock,
   TrendingUp,
   TrendingDown,
-  Activity,
   Package,
   Truck,
   BarChart3,
@@ -119,6 +117,13 @@ export const Dashboard = () => {
               forceRefresh: true,
             }),
           ),
+          dispatch(
+            handleFetchPutawayHistory("outward", {
+              page: 1,
+              size: 50,
+              forceRefresh: true,
+            }),
+          ),
         ]);
         setDataReady(true);
       } catch (err) {
@@ -128,46 +133,6 @@ export const Dashboard = () => {
     };
     initFetch();
   }, [dispatch]);
-
-  // Combined and sorted transactions for the real-time ledger
-  const activeTransactions = useMemo(() => {
-    const combined = [
-      ...inward.data.map((tx) => ({ ...tx, origin: "putaway" })),
-      ...outward.data.map((tx) => ({ ...tx, origin: "putaway" })),
-      ...flowThroughItems.map((tx) => ({
-        ...tx,
-        origin: "gin",
-        putaway_type: 1,
-      })),
-      ...putawayItems.map((tx) => ({ ...tx, origin: "gin", putaway_type: 1 })),
-    ];
-
-    return combined
-      .sort((a, b) => {
-        const timeA = new Date(a.docdate || a.created_at || 0).getTime() || 0;
-        const timeB = new Date(b.docdate || b.created_at || 0).getTime() || 0;
-        return timeB - timeA;
-      })
-      .slice(0, 5);
-  }, [inward.data, outward.data, flowThroughItems, putawayItems]);
-
-  const displayTransactions = useMemo(() => {
-    return activeTransactions.map((tx) => ({
-      id: tx.id?.toString() || "---",
-      headerId: tx.header_id,
-      origin: tx.origin,
-      type:
-        tx.origin === "gin"
-          ? "Inward (GIN)"
-          : tx.putaway_type === 1
-            ? "Inward"
-            : "Outward",
-      item: tx.item_code || "Unknown Item",
-      qty: tx.quantity || tx.received_qty || 0,
-      date:
-        (tx.docdate || tx.created_at || "").toString().split("T")[0] || "---",
-    }));
-  }, [activeTransactions]);
 
   // Generate real chart data from transaction history
   const chartData = useMemo(() => {
@@ -366,13 +331,13 @@ export const Dashboard = () => {
         })}
       </div>
 
-      {/* Real Analytics Chart */}
+      {/* Operation Intelligence Chart */}
       <Card className="border-0 shadow-2xl rounded-[3rem] overflow-hidden bg-white">
         <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between px-10 py-8 border-b border-slate-50 relative">
           <div className="absolute top-0 left-0 w-2 h-full bg-blue-600" />
           <div>
             <CardTitle className="heading-section !text-2xl text-slate-900 uppercase">
-              Activity Analytics
+              Operation Analytics
             </CardTitle>
             <p className="caption-small !text-slate-400 mt-1 uppercase tracking-widest">
               Live Movement Trends
@@ -453,100 +418,6 @@ export const Dashboard = () => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Activity Ledger */}
-      <Card className="border-0 shadow-2xl rounded-[3rem] bg-white overflow-hidden">
-        <CardHeader className="border-b border-slate-50 px-10 py-8 relative">
-          <div className="absolute top-0 left-0 w-2 h-full bg-slate-900 rounded-r-3xl" />
-          <div className="flex items-center justify-between w-full">
-            <div>
-              <CardTitle className="heading-section !text-2xl text-slate-900 uppercase">
-                Recent Logs
-              </CardTitle>
-              <p className="caption-small !text-slate-400 mt-1 uppercase tracking-widest">
-                Global Movement History
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              className="rounded-2xl h-12 px-6 label-bold border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all group shadow-sm"
-              onClick={() => navigate("/activity-logs")}
-            >
-              VIEW ALL
-              <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto scrollbar-hide">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50/50">
-                <tr>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-[11px] uppercase tracking-widest">
-                    Entry ID
-                  </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-[11px] uppercase tracking-widest">
-                    Operation
-                  </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-[11px] uppercase tracking-widest">
-                    Specification
-                  </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-right text-[11px] uppercase tracking-widest">
-                    Qty
-                  </th>
-                  <th className="px-10 py-6 label-bold !text-slate-400 text-right text-[11px] uppercase tracking-widest">
-                    Sync
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {displayTransactions.map((tx) => (
-                  <tr
-                    key={tx.id}
-                    className="hover:bg-blue-50/30 transition-all duration-300 group cursor-pointer border-b border-slate-50 last:border-0"
-                    onClick={() => {
-                      if (tx.origin === "gin") {
-                        navigate(`/transactions/gin/view/${tx.headerId}`);
-                      } else {
-                        navigate(`/transactions/tasks/${tx.id}`);
-                      }
-                    }}
-                  >
-                    <td className="px-10 py-6 text-sm font-black text-slate-400 font-mono">
-                      #{tx.id}
-                    </td>
-                    <td className="px-10 py-6">
-                      <Badge
-                        className={`rounded-lg px-3 py-1.5 border-0 font-black text-[10px] tracking-widest text-white ${tx.type === "Inward" || tx.type === "Inward (GIN)" ? "bg-blue-600 shadow-[0_4px_12px_rgba(37,99,235,0.3)]" : "bg-indigo-600 shadow-[0_4px_12px_rgba(79,70,229,0.3)]"}`}
-                      >
-                        {tx.type.toUpperCase()}
-                      </Badge>
-                    </td>
-                    <td className="px-10 py-6">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-black text-slate-800">
-                          {tx.item || "General Inventory"}
-                        </span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">
-                          Movement Verified
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-10 py-6 text-right">
-                      <span className="bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl text-slate-600 font-black text-xs shadow-sm">
-                        {tx.qty}
-                      </span>
-                    </td>
-                    <td className="px-10 py-6 text-right text-xs font-black text-slate-400 group-hover:text-slate-900 transition-colors uppercase tracking-widest">
-                      {tx.date}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </CardContent>
       </Card>

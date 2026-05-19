@@ -1,4 +1,4 @@
-import { useState, useRef, forwardRef } from "react";
+import { useState, useRef, forwardRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Input, Button, Label } from "@/components/ui";
 import {
@@ -13,7 +13,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { handleCreatePackage } from "@/app/manager/packageManager";
+import {
+  handleCreatePackage,
+  handleGenerateBarcodes,
+} from "@/app/manager/packageManager";
+import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 import Barcode from "react-barcode";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
@@ -52,29 +56,46 @@ const PrintableBarcodes = forwardRef<
 export const CreatePackage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state) => state.package);
-
+  const { data: warehouses } = useAppSelector((state) => state.warehouse);
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<number>(0);
+  const [selectedWhsCode, setSelectedWhsCode] = useState<string>("");
   const [batchName, setBatchName] = useState("Warehouse Asset");
-  const [packageType] = useState(2); // Locked to Warehouse
+  const [packageType] = useState(2); // Type 2 = Warehouse
   const [batchCount, setBatchCount] = useState(10);
   const [generatedBarcodes, setGeneratedBarcodes] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  useEffect(() => {
+    dispatch(handleFetchAllWarehouses({ is_paginate: false }));
+  }, [dispatch]);
+
   const printRef = useRef<HTMLDivElement>(null);
 
-  const handleGenerateBatch = () => {
-    setIsGenerating(true);
-    const newCodes: string[] = [];
-    const timestamp = new Date().getTime().toString().slice(-4);
-    const prefix = "WH";
-
-    for (let i = 0; i < batchCount; i++) {
-      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-      newCodes.push(`${prefix}-${timestamp}-${random}`);
+  const handleGenerateBatch = async () => {
+    if (!selectedWarehouseId) {
+      toast.error("Please select a target warehouse");
+      return;
     }
-    setGeneratedBarcodes(newCodes);
+    if (batchCount <= 0) {
+      toast.error("Quantity must be at least 1");
+      return;
+    }
+
+    setIsGenerating(true);
+    const result = await dispatch(
+      handleGenerateBarcodes({
+        package_type: packageType,
+        warehouse_id: selectedWarehouseId,
+        whscode: selectedWhsCode,
+        quntity: batchCount,
+      }),
+    );
+
+    if (result && Array.isArray(result)) {
+      setGeneratedBarcodes(result);
+      toast.success(`${result.length} sequences generated from server`);
+    }
     setIsGenerating(false);
-    toast.success(`${newCodes.length} barcodes prepared`);
   };
 
   const handleSaveBatch = async () => {
@@ -89,10 +110,12 @@ export const CreatePackage = () => {
     for (const code of generatedBarcodes) {
       const success = await dispatch(
         handleCreatePackage({
-          name: batchName,
-          barcode: code,
+          package_type_name: batchName,
+          package_code: code,
           package_type: packageType,
-          status: 1,
+          warehouse_id: selectedWarehouseId,
+          whscode: selectedWhsCode,
+          status: "Active",
         }),
       );
       if (success) successCount++;
@@ -197,20 +220,35 @@ export const CreatePackage = () => {
                 <Label className="text-xs font-semibold text-slate-600">
                   Select Warehouse
                 </Label>
-                <div className="relative">
+                <div className="relative group">
                   <select
-                    className="h-11 w-full pl-4 pr-12 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all bg-white text-sm font-semibold outline-none appearance-none cursor-pointer hover:border-blue-200"
-                    disabled
+                    className="h-11 w-full pl-4 pr-12 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all bg-white text-sm font-bold outline-none appearance-none cursor-pointer hover:border-blue-300 group-hover:bg-slate-50/50"
+                    value={selectedWarehouseId}
+                    onChange={(e) => {
+                      const id = Number(e.target.value);
+                      const whs = warehouses.find((w) => w.id === id);
+                      setSelectedWarehouseId(id);
+                      setSelectedWhsCode(whs?.warehouse_code || "");
+                    }}
                   >
-                    <option value="">No Warehouses Available</option>
+                    <option value="0" disabled>
+                      Select Warehouse Node
+                    </option>
+                    {warehouses.map((wh) => (
+                      <option key={wh.id} value={wh.id}>
+                        {wh.warehouse_code} - {wh.warehouse_name}
+                      </option>
+                    ))}
                   </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
                     <ChevronDown className="h-4 w-4" />
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-400 font-medium italic pl-1">
-                  Warehouse list will be synced automatically
-                </p>
+                {selectedWhsCode && (
+                  <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest pl-1 mt-1">
+                    Active Node: {selectedWhsCode}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -323,9 +361,9 @@ export const CreatePackage = () => {
         <Button
           className="h-11 px-10 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
           onClick={handleSaveBatch}
-          disabled={loading || generatedBarcodes.length === 0}
+          disabled={isGenerating || generatedBarcodes.length === 0}
         >
-          {loading ? (
+          {isGenerating ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Save className="mr-2 h-4 w-4" />

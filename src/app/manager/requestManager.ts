@@ -4,6 +4,9 @@ import {
   requestLoadStart,
   inwardLoadSuccess,
   outwardLoadSuccess,
+  onwardLoadSuccess,
+  sortingLoadSuccess,
+  manualLoadSuccess,
   unifiedRequestSuccess,
   requestLoadFailure,
 } from "../store/requestSlice";
@@ -13,8 +16,8 @@ interface FetchParams {
   page?: number;
   size?: number;
   search?: string;
-  from_date?: string;
-  to_date?: string;
+  doc_entry?: string;
+  is_paginate?: boolean;
   forceRefresh?: boolean;
 }
 
@@ -135,6 +138,44 @@ export const handleFetchOutwardRequests =
     }
   };
 
+export const handleFetchOnwardPicklist =
+  () =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch(requestLoadStart("onward"));
+
+      const response = await api.get(
+        API_ENDPOINTS.TRANSACTIONS.OUTWARD.GET_ONWARD_PICKLIST
+      );
+
+      if (response.data.status) {
+        dispatch(
+          onwardLoadSuccess({
+            data: response.data.data || [],
+            total: response.data.data.length,
+          }),
+        );
+        return true;
+      } else {
+        dispatch(
+          requestLoadFailure({
+            type: "onward",
+            error: response.data.message || "Failed to fetch onward picklist",
+          }),
+        );
+        return false;
+      }
+    } catch (err: any) {
+      dispatch(
+        requestLoadFailure({
+          type: "onward",
+          error: err.message || "Error fetching onward picklist",
+        }),
+      );
+      return false;
+    }
+  };
+
 export const handleGeneratePicklist =
   (docEntry: number) =>
   async (dispatch: AppDispatch) => {
@@ -145,6 +186,89 @@ export const handleGeneratePicklist =
       return response.data.status;
     } catch (err) {
       console.error("Error generating picklist:", err);
+      return false;
+    }
+  };
+
+export const handleGenerateManualPicklist =
+  (payload: { doc_entry: string; item_code: string[] }) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch(requestLoadStart("manual"));
+
+      const response = await api.post(
+        API_ENDPOINTS.TRANSACTIONS.OUTWARD.GET_MANUAL_PICKLIST,
+        payload
+      );
+
+      if (response.data.status) {
+        dispatch(manualLoadSuccess(response.data.data || []));
+        return true;
+      } else {
+        dispatch(
+          requestLoadFailure({
+            type: "manual",
+            error: response.data.message || "Failed to generate manual picklist",
+          })
+        );
+        return false;
+      }
+    } catch (err: any) {
+      dispatch(
+        requestLoadFailure({
+          type: "manual",
+          error: err.message || "Error generating manual picklist",
+        })
+      );
+      return false;
+    }
+  };
+
+export const handleFetchSorting =
+  (params?: FetchParams) =>
+  async (dispatch: AppDispatch) => {
+    try {
+      dispatch(requestLoadStart("sorting"));
+
+      const queryParams = new URLSearchParams({
+        is_paginate: (params?.is_paginate ?? true).toString(),
+        page: (params?.page || 1).toString(),
+        size: (params?.size || 50).toString(),
+      });
+
+      if (params?.doc_entry) queryParams.append("doc_entry", params.doc_entry);
+
+      const response = await api.get(
+        `${API_ENDPOINTS.TRANSACTIONS.OUTWARD.GET_ALL_SORTING}?${queryParams.toString()}`
+      );
+
+      if (response.data.status) {
+        const data = response.data.data.items || response.data.data || [];
+        const total = response.data.data.total || data.length;
+        
+        dispatch(
+          sortingLoadSuccess({
+            data,
+            total,
+          })
+        );
+        return true;
+      } else {
+        dispatch(
+          requestLoadFailure({
+            type: "sorting",
+            error: response.data.message || "Failed to fetch sorting data",
+          })
+        );
+        return false;
+      }
+    } catch (err: any) {
+      dispatch(
+        requestLoadFailure({
+          type: "sorting",
+          error: err.message || "Error fetching sorting data",
+        })
+      );
       return false;
     }
   };

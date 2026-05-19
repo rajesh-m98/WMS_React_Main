@@ -36,17 +36,43 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     if (normalizedPath.includes("/masters/users/"))
       return { title: "User Details", description: "View system user details" };
     if (normalizedPath.includes("/masters/items/create"))
-      return { title: "Register Item", description: "Create a new inventory master record" };
-    if (normalizedPath.includes("/masters/items/") && normalizedPath.endsWith("/edit"))
-      return { title: "Edit Item", description: "Modify existing item registry and mappings" };
+      return {
+        title: "Register Item",
+        description: "Create a new inventory master record",
+      };
+    if (
+      normalizedPath.includes("/masters/items/") &&
+      normalizedPath.endsWith("/edit")
+    )
+      return {
+        title: "Edit Item",
+        description: "Modify existing item registry and mappings",
+      };
     if (normalizedPath.includes("/masters/items/"))
-      return { title: "Item Detail", description: "Deep dive into item specifications and bin assignments" };
+      return {
+        title: "Item Detail",
+        description: "Deep dive into item specifications and bin assignments",
+      };
     if (normalizedPath.includes("/masters/hst/new"))
-      return { title: "Add New Device", description: "Register a new handheld terminal device" };
-    if (normalizedPath.endsWith("/edit") && normalizedPath.includes("/masters/hst/"))
-      return { title: "Edit Device", description: "Update handheld terminal details and location assignments" };
+      return {
+        title: "Add New Device",
+        description: "Register a new handheld terminal device",
+      };
+    if (
+      normalizedPath.endsWith("/edit") &&
+      normalizedPath.includes("/masters/hst/")
+    )
+      return {
+        title: "Edit Device",
+        description:
+          "Update handheld terminal details and location assignments",
+      };
     if (normalizedPath.includes("/masters/hst/"))
-      return { title: "Device Detail", description: "View handheld terminal specifications and location assignments" };
+      return {
+        title: "Device Detail",
+        description:
+          "View handheld terminal specifications and location assignments",
+      };
     if (normalizedPath.includes("/transactions/tasks/"))
       return {
         title: "Task Details",
@@ -58,10 +84,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         "/dashboard": {
           title: "Dashboard",
           description: "Overview of warehouse operations and activity",
-        },
-        "/activity-logs": {
-          title: "Global Activity Logs",
-          description: "Complete system-wide movement history and audit trail",
         },
         "/masters/users": {
           title: "User Master",
@@ -105,11 +127,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         },
         "/transactions/dispatch-history": {
           title: "Dispatch History",
-          description: "Review and track all package dispatches",
+          description: "Review and track all package dispatches by warehouse",
         },
-        "/transactions/dispatch/:id": {
-          title: "Dispatch Details",
-          description: "Detailed information for specific dispatch",
+        "/transactions/dispatch/:whsCode": {
+          title: "Warehouse Dispatch Summary",
+          description: "Detailed line item breakdown for the selected facility",
         },
         "/transactions/inward-history": {
           title: "Inward Putaway History",
@@ -137,16 +159,32 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           title: "Outward Picklist",
           description: "Manage sales order picking & warehouse distribution",
         },
+        "/transactions/picklist/manual-result": {
+          title: "Manual Picklist Result",
+          description: "Detailed inventory mappings and location assignments",
+        },
       };
 
     if (normalizedPath.includes("/transactions/outward-picklist/"))
-      return { title: "Generated Picklist", description: "Deep-dive into picking locations and item verification" };
+      return {
+        title: "Generated Picklist",
+        description: "Deep-dive into picking locations and item verification",
+      };
     if (normalizedPath.includes("/transactions/gin/view/"))
-      return { title: "Transaction Details", description: "Comprehensive view of transaction line details" };
+      return {
+        title: "Transaction Details",
+        description: "Comprehensive view of transaction line details",
+      };
     if (normalizedPath.includes("/transactions/gin/edit/"))
-      return { title: "Edit Transaction", description: "Modify transaction quantities and details" };
+      return {
+        title: "Edit Transaction",
+        description: "Modify transaction quantities and details",
+      };
     if (path.includes("/transactions/gin/edit-header/"))
-      return { title: "Edit Header", description: "Update transaction header information" };
+      return {
+        title: "Edit Header",
+        description: "Update transaction header information",
+      };
     return (
       pageData[normalizedPath] || {
         title: "Warehouse Management",

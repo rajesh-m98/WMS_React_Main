@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui";
 import { Button } from "@/components/ui";
 import {
@@ -21,26 +21,59 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  DatabaseZap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui";
 import { Badge } from "@/components/ui";
 import * as XLSX from "xlsx";
-
-interface Warehouse {
-  warehouseCode: string;
-  warehouseName: string;
-  city: string | null;
-  state: string;
-}
+import { useAppDispatch, useAppSelector } from "@/app/store";
+import {
+  handleFetchAllWarehouses,
+  handleRefreshWarehouse,
+} from "@/app/manager/warehouseManager";
+import { useDebounce } from "@/hooks/use-debounce";
+import { WarehouseItem } from "@/app/store/warehouseSlice";
 
 export const WarehouseMaster = () => {
-  const [search, setSearch] = useState("");
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const dispatch = useAppDispatch();
+  const {
+    data: warehouses,
+    loading: isFetching,
+    totalCount,
+  } = useAppSelector((state) => state.warehouse);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    dispatch(
+      handleFetchAllWarehouses({
+        page,
+        size: pageSize,
+        is_paginate: true,
+      }),
+    );
+  }, [dispatch, page]);
+
+  // Handle search separately or integrated
+  useEffect(() => {
+    if (debouncedSearch.length >= 3 || debouncedSearch === "") {
+      dispatch(
+        handleFetchAllWarehouses({
+          page: 1,
+          size: pageSize,
+          is_paginate: true,
+          // If API supports search param, add it here
+        }),
+      );
+      setPage(1);
+    }
+  }, [debouncedSearch, dispatch]);
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -68,7 +101,7 @@ export const WarehouseMaster = () => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        const extractedData: Warehouse[] = jsonData.map((row: any) => {
+        const extractedData: any[] = jsonData.map((row: any) => {
           // Helper to find value by key name case-insensitively
           const getValue = (targetKey: string) => {
             const key = Object.keys(row).find(
@@ -78,32 +111,31 @@ export const WarehouseMaster = () => {
           };
 
           return {
-            warehouseCode:
+            warehouse_code:
               getValue("warehouseCode") ||
               getValue("warehouse_code") ||
               getValue("code") ||
               String(Object.values(row)[0] || ""),
-            warehouseName:
+            warehouse_name:
               getValue("warehouseName") ||
               getValue("warehouse_name") ||
               getValue("name") ||
               String(Object.values(row)[1] || ""),
-            city: getValue("city") || null,
+            city: getValue("city") || "",
             state: getValue("state") || "",
           };
         });
 
-        setWarehouses(extractedData);
-        setPage(1);
+        // For now, we just toast, as we should probably have a "Save to DB" action
         toast.success(
-          `${extractedData.length} Warehouses imported successfully`,
+          `${extractedData.length} Warehouses parsed from file. API integration recommended for saving.`,
         );
       } catch (error) {
         toast.error("Failed to parse file. Check format.");
         console.error(error);
       } finally {
-        setIsLoading(false);
         if (fileInputRef.current) fileInputRef.current.value = "";
+        setIsLoading(false);
       }
     };
 
@@ -114,26 +146,16 @@ export const WarehouseMaster = () => {
     }
   };
 
-  const displayData =
-    search.length >= 5
-      ? warehouses.filter((wh) =>
-          wh.warehouseName.toLowerCase().includes(search.toLowerCase()),
-        )
-      : warehouses;
-
-  const totalCount = displayData.length;
-  const totalPages = Math.ceil(totalCount / pageSize);
-  const paginatedData = displayData.slice(
-    (page - 1) * pageSize,
-    page * pageSize,
-  );
-
-  const handleRefresh = () => {
-    setWarehouses([]);
-    setSearch("");
-    setPage(1);
-    toast.info("Facility List Cleared");
+  const handleRefresh = async () => {
+    toast.info("Syncing with Master Data...");
+    const success = await dispatch(handleRefreshWarehouse());
+    if (success) {
+      toast.success("Warehouse data synchronized");
+      dispatch(handleFetchAllWarehouses({ page: 1, size: pageSize }));
+    }
   };
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -181,7 +203,7 @@ export const WarehouseMaster = () => {
               onClick={handleRefresh}
             >
               <RefreshCw
-                className={`icon-sm ${isLoading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
+                className={`icon-sm ${isFetching ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
               />
               <span className="uppercase tracking-widest text-[10px] font-bold">
                 Refresh
@@ -215,43 +237,39 @@ export const WarehouseMaster = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? (
+                {isFetching || isLoading ? (
                   <TableRow>
                     <TableCell colSpan={5} className="h-60 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="icon-xl text-blue-600 animate-spin" />
                         <p className="body-strong text-slate-400 uppercase tracking-[0.2em]">
-                          Processing File Data...
+                          {isLoading ? "Processing File Data..." : "Fetching Master Data..."}
                         </p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : paginatedData.length === 0 ? (
+                ) : warehouses.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="h-60 text-center">
                       <div className="flex flex-col items-center gap-4 opacity-30">
-                        <FileText className="icon-xl" />
+                        <Building2 className="icon-xl" />
                         <p className="text-sm font-black uppercase tracking-widest">
-                          {warehouses.length === 0
-                            ? "No Data Imported"
-                            : "No Matches Found"}
+                          No Warehouse Data Found
                         </p>
-                        {warehouses.length === 0 && (
-                          <Button
-                            variant="link"
-                            className="text-blue-600 font-bold uppercase text-[10px]"
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            Click here to import CSV or Excel
-                          </Button>
-                        )}
+                        <Button
+                          variant="link"
+                          className="text-blue-600 font-bold uppercase text-[10px]"
+                          onClick={handleRefresh}
+                        >
+                          Sync from Backend Master
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedData.map((wh, index) => (
+                  warehouses.map((wh, index) => (
                     <TableRow
-                      key={index}
+                      key={wh.id}
                       className="group border-b border-slate-50 even:bg-slate-50/20 hover:bg-blue-50/50 transition-all font-semibold text-slate-700"
                     >
                       <TableCell className="px-6 py-5 text-xs font-bold text-slate-900">
@@ -263,12 +281,12 @@ export const WarehouseMaster = () => {
                             <Building2 className="icon-sm text-blue-600" />
                           </div>
                           <span className="text-sm font-bold text-slate-900">
-                            {wh.warehouseName}
+                            {wh.warehouse_name}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-5 font-mono text-[12px] font-black text-blue-600 tracking-wider">
-                        {wh.warehouseCode}
+                        {wh.warehouse_code}
                       </TableCell>
                       <TableCell className="px-6 py-5">
                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">

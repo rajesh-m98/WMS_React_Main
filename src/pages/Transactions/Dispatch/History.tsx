@@ -1,6 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Eye, Loader2, ClipboardList, Calendar, MapPin, Barcode } from "lucide-react";
+import {
+  Search,
+  Eye,
+  Loader2,
+  ClipboardList,
+  Calendar,
+  MapPin,
+  Barcode,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,6 +20,7 @@ import {
   TableRow,
   Button,
   Input,
+  Badge,
 } from "@/components/ui";
 import { useAppSelector, useAppDispatch } from "@/app/store";
 import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
@@ -24,25 +33,43 @@ export const DispatchHistory = () => {
     data: storeData,
     loading,
     totalCount,
-    filters,
   } = useAppSelector((state) => state.dispatch);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
-  const pageSize = 50; // As per API default
+  const pageSize = 50;
 
   useEffect(() => {
-    dispatch(handleFetchDispatchHistory({ 
-      page, 
-      size: pageSize,
-      carton_barcode: debouncedSearch || undefined
-    }));
+    dispatch(
+      handleFetchDispatchHistory({
+        page,
+        size: pageSize,
+        search: debouncedSearch || undefined,
+      }),
+    );
   }, [dispatch, page, debouncedSearch]);
 
-  const handleViewDetail = (id: number) => {
-    navigate(`/transactions/dispatch/${id}`);
-  };
+  // Group by warehouse
+  const uniqueWarehouses = useMemo(() => {
+    const whsMap = new Map();
+    storeData.forEach((item) => {
+      const whsCode = item.whscode || "N/A";
+      if (!whsMap.has(whsCode)) {
+        whsMap.set(whsCode, {
+          whscode: whsCode,
+          whsname: item.whsname || "Mylapore - Sannadhi Street",
+        });
+      }
+    });
+    return Array.from(whsMap.values());
+  }, [storeData]);
+
+  const filteredWhs = uniqueWarehouses.filter(
+    (whs) =>
+      whs.whscode.toLowerCase().includes(search.toLowerCase()) ||
+      whs.whsname.toLowerCase().includes(search.toLowerCase()),
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
@@ -50,7 +77,7 @@ export const DispatchHistory = () => {
         <div className="relative flex-1 max-w-2xl">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Search by Carton Barcode..."
+            placeholder="Search by Warehouse Name or Code..."
             className="pl-11 h-12 rounded-[1.25rem] bg-white border-2 border-slate-100 hover:border-blue-400 transition-all text-sm font-medium shadow-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -60,87 +87,87 @@ export const DispatchHistory = () => {
 
       <Card className="border-0 shadow-2xl rounded-[3rem] bg-white overflow-hidden relative">
         <CardContent className="p-0">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
+          <div className="overflow-x-auto">
             <Table className="min-w-full">
               <TableHeader className="bg-slate-50/50">
                 <TableRow className="border-b-2 border-slate-900/10">
-                  <TableHead className="label-bold px-6 py-5 text-left">SL NO</TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left">Carton Barcode</TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left">Doc No</TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left">Warehouse</TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left">Card Name</TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left">Date</TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-right">Quantity</TableHead>
-                  <TableHead className="label-bold px-10 py-5 text-right pr-6">Actions</TableHead>
+                  <TableHead className="px-8 py-6 text-left text-[11px] font-black text-slate-600 uppercase tracking-widest">
+                    SL NO
+                  </TableHead>
+                  <TableHead className="px-8 py-6 text-left text-[11px] font-black text-slate-600 uppercase tracking-widest">
+                    Warehouse Name
+                  </TableHead>
+                  <TableHead className="px-8 py-6 text-left text-[11px] font-black text-slate-600 uppercase tracking-widest">
+                    WHS Code
+                  </TableHead>
+                  <TableHead className="px-8 py-6 text-right text-[11px] font-black text-slate-600 uppercase tracking-widest">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-96 text-center">
+                    <TableCell colSpan={4} className="h-96 text-center">
                       <div className="flex flex-col items-center justify-center gap-4">
                         <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
-                        <p className="label-bold !text-slate-400">Loading Dispatch Records...</p>
+                        <p className="label-bold !text-slate-400">
+                          Loading Dispatch History...
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : storeData.length === 0 ? (
+                ) : filteredWhs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-64 text-center">
+                    <TableCell colSpan={4} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center gap-4 opacity-20">
                         <ClipboardList className="h-20 w-20 text-slate-400" />
-                        <p className="text-xl font-black text-slate-400 uppercase">No Dispatch Records Found</p>
+                        <p className="text-xl font-black text-slate-400 uppercase">
+                          No Warehouses Found
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  storeData.map((row, idx) => (
+                  filteredWhs.map((whs, idx) => (
                     <TableRow
-                      key={row.id}
-                      className="hover:bg-blue-50/40 transition-all duration-300 group border-b border-slate-50"
+                      key={whs.whscode}
+                      className="hover:bg-blue-50/50 transition-all duration-300 group cursor-pointer border-b border-slate-100"
+                      onClick={() =>
+                        navigate(`/transactions/dispatch/${whs.whscode}`)
+                      }
                     >
-                      <td className="px-6 py-5 body-strong text-black font-mono text-left">
-                        {(page - 1) * pageSize + idx + 1}
+                      <td className="px-8 py-6 font-black text-slate-900">
+                        {idx + 1}
                       </td>
-                      <td className="px-4 py-5">
-                        <div className="flex items-center gap-2">
-                           <Barcode className="w-3.5 h-3.5 text-blue-400" />
-                           <span className="text-sm font-black text-slate-900">{row.box_barcode}</span>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+                            <MapPin className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <span className="font-black text-slate-800 text-sm uppercase tracking-tight">
+                            {whs.whsname}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-4 py-5">
-                        <span className="text-sm font-black text-blue-600 bg-blue-50/70 border border-blue-100/50 px-2.5 py-1 rounded-lg shadow-sm">
-                          {row.docnum}
-                        </span>
-                      </td>
-                      <td className="px-4 py-5">
-                         <div className="flex items-center gap-1.5 text-sm font-black text-slate-700">
-                           <MapPin className="w-3 h-3 text-slate-400" />
-                           {row.whscode}
-                         </div>
-                      </td>
-                      <td className="px-4 py-5 text-sm font-black text-slate-600 truncate max-w-[150px]">
-                        {row.cardname}
-                      </td>
-                      <td className="px-4 py-5">
-                        <div className="flex items-center gap-2 text-slate-500 font-bold text-xs">
-                          <Calendar className="h-3 w-3" />
-                          {row.docdate}
-                        </div>
-                      </td>
-                      <td className="px-4 py-5 text-right font-black text-slate-900 tabular-nums">
-                        <span className="bg-slate-900 text-white px-3 py-1.5 rounded-xl shadow-lg shadow-slate-200">
-                          {row.quantity}
-                        </span>
-                      </td>
-                      <td className="px-10 py-5 text-right pr-6">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-10 w-10 rounded-2xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 border border-slate-100/50"
-                          onClick={() => handleViewDetail(row.id)}
+                      <td className="px-8 py-6">
+                        <Badge
+                          variant="outline"
+                          className="bg-slate-50 text-slate-600 font-black px-3 py-1 border-slate-200"
                         >
-                          <Eye className="h-4 w-4" />
+                          {whs.whscode}
+                        </Badge>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <Button
+                          size="sm"
+                          className="h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/transactions/dispatch/${whs.whscode}`);
+                          }}
+                        >
+                          View Details
                         </Button>
                       </td>
                     </TableRow>
@@ -148,38 +175,6 @@ export const DispatchHistory = () => {
                 )}
               </TableBody>
             </Table>
-          </div>
-
-          <div className="p-8 border-t border-slate-50 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="label-bold text-slate-400 text-[11px] uppercase tracking-widest">Total Dispatches</span>
-              <div className="h-7 px-3 bg-blue-600 text-white rounded-lg flex items-center justify-center font-black text-xs shadow-md shadow-blue-100">
-                {totalCount}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl h-10 px-4 font-bold border-slate-200"
-                disabled={page === 1 || loading}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                Previous
-              </Button>
-              <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center font-black text-xs text-slate-900 border border-slate-200">
-                {page}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl h-10 px-4 font-bold border-slate-200"
-                disabled={storeData.length < pageSize || loading}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>

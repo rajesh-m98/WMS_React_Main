@@ -103,19 +103,26 @@ export interface CreateBinPayload {
 
 export interface PackageDTO {
   id: number;
-  name: string;
-  barcode: string;
+  package_type_name: string;
+  package_code: string;
   package_type: number;
-  status: number;
+  description?: string;
+  warehouse_id?: number;
+  whscode?: string;
+  whsname?: string;
+  status: string | number;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreatePackagePayload {
-  name: string;
-  barcode: string;
+  package_type_name: string;
+  package_code: string;
   package_type: number;
-  status: number;
+  description?: string;
+  warehouse_id?: number;
+  whscode?: string;
+  status: string | number;
 }
 
 export interface FloorDTO {

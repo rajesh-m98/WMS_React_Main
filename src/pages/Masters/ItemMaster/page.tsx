@@ -66,11 +66,17 @@ export const ItemMaster = () => {
 
   // Determine if we should perform a global search
   const isSearchActive = debouncedSearch.length >= 5;
+  const searchTerm = isSearchActive ? debouncedSearch : "";
 
   useEffect(() => {
-    // Determine search term and target page
-    const searchTerm = isSearchActive ? debouncedSearch : "";
-    const targetPage = isSearchActive && page !== 1 ? 1 : page;
+    dispatch(handleFetchBins({ warehouseid: 1 }));
+    return () => {
+      dispatch(clearItems());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    const targetPage = searchTerm && page !== 1 ? 1 : page;
 
     dispatch(
       handleFetchAllItems({
@@ -81,16 +87,10 @@ export const ItemMaster = () => {
       }),
     );
 
-    // If we determined we need to be on page 1 for a new search, update state
-    if (isSearchActive && page !== 1) {
+    if (searchTerm && page !== 1) {
       setPage(1);
     }
-
-    dispatch(handleFetchBins({ warehouseid: 1 }));
-    return () => {
-      dispatch(clearItems());
-    };
-  }, [dispatch, page, debouncedSearch, isSearchActive]);
+  }, [dispatch, page, searchTerm]);
 
   const handleSync = async () => {
     setIsRefreshing(true);

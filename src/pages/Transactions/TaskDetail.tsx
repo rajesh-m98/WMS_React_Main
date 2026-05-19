@@ -45,7 +45,7 @@ const TaskDetail = () => {
 
   useEffect(() => {
     if (isDispatch && id) {
-      dispatch(handleFetchDispatchDetail(id));
+      dispatch(handleFetchDispatchDetail(parseInt(id)));
     }
     if (type === "putaway" && id) {
       dispatch(handleFetchPutawayDetail(parseInt(id)));

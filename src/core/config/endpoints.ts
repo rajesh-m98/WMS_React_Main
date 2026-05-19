@@ -42,6 +42,7 @@ export const API_ENDPOINTS = {
       CREATE: 'packaging/packaging_create/',
       GET_BY_ID: 'packaging/get_packaging/',
       DELETE: 'packaging/delete_package/',
+      GENERATE: 'packaging/generate_barcode/',
     },
     FLOOR: {
       ALL: 'floor/get_all_floors/',
@@ -57,6 +58,9 @@ export const API_ENDPOINTS = {
     OUTWARD: {
       GET_ALL: 'outward/get_all_outward/',
       GENERATE: 'outward/generate_picklist/',
+      GET_ONWARD_PICKLIST: 'outward/get_all_onward_picklist/',
+      GET_MANUAL_PICKLIST: 'outward/get_all_manual_picklist/',
+      GET_ALL_SORTING: 'outward/get_all_sorting/',
     },
     TASKS: {
       GET_BY_ID: 'picklist/get_picklist',

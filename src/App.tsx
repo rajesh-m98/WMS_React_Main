@@ -4,7 +4,6 @@ import { SonnerToaster, Toaster, TooltipProvider } from "@/components/ui";
 import { AppLayout } from "@/components/AppLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Dashboard } from "./pages/Dashboard/page";
-import { ActivityLog } from "./pages/ActivityLogs/ActivityLog";
 import InwardRequest from "./pages/Transactions/InwardRequest";
 import OutwardRequest from "./pages/Transactions/OutwardRequest";
 import TaskDetail from "./pages/Transactions/TaskDetail";
@@ -21,6 +20,7 @@ import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
 import MasterDetail from "./pages/Masters/MasterDetail";
 import { PackageList } from "./pages/Masters/PackageMaster/PackageList";
 import { CreatePackage } from "./pages/Masters/PackageMaster/CreatePackage";
+import PackageDetail from "./pages/Masters/PackageMaster/PackageDetail";
 import { FloorMaster } from "./pages/Masters/FloorMaster/page";
 import FloorCreate from "./pages/Masters/FloorMaster/Create";
 import FloorEdit from "./pages/Masters/FloorMaster/Edit";
@@ -32,6 +32,7 @@ import { OutwardHistory } from "./pages/Transactions/OutwardHistory";
 import { Login } from "./pages/Login/page";
 import PutawayPage from "./pages/Transactions/GinManagement/PutawayPage";
 import FlowThroughPage from "./pages/Transactions/GinManagement/FlowThroughPage";
+import GinHeaderListPage from "./pages/Transactions/GinManagement/GinHeaderListPage";
 import GinDetail from "./pages/Transactions/GinManagement/Detail";
 import GinEdit from "./pages/Transactions/GinManagement/Edit";
 import GinHeaderEdit from "./pages/Transactions/GinManagement/HeaderEdit";
@@ -40,7 +41,19 @@ import GinCreateLine from "./pages/Transactions/GinManagement/CreateLine";
 import OutwardListPage from "./pages/Transactions/Outward/OutwardListPage";
 import OutwardPicklistPage from "./pages/Transactions/OutwardPicklist/page";
 import OutwardPicklistDetail from "./pages/Transactions/OutwardPicklist/Detail";
+import FlowthroughTransferPage from "./pages/Transactions/FlowthroughTransfer/FlowthroughTransferPage";
+import PicklistGenerationPage from "./pages/Transactions/PicklistGeneration/PicklistGenerationPage";
+import FlowthroughDispatchDetailPage from "./pages/Transactions/FlowthroughDispatch/FlowthroughDispatchDetailPage";
+import OnwardPicklistPage from "./pages/Transactions/PicklistSorting/OnwardPicklistPage";
+import OnwardPicklistDetailPage from "./pages/Transactions/PicklistSorting/OnwardPicklistDetailPage";
+import PicklistDispatchPage from "./pages/Transactions/PicklistDispatch/PicklistDispatchPage";
+import PicklistDispatchDetailPage from "./pages/Transactions/PicklistDispatch/PicklistDispatchDetailPage";
 import NotFound from "./pages/NotFound";
+import PutawayLocationDetail from "./pages/Transactions/GinManagement/PutawayLocationDetail";
+import PicklistGenerationDetailPage from "./pages/Transactions/PicklistGeneration/PicklistGenerationDetailPage";
+import FlowthroughTransferDetailPage from "./pages/Transactions/FlowthroughTransfer/FlowthroughTransferDetailPage";
+import FlowthroughDispatchPage from "./pages/Transactions/FlowthroughDispatch/FlowthroughDispatchPage";
+import ManualPicklistResultPage from "./pages/Transactions/PicklistGeneration/ManualPicklistResultPage";
 
 const queryClient = new QueryClient();
 
@@ -60,7 +73,6 @@ const App = () => (
                 <AppLayout>
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/activity-logs" element={<ActivityLog />} />
                     <Route
                       path="/transactions/InwardRequest"
                       element={<InwardRequest />}
@@ -82,7 +94,7 @@ const App = () => (
                       element={<DispatchHistory />}
                     />
                     <Route
-                      path="/transactions/dispatch/:id"
+                      path="/transactions/dispatch/:whsCode"
                       element={<DispatchDetail />}
                     />
                     <Route
@@ -110,7 +122,55 @@ const App = () => (
                       element={<FlowThroughPage />}
                     />
                     <Route
-                      path="/transactions/gin/view/:headerId"
+                      path="/transactions/flow-through/transfer"
+                      element={<FlowthroughTransferPage />}
+                    />
+                    <Route
+                      path="/transactions/flow-through/transfer/:id"
+                      element={<FlowthroughTransferDetailPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/generation"
+                      element={<PicklistGenerationPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/generation/:id"
+                      element={<PicklistGenerationDetailPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/manual-result"
+                      element={<ManualPicklistResultPage />}
+                    />
+                    <Route
+                      path="/transactions/ft-dispatch/warehouse/:whsCode"
+                      element={<FlowthroughDispatchDetailPage />}
+                    />
+                    <Route
+                      path="/transactions/ft-dispatch"
+                      element={<FlowthroughDispatchPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/sorting"
+                      element={<OnwardPicklistPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/sorting/:id"
+                      element={<OnwardPicklistDetailPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/dispatch"
+                      element={<PicklistDispatchPage />}
+                    />
+                    <Route
+                      path="/transactions/picklist/dispatch/warehouse/:whsCode"
+                      element={<PicklistDispatchDetailPage />}
+                    />
+                    <Route
+                      path="/transactions/gin/:type/headers/:gpNumber"
+                      element={<GinHeaderListPage />}
+                    />
+                    <Route
+                      path="/transactions/gin/view/:type/:headerId"
                       element={<GinDetail />}
                     />
                     <Route
@@ -128,6 +188,10 @@ const App = () => (
                     <Route
                       path="/transactions/gin/edit/:headerId/:lineId"
                       element={<GinEdit />}
+                    />
+                    <Route
+                      path="/transactions/gin/putaway-location/:headerId/:lineId"
+                      element={<PutawayLocationDetail />}
                     />
                     <Route
                       path="/transactions/gin/create"
@@ -159,10 +223,7 @@ const App = () => (
                     />
                     <Route path="/masters/bins" element={<LocationMaster />} />
                     <Route path="/masters/hst" element={<HSTMaster />} />
-                    <Route
-                      path="/masters/hst/:id/edit"
-                      element={<HSTEdit />}
-                    />
+                    <Route path="/masters/hst/:id/edit" element={<HSTEdit />} />
                     <Route path="/masters/hst/:id" element={<MasterDetail />} />
                     <Route
                       path="/masters/warehouses"
@@ -172,13 +233,14 @@ const App = () => (
                       path="/masters/warehouses/:id"
                       element={<MasterDetail />}
                     />
-                    <Route
-                      path="/masters/packages"
-                      element={<PackageList />}
-                    />
+                    <Route path="/masters/packages" element={<PackageList />} />
                     <Route
                       path="/masters/packages/create"
                       element={<CreatePackage />}
+                    />
+                    <Route
+                      path="/masters/packages/detail/:whsCode"
+                      element={<PackageDetail />}
                     />
                     <Route
                       path="/masters/packages/:id"

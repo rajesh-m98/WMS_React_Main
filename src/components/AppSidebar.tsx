@@ -17,6 +17,9 @@ import {
   ChevronDown,
   Activity,
   Layers,
+  Shuffle,
+  Truck,
+  ArrowRightLeft,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -58,6 +61,7 @@ import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
 import { handleFetchPutawayHistory } from "@/app/manager/putawayManager";
 import { handleFetchFloors } from "@/app/manager/floorManager";
 import { handleFetchGins } from "@/app/manager/ginManager";
+import { handleFetchOnwardPicklist } from "@/app/manager/requestManager";
 import { handleFetchAllPackages } from "@/app/manager/packageManager";
 
 export function AppSidebar() {
@@ -108,6 +112,21 @@ export function AppSidebar() {
         break;
       case "/transactions/gin/flow-through":
         dispatch(handleFetchGins({ gin_type: 1 }));
+        break;
+      case "/transactions/flow-through/transfer":
+        dispatch(handleFetchOutwardRequests({ page: 1, size: 15 }));
+        break;
+      case "/transactions/ft-dispatch":
+        dispatch(handleFetchDispatchHistory({ page: 1, size: 15 }));
+        break;
+      case "/transactions/picklist/generation":
+        dispatch(handleFetchOutwardRequests({ page: 1, size: 15 }));
+        break;
+      case "/transactions/picklist/sorting":
+        dispatch(handleFetchOnwardPicklist());
+        break;
+      case "/transactions/picklist/dispatch":
+        dispatch(handleFetchDispatchHistory({ page: 1, size: 15 }));
         break;
 
       // Transactions
@@ -162,7 +181,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-3.5 py-6 gap-4 scrollbar-hide">
+      <SidebarContent className="px-1.5 py-2 gap-4 scrollbar-hide">
         {/* Dashboard Section */}
         <SidebarMenu>
           <SidebarMenuItem>
@@ -266,62 +285,79 @@ export function AppSidebar() {
             <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
               <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
                 <SubMenuItem
-                  title="Putaway GRN"
+                  title="GRN Putaway"
                   url="/transactions/gin/putaway"
                   icon={PackagePlus}
                 />
                 <SubMenuItem
-                  title="Flow Through GRN"
+                  title="GRN Flow-Through"
                   url="/transactions/gin/flow-through"
                   icon={ArrowLeftRight}
                 />
                 <SubMenuItem
-                  title="OutwardPutaway"
-                  url="/transactions/gin/putaway"
-                  icon={PackagePlus}
+                  title="Flowthrough Transfer"
+                  url="/transactions/flow-through/transfer"
+                  icon={Shuffle}
                 />
                 <SubMenuItem
-                  title="Dispatch History"
-                  url="/transactions/dispatch-history"
-                  icon={History}
+                  title="Flowthrough Dispatch"
+                  url="/transactions/ft-dispatch"
+                  icon={Truck}
+                />
+                <SubMenuItem
+                  title="Picklist Generation"
+                  url="/transactions/picklist/generation"
+                  icon={ClipboardList}
+                />
+                <SubMenuItem
+                  title="Picklist Sorting"
+                  url="/transactions/picklist/sorting"
+                  icon={ArrowRightLeft}
+                />
+                <SubMenuItem
+                  title="Picklist Dispatch"
+                  url="/transactions/picklist/dispatch"
+                  icon={Truck}
                 />
               </SidebarMenuSub>
             </CollapsibleContent>
           </Collapsible>
         </SidebarGroup>
 
-        {/* Activity Logs Section */}
+        {/* Activity Logs Section
         <SidebarMenu className="mt-2 caption-small px-4">
           System Auditing
         </SidebarMenu>
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="mt-1">
             <SidebarMenuButton
               asChild
-              isActive={isItemActive("/activity-logs")}
+              isActive={isItemActive("/transactions/dispatch-history")}
             >
               <NavLink
-                to="/activity-logs"
+                to="/transactions/dispatch-history"
                 className={`flex items-center gap-3.5 px-4 py-4 rounded-lg transition-all duration-300 ${
-                  isItemActive("/activity-logs")
+                  isItemActive("/transactions/dispatch-history")
                     ? "bg-blue-600 text-white font-bold shadow-xl shadow-blue-200/80 scale-[1.02]"
                     : "text-slate-600 hover:bg-blue-50 hover:text-blue-600"
                 }`}
                 activeClassName=""
-                onClick={() => handleSidebarClick("/activity-logs")}
+                onClick={() =>
+                  handleSidebarClick("/transactions/dispatch-history")
+                }
               >
                 <div
-                  className={`p-1.5 rounded-xl transition-colors ${isItemActive("/activity-logs") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
+                  className={`p-1.5 rounded-xl transition-colors ${isItemActive("/transactions/dispatch-history") ? "bg-white/20" : "bg-slate-100 group-hover:bg-blue-100/50"}`}
                 >
-                  <Activity
-                    className={`icon-base shrink-0 ${isItemActive("/activity-logs") ? "text-black" : "text-slate-500 group-hover:text-blue-600"}`}
+                  <History
+                    className={`icon-base shrink-0 ${isItemActive("/transactions/dispatch-history") ? "text-black" : "text-slate-400 group-hover:text-blue-600"}`}
                   />
                 </div>
-                <span className="body-strong">Activity Logs</span>
+                <span className="body-strong">Dispatch History</span>
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenu> */}
       </SidebarContent>
     </Sidebar>
   );

@@ -60,7 +60,7 @@ import {
   handleCreatePackage,
   handleDeletePackage,
 } from "@/app/manager/packageManager";
-import { clearAllPackages } from "@/app/store/masterSlice";
+import { clearPackages } from "@/app/store/packageSlice";
 import { useDebounce } from "@/hooks/use-debounce";
 import config from "./PackageConfig.json";
 import { PackageDTO } from "@/core/models/master.model";
@@ -109,7 +109,7 @@ export const PackageMaster = () => {
     data: packages,
     loading,
     totalCount,
-  } = useAppSelector((state) => state.master.packages);
+  } = useAppSelector((state) => state.package);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
@@ -234,6 +234,12 @@ export const PackageMaster = () => {
   const endPage = Math.min(totalPages, Math.max(page + 2, 5));
 
   useEffect(() => {
+    return () => {
+      dispatch(clearPackages());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(
       handleFetchAllPackages({
         page,
@@ -241,9 +247,6 @@ export const PackageMaster = () => {
         search: debouncedSearch,
       }),
     );
-    return () => {
-      dispatch(clearAllPackages());
-    };
   }, [dispatch, page, debouncedSearch]);
 
   const handleOpenDialog = (item: PackageDTO | null = null) => {
