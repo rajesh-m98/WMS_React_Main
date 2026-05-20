@@ -1,5 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
-import { Card, CardContent, Badge, Button, Input } from "@/components/ui";
+import {
+  Card,
+  CardContent,
+  Badge,
+  Button,
+  Input,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui";
 import {
   Search,
   ChevronLeft,
@@ -12,6 +21,7 @@ import {
   Warehouse,
   TrendingUp,
   Package,
+  Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/store";
@@ -24,6 +34,8 @@ const PicklistDispatchPage = () => {
     (state) => state.dispatch,
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [page, setPage] = useState(1);
   const itemsPerPage = 15;
 
@@ -39,11 +51,31 @@ const PicklistDispatchPage = () => {
       row.grpo_doc_entry === "",
   );
 
+  const dateFilteredData = useMemo(() => {
+    return picklistData.filter((row: any) => {
+      if (!row.created_at) return true;
+      const rowDate = new Date(row.created_at);
+      rowDate.setHours(0, 0, 0, 0);
+
+      if (fromDate) {
+        const from = new Date(fromDate);
+        from.setHours(0, 0, 0, 0);
+        if (rowDate < from) return false;
+      }
+      if (toDate) {
+        const to = new Date(toDate);
+        to.setHours(0, 0, 0, 0);
+        if (rowDate > to) return false;
+      }
+      return true;
+    });
+  }, [picklistData, fromDate, toDate]);
+
   // GROUP BY WAREHOUSE: List warehouses and their dispatch summaries
   const groupedWarehouses = useMemo(() => {
     // 1. Deduplicate identical dispatch lines returned by the backend
     const uniqueMap = new Map();
-    picklistData.forEach((row: any) => {
+    dateFilteredData.forEach((row: any) => {
       // Use composite key including whscode and outward_header_id (since GRPO is null for picklist)
       const uniqueKey = `${row.whscode}_${row.item_code}_${row.outward_header_id}_${row.qty}`;
       if (!uniqueMap.has(uniqueKey)) {
@@ -115,15 +147,81 @@ const PicklistDispatchPage = () => {
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-sky-600 transition-colors" />
             <Input
-              placeholder="Search by Warehouse..."
-              className="pl-12 h-12 w-80 rounded-2xl bg-slate-50 border-0 focus:bg-white focus:ring-4 focus:ring-sky-50 transition-all text-sm font-black shadow-inner"
+              placeholder="Search by Warehouse Name ..."
+              className="pl-12 h-12 w-80 rounded-2xl bg-slate-50 border-1 border-slate-200 shadow-lg shadow-slate-300 focus:bg-white focus:ring-4 focus:ring-sky-50 transition-all text-sm font-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={`h-12 px-6 rounded-2xl border-1 font-black text-[10px] uppercase tracking-widest flex gap-2 active:scale-95 transition-all ${
+                  fromDate || toDate
+                    ? "bg-sky-50 border-sky-300 text-sky-600 shadow-lg shadow-sky-100"
+                    : "bg-slate-50 border-slate-300 text-slate-600 shadow-lg shadow-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                {fromDate || toDate ? "Filtered" : "Filter Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-80 p-5 rounded-3xl border border-slate-100 bg-white shadow-xl flex flex-col gap-4"
+              align="end"
+            >
+              <div className="flex flex-col gap-1.5">
+                <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                  Filter by Date
+                </h4>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Narrow down by creation date
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">
+                    From Date
+                  </span>
+                  <Input
+                    type="date"
+                    className="h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-black text-slate-700 font-mono"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">
+                    To Date
+                  </span>
+                  <Input
+                    type="date"
+                    className="h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-black text-slate-700 font-mono"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                  />
+                </div>
+              </div>
+              {(fromDate || toDate) && (
+                <Button
+                  variant="ghost"
+                  className="h-9 w-full rounded-xl text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition-all mt-1"
+                  onClick={() => {
+                    setFromDate("");
+                    setToDate("");
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </PopoverContent>
+          </Popover>
+
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-2xl bg-white hover:bg-slate-50 border-0 shadow-lg shadow-slate-100 font-black text-[10px] uppercase tracking-widest text-slate-600 flex gap-2 active:scale-95 transition-all"
+            className="h-12 px-6 rounded-2xl bg-white hover:bg-slate-50 border-1 border-slate-200 shadow-lg shadow-slate-300 font-black text-[10px] uppercase tracking-widest text-slate-600 flex gap-2 active:scale-95 transition-all"
             onClick={() =>
               dispatch(handleFetchDispatchHistory({ page: 1, size: 100 }))
             }

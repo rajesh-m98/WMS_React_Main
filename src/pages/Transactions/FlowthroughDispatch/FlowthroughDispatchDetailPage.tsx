@@ -31,7 +31,12 @@ const FlowthroughDispatchDetailPage = () => {
 
   const warehouseDetails = useMemo(() => {
     const filtered = dispatchData.filter(
-      (item) => item.whscode === whsCode && item.grpo_doc_entry !== null,
+      (item) =>
+        item.whscode === whsCode &&
+        item.grpo_doc_entry !== null &&
+        item.status !== null &&
+        item.status !== undefined &&
+        String(item.status).toLowerCase() !== "null",
     );
 
     // Deduplicate identical items to fix inflated counts
@@ -63,8 +68,10 @@ const FlowthroughDispatchDetailPage = () => {
     });
   };
 
-  const getStatusBadge = (status: number | null) => {
-    switch (status) {
+  const getStatusBadge = (status: any) => {
+    const statusNum =
+      status !== null && status !== undefined ? Number(status) : null;
+    switch (statusNum) {
       case 1:
         return (
           <Badge className="bg-emerald-50 text-emerald-600 border-0 font-black uppercase text-sm px-3 py-1 rounded-lg cursor-pointer hover:bg-emerald-600 hover:text-white transition-all">
@@ -99,36 +106,28 @@ const FlowthroughDispatchDetailPage = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-12 w-12 rounded-2xl bg-slate-200 text-slate-700 shadow-lg shadow-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95"
+            className="h-12 w-12 rounded-2xl bg-slate-200 text-black shadow-lg shadow-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95"
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-4">
-            <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <Warehouse className="w-7 h-7 text-blue-500" />
               <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
                 {whsName}
               </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <Warehouse className="w-3.5 h-3.5 text-blue-500" />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Storage Location Detail
-                </span>
-              </div>
             </div>
-            <Badge className="bg-blue-600 text-white border-0 font-black text-sm px-3 py-1 rounded-lg shadow-lg shadow-blue-100">
-              {whsCode}
-            </Badge>
           </div>
         </div>
 
         <div className="flex items-center gap-6 pr-4">
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
               Items Count
             </span>
             <div className="flex items-center gap-2">
-              <Box className="w-4 h-4 text-blue-500" />
+              <Box className="w-5 h-5 text-blue-500" />
               <span className="text-2xl font-black text-slate-900 tabular-nums">
                 {uniqueItemCount}
               </span>
@@ -136,11 +135,11 @@ const FlowthroughDispatchDetailPage = () => {
           </div>
           <div className="h-10 w-px bg-slate-100" />
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
               Total Qty
             </span>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
+              <TrendingUp className="w-5 h-5 text-emerald-500" />
               <span className="text-2xl font-black text-slate-900 tabular-nums">
                 {totalQty}
               </span>
@@ -156,25 +155,25 @@ const FlowthroughDispatchDetailPage = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-slate-100">
-                  <th className="px-8 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                    SL
+                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
+                    SL No
                   </th>
-                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
                     Item Name
                   </th>
-                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
                     Item Code
                   </th>
-                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
                     GRPO No
                   </th>
-                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
                     Quantity
                   </th>
-                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
                     Dispatch Date
                   </th>
-                  <th className="px-8 py-5 text-right pr-12 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th className="px-8 py-5 text-right pr-12 text-[11px] font-black text-slate-650 uppercase tracking-widest whitespace-nowrap">
                     Status
                   </th>
                 </tr>
@@ -191,7 +190,7 @@ const FlowthroughDispatchDetailPage = () => {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-                          <Package className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                          <Package className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" />
                         </div>
                         <span className="text-sm font-black text-slate-900 uppercase">
                           {detail.item_name}
@@ -224,8 +223,8 @@ const FlowthroughDispatchDetailPage = () => {
                         <span className="text-sm font-black text-slate-600 uppercase">
                           {formatDate(detail.created_at)}
                         </span>
-                        <div className="flex items-center gap-1 text-sm text-slate-400 font-bold">
-                          <Clock className="w-2.5 h-2.5" />
+                        <div className="flex items-center gap-1 text-sm text-slate-500 font-bold">
+                          <Clock className="w-3.5 h-3.5" />
                           {new Date(detail.created_at).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",

@@ -1,6 +1,6 @@
-import { 
+import {
   handleFetchGins,
-  handleDeleteGinHeader
+  handleDeleteGinHeader,
 } from "@/app/manager/ginManager";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
@@ -45,7 +45,9 @@ const GinHeaderListPage = () => {
   const items = type === "putaway" ? putawayItems : flowThroughItems;
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [deleteHeaderTarget, setDeleteHeaderTarget] = useState<number | null>(null);
+  const [deleteHeaderTarget, setDeleteHeaderTarget] = useState<number | null>(
+    null,
+  );
 
   const ginType = type === "putaway" ? 2 : 1;
 
@@ -122,36 +124,26 @@ const GinHeaderListPage = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      <Card className="border-0 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-[32px] overflow-hidden bg-white">
+      <Card className="border border-slate-100 p-4 shadow-[0_0_25px_rgba(0,0,0,0.06),0_10px_20px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden bg-white">
         <CardHeader className="p-5 border-b border-slate-100/50 flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50"
-            >
-              <ChevronLeft className="w-5 h-5 text-slate-600" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                Gate Pass: {gpNumber}
-              </h1>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                Select a Purchase Order / Header to view details
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div className="relative w-full lg:w-2/5 shrink-0">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
-              <Input
-                placeholder="Search by PO Number or Doc Entry..."
-                className="pl-12 h-12 rounded-xl bg-slate-50/50 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(-1)}
+                className="rounded-xl border border-slate-200 shadow-md shadow-slate-300 hover:bg-slate-50 hover:shadow-slate-400"
+              >
+                <ChevronLeft className="w-5 h-5 text-slate-600" />
+              </Button>
+              <div>
+                <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                  Gate Pass: {gpNumber}
+                </h1>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                  Select a Purchase Order / Header to view details
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <Button
@@ -159,10 +151,10 @@ const GinHeaderListPage = () => {
                 className="rounded-2xl border-indigo-100 hover:bg-indigo-50 transition-all font-black gap-3 h-12 px-8 bg-white shadow-sm hover:shadow-indigo-100/50 active:scale-95 text-indigo-600 uppercase tracking-widest text-xs"
                 onClick={() =>
                   dispatch(
-                    handleFetchGins({ 
-                      gin_type: ginType, 
-                      is_paginate: true, 
-                      forceRefresh: true 
+                    handleFetchGins({
+                      gin_type: ginType,
+                      is_paginate: true,
+                      forceRefresh: true,
                     }),
                   )
                 }
@@ -365,7 +357,8 @@ const GinHeaderListPage = () => {
               Delete Header?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-4 leading-relaxed">
-              Are you sure you want to delete this Gate Pass Header? This will remove all associated line items and cannot be undone.
+              Are you sure you want to delete this Gate Pass Header? This will
+              remove all associated line items and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-col gap-3 mt-8">

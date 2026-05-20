@@ -26,7 +26,7 @@ const PicklistGenerationPage = () => {
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const itemsPerPage = 15;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     dispatch(handleFetchOnwardPicklist());
@@ -82,8 +82,8 @@ const PicklistGenerationPage = () => {
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <Input
-              placeholder="Search by DocNum or DocEntry..."
-              className="pl-12 h-12 w-80 rounded-2xl bg-slate-50 border-0 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-sm font-black shadow-inner"
+              placeholder="Search by Doc Num ..."
+              className="pl-12 h-12 w-80 rounded-2xl bg-slate-50 border-1 border-slate-200 shadow-lg shadow-slate-300 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-sm font-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -107,13 +107,10 @@ const PicklistGenerationPage = () => {
               <thead>
                 <tr className="bg-slate-100">
                   <th className="px-8 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                    SL
+                    SL NO
                   </th>
                   <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     Doc Entry
-                  </th>
-                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                    Status
                   </th>
                   <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     Doc Date
@@ -132,7 +129,7 @@ const PicklistGenerationPage = () => {
               <tbody className="bg-white">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-32 text-center">
+                    <td colSpan={6} className="py-32 text-center">
                       <div className="flex flex-col items-center justify-center gap-4">
                         <Loader2 className="h-14 w-14 text-blue-600 animate-spin" />
                         <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">
@@ -143,7 +140,7 @@ const PicklistGenerationPage = () => {
                   </tr>
                 ) : paginatedData.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-32 text-center">
+                    <td colSpan={6} className="py-32 text-center">
                       <div className="flex flex-col items-center justify-center gap-4 opacity-20">
                         <PackageSearch className="h-24 w-24 text-slate-300" />
                         <p className="text-xl font-black text-slate-400 uppercase tracking-widest">
@@ -161,24 +158,13 @@ const PicklistGenerationPage = () => {
                         navigate(`/transactions/picklist/generation/${row.id}`)
                       }
                     >
-                      <td className="px-8 py-5 font-black text-slate-400 font-mono text-xs">
+                      <td className="px-8 py-5 font-black text-slate-700 font-mono text-xs">
                         {(page - 1) * itemsPerPage + idx + 1}
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex flex-col gap-1">
-                          {/* <span className="text-sm font-black text-blue-600 tracking-tight">
-                            Doc Num: #{row.docnum}
-                          </span> */}
                           <span className="text-sm font-bold text-slate-800 uppercase tracking-wider">
                             {row.docentry}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2">
-                          <AlertCircle className="w-3.5 h-3.5 font-bold text-amber-500" />
-                          <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">
-                            Awaiting
                           </span>
                         </div>
                       </td>
@@ -193,17 +179,19 @@ const PicklistGenerationPage = () => {
                       <td className="px-6 py-5 text-center">
                         <Badge
                           variant="outline"
-                          className="bg-blue-500 text-white text-sm font-black px-2 py-0.5"
+                          className="bg-blue-500 text-white text-[12px] font-black px-3 py-2"
                         >
                           {row.doctype}
                         </Badge>
                       </td>
                       <td className="px-6 py-5 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <Layers className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-xs font-black text-slate-900">
-                            {row.lines?.length || 0}{" "}
-                            {row.lines?.length === 1 ? "Line" : "Lines"}
+                          <Layers className="w-4 h-4 text-slate-400" />
+                          <span className="text-[14px] font-black text-slate-900">
+                            {(row.lines || row.db_line || []).length}{" "}
+                            {(row.lines || row.db_line || []).length === 1
+                              ? "Item"
+                              : "Items"}
                           </span>
                         </div>
                       </td>

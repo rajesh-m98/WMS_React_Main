@@ -113,14 +113,14 @@ const GinListPage = ({ type }: GinListPageProps) => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      <Card className="border-1 border-slate-50 p-4 shadow-lg shadow-slate-400 rounded-[32px] overflow-hidden bg-white">
-        <CardHeader className="p-3 shadow-sm shadow-slate-100">
+      <Card className="border border-slate-100 p-4 shadow-[0_0_25px_rgba(0,0,0,0.06),0_10px_20px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden bg-white">
+        <CardHeader className="p-5 border-b border-slate-100/50">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="relative w-full lg:w-2/5 shrink-0">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
               <Input
                 placeholder="Search by Gate Pass or Vendor..."
-                className="pl-12 h-12 rounded-xl bg-slate-50/50 border-0 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full shadow-md shadow-slate-400"
+                className="pl-12 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full shadow-lg shadow-slate-200"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -128,7 +128,7 @@ const GinListPage = ({ type }: GinListPageProps) => {
             <div className="flex items-center gap-3 justify-end w-full lg:w-auto">
               <Button
                 variant="outline"
-                className="rounded-2xl hover:bg-indigo-50 transition-all font-black gap-3 h-12 px-8 bg-white shadow-md shadow-indigo active:scale-95 text-indigo-600 uppercase tracking-widest text-xs border-0"
+                className="rounded-2xl hover:bg-indigo-50 transition-all font-black gap-3 h-12 px-8 bg-white shadow-lg shadow-indigo-100 active:scale-95 text-indigo-600 uppercase tracking-widest text-xs border-1 border-indigo-100"
                 onClick={() =>
                   dispatch(
                     handleFetchGins({

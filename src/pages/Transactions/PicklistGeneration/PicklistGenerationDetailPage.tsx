@@ -52,10 +52,11 @@ const PicklistGenerationDetailPage = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedLines.length === (headerData?.db_line?.length || 0)) {
+    const lines = headerData?.lines || headerData?.db_line || [];
+    if (selectedLines.length === lines.length) {
       setSelectedLines([]);
     } else {
-      setSelectedLines((headerData?.db_line || []).map((l: any) => l.id));
+      setSelectedLines(lines.map((l: any) => l.id));
     }
   };
 
@@ -63,7 +64,8 @@ const PicklistGenerationDetailPage = () => {
     if (!headerData || selectedLines.length === 0) return;
 
     // Map selected IDs to item codes
-    const selectedItemCodes = headerData.db_line
+    const lines = headerData.lines || headerData.db_line || [];
+    const selectedItemCodes = lines
       .filter((l: any) => selectedLines.includes(l.id))
       .map((l: any) => l.itemcode);
 
@@ -145,7 +147,7 @@ const PicklistGenerationDetailPage = () => {
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-blue-500" />
               <span className="text-2xl font-black text-slate-900 tabular-nums">
-                {headerData.lines?.length || 0}
+                {(headerData.lines || headerData.db_line || []).length}
               </span>
             </div>
           </div>
@@ -163,8 +165,10 @@ const PicklistGenerationDetailPage = () => {
                     <Checkbox
                       checked={
                         selectedLines.length ===
-                          (headerData.lines?.length || 0) &&
-                        (headerData.lines?.length || 0) > 0
+                          (headerData.lines || headerData.db_line || [])
+                            .length &&
+                        (headerData.lines || headerData.db_line || []).length >
+                          0
                       }
                       onCheckedChange={handleSelectAll}
                       className="rounded-lg border-2 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
@@ -182,56 +186,53 @@ const PicklistGenerationDetailPage = () => {
                   <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap text-center">
                     Warehouse Name
                   </th>
-                  {/* <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                    Line ID
-                  </th> */}
-                  {/* <th className="px-8 py-5 text-right pr-12 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">Timestamp</th> */}
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {(headerData.db_line || []).map((line: any, idx: number) => (
-                  <tr
-                    key={line.id}
-                    className={`transition-all duration-300 border-b border-slate-100 last:border-0 group ${selectedLines.includes(line.id) ? "bg-blue-50/40" : "hover:bg-slate-50/50"}`}
-                  >
-                    <td className="px-8 py-5">
-                      <Checkbox
-                        checked={selectedLines.includes(line.id)}
-                        onCheckedChange={() => handleToggleLine(line.id)}
-                        className="rounded-lg border-2 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                      />
-                    </td>
-                    <td className="px-4 py-5 font-black text-slate-400 font-mono text-xs">
-                      {idx + 1}
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-sm font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
-                          {line.name}
-                        </span>
-                        {/* <div className="flex items-center gap-2">
+                {(headerData.lines || headerData.db_line || []).map(
+                  (line: any, idx: number) => (
+                    <tr
+                      key={line.id}
+                      className={`transition-all duration-300 border-b border-slate-100 last:border-0 group ${selectedLines.includes(line.id) ? "bg-blue-50/40" : "hover:bg-slate-50/50"}`}
+                    >
+                      <td className="px-8 py-5">
+                        <Checkbox
+                          checked={selectedLines.includes(line.id)}
+                          onCheckedChange={() => handleToggleLine(line.id)}
+                          className="rounded-lg border-2 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                        />
+                      </td>
+                      <td className="px-4 py-5 font-black text-slate-800 font-mono text-sm">
+                        {idx + 1}
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-sm font-black text-slate-900 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                            {line.name}
+                          </span>
+                          {/* <div className="flex items-center gap-2">
                           <Box className="w-3 h-3 text-slate-300" />
                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                             Ref ID: {line.lineid}
                           </span>
                         </div> */}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <Badge
-                        variant="outline"
-                        className="bg-slate-50 text-slate-600 border-slate-200 font-black text-sm px-3 py-1 rounded-lg"
-                      >
-                        {line.itemcode}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-5 text-center font-black text-slate-600 tabular-nums">
-                      {line.whsname || "---"}
-                    </td>
-                    {/* <td className="px-6 py-5 text-center font-black text-slate-400 tabular-nums">
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <Badge
+                          variant="outline"
+                          className="bg-slate-50 text-slate-600 border-slate-200 font-black text-sm px-3 py-1 rounded-lg"
+                        >
+                          {line.itemcode}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-5 text-center font-black text-slate-600 tabular-nums">
+                        {line.whsname || "---"}
+                      </td>
+                      {/* <td className="px-6 py-5 text-center font-black text-slate-400 tabular-nums">
                       {line.lineid}
                     </td> */}
-                    {/* <td className="px-8 py-5 text-right pr-12">
+                      {/* <td className="px-8 py-5 text-right pr-12">
                       <div className="flex flex-col items-end gap-1">
                         <span className="text-[10px] font-black text-slate-600 uppercase">
                           {new Date(line.created_at).toLocaleDateString()}
@@ -242,8 +243,9 @@ const PicklistGenerationDetailPage = () => {
                         </div>
                       </div>
                     </td> */}
-                  </tr>
-                ))}
+                    </tr>
+                  ),
+                )}
               </tbody>
             </table>
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, Badge, Button, Input } from "@/components/ui";
 import {
   Search,
@@ -33,20 +33,63 @@ const FlowthroughTransferPage = () => {
     dispatch(handleFetchOutwardRequests({ page: 1, size: 100 }));
   }, [dispatch]);
 
-  // FILTER: Grpo Doc Entry must NOT be null or empty for Flowthrough
+  // FILTER: Grpo Doc Entry must NOT be null, empty, 'N', 'N/A' or 'null' for Flowthrough
   const flowthroughHeaders = outwardData.filter(
     (row: any) =>
       row.grpo_docentry !== null &&
       row.grpo_docentry !== undefined &&
-      String(row.grpo_docentry).trim() !== "",
+      String(row.grpo_docentry).trim() !== "" &&
+      String(row.grpo_docentry).trim().toUpperCase() !== "N" &&
+      String(row.grpo_docentry).trim().toUpperCase() !== "N/A" &&
+      String(row.grpo_docentry).trim().toLowerCase() !== "null",
   );
 
-  const filteredData = flowthroughHeaders.filter((row: any) => {
+  // GROUP BY GRPO: Group headers by their grpo_docentry
+  const groupedHeaders = useMemo(() => {
+    const groups: { [key: string]: any } = {};
+    flowthroughHeaders.forEach((row: any) => {
+      const grpo = String(row.grpo_docentry).trim();
+      if (!groups[grpo]) {
+        groups[grpo] = {
+          ...row,
+          lines: [...(row.lines || [])],
+          allDocEntries: [row.docentry],
+          allDocNums: [row.docnum],
+        };
+      } else {
+        // Merge lines, ensuring uniqueness
+        const existingLines = groups[grpo].lines;
+        (row.lines || []).forEach((newLine: any) => {
+          const isDuplicate = existingLines.some(
+            (el: any) =>
+              el.itemcode === newLine.itemcode && el.lineid === newLine.lineid,
+          );
+          if (!isDuplicate) {
+            existingLines.push(newLine);
+          }
+        });
+        if (!groups[grpo].allDocEntries.includes(row.docentry)) {
+          groups[grpo].allDocEntries.push(row.docentry);
+        }
+        if (!groups[grpo].allDocNums.includes(row.docnum)) {
+          groups[grpo].allDocNums.push(row.docnum);
+        }
+      }
+    });
+    return Object.values(groups);
+  }, [flowthroughHeaders]);
+
+  const filteredData = groupedHeaders.filter((row: any) => {
     const searchStr = searchTerm.toLowerCase();
     return (
-      (row.docnum || "").toString().toLowerCase().includes(searchStr) ||
-      (row.docentry || "").toString().toLowerCase().includes(searchStr) ||
-      (row.doctype || "").toLowerCase().includes(searchStr)
+      (row.grpo_docentry || "").toString().toLowerCase().includes(searchStr) ||
+      (row.doctype || "").toLowerCase().includes(searchStr) ||
+      row.allDocEntries.some((d: any) =>
+        (d || "").toString().toLowerCase().includes(searchStr),
+      ) ||
+      row.allDocNums.some((d: any) =>
+        (d || "").toString().toLowerCase().includes(searchStr),
+      )
     );
   });
 
@@ -88,15 +131,15 @@ const FlowthroughTransferPage = () => {
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
             <Input
-              placeholder="Search by DocNum or DocEntry..."
-              className="pl-12 h-12 w-80 rounded-2xl bg-slate-50 border-0 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-black shadow-inner"
+              placeholder="Search by GRPO No ..."
+              className="pl-12 h-12 w-80 rounded-2xl bg-slate-50 border-1 border-slate-200 shadow-lg shadow-slate-300 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-2xl bg-white hover:bg-slate-50 border-0 shadow-lg shadow-slate-100 font-black text-[10px] uppercase tracking-widest text-slate-600 flex gap-2 active:scale-95 transition-all"
+            className="h-12 px-6 rounded-2xl bg-white hover:bg-slate-50 border-1 border-slate-200 shadow-lg shadow-slate-300 font-black text-[10px] uppercase tracking-widest text-slate-600 flex gap-2 active:scale-95 transition-all"
             onClick={() =>
               dispatch(
                 handleFetchOutwardRequests({
@@ -169,11 +212,11 @@ const FlowthroughTransferPage = () => {
                 ) : (
                   paginatedData.map((row: any, idx) => (
                     <tr
-                      key={row.id}
+                      key={row.grpo_docentry}
                       className="hover:bg-indigo-50/30 transition-all duration-300 border-b border-slate-100 last:border-0 group cursor-pointer"
                       onClick={() =>
                         navigate(
-                          `/transactions/flow-through/transfer/${row.id}`,
+                          `/transactions/flow-through/transfer/${row.grpo_docentry}`,
                         )
                       }
                     >
@@ -228,7 +271,7 @@ const FlowthroughTransferPage = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(
-                              `/transactions/flow-through/transfer/${row.id}`,
+                              `/transactions/flow-through/transfer/${row.grpo_docentry}`,
                             );
                           }}
                         >

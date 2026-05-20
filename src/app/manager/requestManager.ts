@@ -149,10 +149,16 @@ export const handleFetchOnwardPicklist =
       );
 
       if (response.data.status) {
+        const rawData = response.data.data;
+        const dataArray = Array.isArray(rawData)
+          ? rawData
+          : (rawData && Array.isArray(rawData.items))
+          ? rawData.items
+          : [];
         dispatch(
           onwardLoadSuccess({
-            data: response.data.data || [],
-            total: response.data.data.length,
+            data: dataArray,
+            total: dataArray.length,
           }),
         );
         return true;

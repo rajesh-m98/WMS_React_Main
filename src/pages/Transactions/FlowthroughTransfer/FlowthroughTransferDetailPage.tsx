@@ -36,9 +36,34 @@ const FlowthroughTransferDetailPage = () => {
     (state) => state.request.outward,
   );
 
-  const headerData = useMemo(() => {
-    return outwardData.find((h) => String(h.id) === String(id));
+  const headersForGrpo = useMemo(() => {
+    return outwardData.filter((h) => String(h.grpo_docentry).trim() === String(id).trim());
   }, [outwardData, id]);
+
+  const headerData = useMemo(() => {
+    if (headersForGrpo.length === 0) return null;
+
+    const firstHeader = headersForGrpo[0];
+    const combinedLines: any[] = [];
+
+    headersForGrpo.forEach((h) => {
+      (h.lines || []).forEach((line: any) => {
+        // Ensure uniqueness by itemcode and lineid
+        const isDuplicate = combinedLines.some(
+          (el) => String(el.itemcode).trim() === String(line.itemcode).trim() &&
+                  String(el.lineid).trim() === String(line.lineid).trim()
+        );
+        if (!isDuplicate) {
+          combinedLines.push(line);
+        }
+      });
+    });
+
+    return {
+      ...firstHeader,
+      lines: combinedLines,
+    };
+  }, [headersForGrpo]);
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "---";
@@ -193,7 +218,7 @@ const FlowthroughTransferDetailPage = () => {
                     </td>
                     <td className="px-6 py-5 text-center">
                       <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-4 py-1.5 rounded-xl shadow-sm shadow-emerald-100/50">
-                        {line.quantity || 0}
+                        {line.quantity || line.qty || line.openqty || line.openQty || line.open_qty || 0}
                       </span>
                     </td>
                   </tr>

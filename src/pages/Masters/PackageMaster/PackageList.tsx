@@ -61,6 +61,7 @@ import Barcode from "react-barcode";
 import { useReactToPrint } from "react-to-print";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
+import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 
 const PAGE_SIZE = 10;
 
@@ -107,6 +108,15 @@ export const PackageList = () => {
     loading,
     totalCount,
   } = useAppSelector((state) => state.package);
+  const { data: warehouses } = useAppSelector((state) => state.warehouse);
+
+  const getWarehouseNameByCode = (code: string): string => {
+    if (!code) return "Warehouse";
+    const found = warehouses.find(
+      (w) => w.warehouse_code?.toLowerCase() === code.toLowerCase(),
+    );
+    return found ? found.warehouse_name : "Warehouse";
+  };
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
@@ -210,6 +220,7 @@ export const PackageList = () => {
   };
 
   useEffect(() => {
+    dispatch(handleFetchAllWarehouses({ is_paginate: false }));
     return () => {
       dispatch(clearPackages());
     };
@@ -223,19 +234,6 @@ export const PackageList = () => {
       }),
     );
   }, [dispatch, debouncedSearch]);
-
-  const handleRemove = async (id: number) => {
-    const success = await dispatch(handleDeletePackage(id));
-    if (success) {
-      toast.success("Package removed successfully");
-      dispatch(
-        handleFetchAllPackages({
-          is_paginate: false,
-          search: debouncedSearch,
-        }),
-      );
-    }
-  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -322,7 +320,7 @@ export const PackageList = () => {
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <Input
-              placeholder="Search assets..."
+              placeholder="Search By Warehouse Name ..."
               className="pl-12 h-12 w-80 rounded-lg bg-slate-50 border-1 border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-50 text-sm font-black shadow-lg shadow-slate-300"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -356,9 +354,6 @@ export const PackageList = () => {
                   <TableHead className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     Generated Barcodes
                   </TableHead>
-                  {/* <TableHead className="px-8 py-5 text-right pr-12 text-[11px] font-black text-slate-500 uppercase tracking-widest">
-                    Actions
-                  </TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -391,16 +386,16 @@ export const PackageList = () => {
                         navigate(`/masters/packages/detail/${pkg.whscode}`)
                       }
                     >
-                      <TableCell className="px-8 py-5 font-black text-slate-400 font-mono text-xs">
+                      <TableCell className="px-8 py-5 font-black text-slate-700 text-sm">
                         {(page - 1) * PAGE_SIZE + idx + 1}
                       </TableCell>
                       <TableCell className="px-6 py-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-                            <Warehouse className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100">
+                            <Warehouse className="w-4 h-4 text-blue-600 group-hover:text-blue-600 transition-colors" />
                           </div>
                           <span className="text-sm font-black text-slate-900 uppercase tracking-tight">
-                            {pkg.whscode}
+                            {getWarehouseNameByCode(pkg.whscode)}
                           </span>
                         </div>
                       </TableCell>
@@ -417,19 +412,6 @@ export const PackageList = () => {
                           {pkg.count} Barcodes
                         </Badge>
                       </TableCell>
-                      {/* <TableCell className="px-8 py-5 text-right pr-12">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-10 w-10 rounded-2xl bg-slate-200 text-slate-700 shadow-lg shadow-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/masters/packages/detail/${pkg.whscode}`);
-                          }}
-                        >
-                          <ImageIcon className="w-4 h-4" />
-                        </Button>
-                      </TableCell> */}
                     </TableRow>
                   ))
                 )}
