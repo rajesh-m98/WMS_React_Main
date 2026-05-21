@@ -8,7 +8,7 @@
     "addUserBtn": "Add New User",
     "noUsersFound": "No users registered in the system.",
     "noResultsFound": "No users found matching your current search or filters.",
-    "totalUsersLabel": "Total system users:",
+    "totalUsersLabel": "Total Users:",
     "pagination": {
       "prev": "Previous",
       "next": "Next"
@@ -21,10 +21,8 @@
     },
     "table": {
       "id": "S.No",
-      "userId": "User ID",
+      "userId": "User Name",
       "employeeId": "Emp ID",
-      "fullName": "Full Name",
-      "username": "Username",
       "role": "Role",
       "department": "Department",
       "status": "Status",
@@ -58,7 +56,7 @@
     },
     "create": {
       "title": "Create New User",
-      "subtitle": "Register a new operator or admin",
+      "subtitle": "Register a new operator",
       "basicSection": "Basic Information",
       "mappingSection": "Device & Outlet Mapping",
       "permissionsSection": "Module Access Permissions",
@@ -91,8 +89,7 @@
       { "label": "Sorting", "key": "sorting" },
       { "label": "Putaway", "key": "putaway" },
       { "label": "Picking", "key": "picking" },
-      { "label": "Dispatch", "key": "dispatch" },
-      { "label": "Bin Transfer", "key": "bin_transfer" }
+      { "label": "Dispatch", "key": "dispatch" }
     ]
   }
 }

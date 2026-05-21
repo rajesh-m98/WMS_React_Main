@@ -26,6 +26,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
+import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 
 const PicklistDispatchPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ const PicklistDispatchPage = () => {
   const { data: dispatchData, loading } = useAppSelector(
     (state) => state.dispatch,
   );
+  const { data: warehouses } = useAppSelector((state) => state.warehouse);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -41,7 +44,16 @@ const PicklistDispatchPage = () => {
 
   useEffect(() => {
     dispatch(handleFetchDispatchHistory({ page: 1, size: 100 }));
+    dispatch(handleFetchAllWarehouses({ page: 1, size: 100 }));
   }, [dispatch]);
+
+  const getWarehouseNameByCode = (code: string): string => {
+    if (!code) return "Unknown Warehouse";
+    const found = warehouses.find(
+      (w) => w.warehouse_code?.toLowerCase() === code.toLowerCase(),
+    );
+    return found ? found.warehouse_name : "Unknown Warehouse";
+  };
 
   // FILTER: Grpo Doc Entry must BE NULL for Picklist Dispatch
   const picklistData = dispatchData.filter(
@@ -90,10 +102,11 @@ const PicklistDispatchPage = () => {
       if (!whsMap.has(key)) {
         whsMap.set(key, {
           whscode: key,
-          whsname: row.whsname || "----",
+          whsname: row.whsname || getWarehouseNameByCode(key),
           total_items: new Set(),
           total_qty: 0,
           outward_count: new Set(),
+          doc_entries: new Set(),
           last_updated: row.created_at,
         });
       }
@@ -103,11 +116,18 @@ const PicklistDispatchPage = () => {
       if (row.id) {
         existing.outward_count.add(row.id);
       }
+      if (row.doc_entry) {
+        existing.doc_entries.add(row.doc_entry);
+      }
       if (new Date(row.created_at) > new Date(existing.last_updated)) {
         existing.last_updated = row.created_at;
       }
     });
-    return Array.from(whsMap.values());
+    
+    return Array.from(whsMap.values()).map((whs: any) => ({
+      ...whs,
+      doc_entry: Array.from(whs.doc_entries).join(", ") || "----",
+    }));
   }, [picklistData]);
 
   const filteredData = groupedWarehouses.filter((whs: any) => {
@@ -255,7 +275,7 @@ const PicklistDispatchPage = () => {
                     Total Qty
                   </th>
                   <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                    Outward IDs
+                    Doc Entry
                   </th>
                   <th className="px-8 py-5 text-right pr-12 text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     Actions
@@ -296,7 +316,7 @@ const PicklistDispatchPage = () => {
                         )
                       }
                     >
-                      <td className="px-8 py-5 font-black text-slate-400 font-mono text-xs">
+                      <td className="px-8 py-5 font-black text-slate-600 text-sm">
                         {(page - 1) * itemsPerPage + idx + 1}
                       </td>
                       <td className="px-6 py-5">
@@ -311,7 +331,7 @@ const PicklistDispatchPage = () => {
                       </td>
                       <td className="px-6 py-5 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <Package className="w-3.5 h-3.5 text-slate-300" />
+                          <Package className="w-4 h-4 text-slate-300" />
                           <span className="text-sm font-black text-slate-700">
                             {whs.total_items.size}{" "}
                             {whs.total_items.size === 1 ? "Item" : "Items"}
@@ -327,7 +347,7 @@ const PicklistDispatchPage = () => {
                         <div className="flex items-center justify-center gap-2">
                           <TrendingUp className="w-3.5 h-3.5 text-sky-400" />
                           <span className="text-sm font-black text-slate-600">
-                            {whs.outward_count.size}
+                            {whs.doc_entry}
                           </span>
                         </div>
                       </td>

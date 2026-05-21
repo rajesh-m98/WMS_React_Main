@@ -42,7 +42,7 @@ const UserCreate = () => {
     username: "",
     email: "",
     mobile_number: "",
-    role: "3", // Standard User
+    role: "4", // Warehouse Picker
     password: "",
     device: "0",
     outlet: "1",
@@ -129,36 +129,33 @@ const UserCreate = () => {
           variant="ghost"
           size="icon"
           onClick={() => navigate("/masters/users")}
-          className="rounded-full hover:bg-slate-100 h-10 w-10 transition-all border border-slate-100 bg-white"
+          className="rounded-full bg-slate-300 border-1 border-slate-400 shadow-lg shadow-slate-300 h-10 w-10 transition-all bg-white"
         >
           <ChevronLeft className="h-5 w-5 text-slate-600" />
         </Button>
         <div>
           <h2 className="heading-section !text-2xl">{strings.title}</h2>
-          <p className="label-bold !text-slate-400 italic">
-            {strings.subtitle.toUpperCase()}
-          </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8" autoComplete="off">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
-            <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
-              <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
-                <UserPlus className="icon-sm" /> Personal & Account Data
+          <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl bg-white">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-200 py-3 px-6">
+              <CardTitle className="text-2xl text-slate-500 flex items-center gap-2">
+                <UserPlus className="icon-md w-5 h-5" /> USER DATA
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    User ID
+                  <Label className="label-bold text-slate-800 uppercase text-sm">
+                    User Name
                   </Label>
                   <Input
-                    placeholder="e.g. USR006"
+                    placeholder="Enter Your User Name"
                     autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong text-sm text-slate-750"
                     required
                     value={formData.userId}
                     onChange={(e) =>
@@ -167,13 +164,13 @@ const UserCreate = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                  <Label className="label-bold text-slate-800 uppercase text-sm">
                     Employee ID
                   </Label>
                   <Input
                     placeholder="EMP-001"
                     autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 font-mono"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong text-sm text-slate-750"
                     required
                     value={formData.employee_id}
                     onChange={(e) =>
@@ -185,130 +182,24 @@ const UserCreate = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    First Name
-                  </Label>
-                  <Input
-                    placeholder="John"
-                    autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                    required
-                    value={formData.firstname}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstname: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    Last Name
-                  </Label>
-                  <Input
-                    placeholder="Doe"
-                    autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                    required
-                    value={formData.lastname}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastname: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    Username
-                  </Label>
-                  <Input
-                    placeholder="johndoe"
-                    autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                    required
-                    value={formData.username}
-                    onChange={(e) =>
-                      setFormData({ ...formData, username: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    Email Address
-                  </Label>
-                  <Input
-                    type="email"
-                    autoComplete="off"
-                    placeholder="john@example.com"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
-                    required
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    Phone Number
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 bg-white z-10 text-sm">
-                      +91
-                    </span>
-                    <Input
-                      type="tel"
-                      placeholder="9876543210"
-                      autoComplete="off"
-                      maxLength={10}
-                      className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 pl-14"
-                      required
-                      value={formData.mobile_number}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, "");
-                        if (value.length > 0) {
-                          const firstDigit = parseInt(value[0]);
-                          if (firstDigit < 6) return;
-                        }
-                        setFormData({
-                          ...formData,
-                          mobile_number: value,
-                        });
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                  <Label className="label-bold text-slate-800 uppercase text-sm">
                     System Role
                   </Label>
-                  <Select
-                    value={formData.role}
-                    onValueChange={(v) => setFormData({ ...formData, role: v })}
-                  >
-                    <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      <SelectItem value="1">Admin</SelectItem>
-                      <SelectItem value="2">Super User</SelectItem>
-                      <SelectItem value="3">Standard User</SelectItem>
-                      <SelectItem value="4">Warehouse Picker</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value="Warehouse User"
+                    disabled
+                    className="rounded-xl h-11 bg-slate-50 border-[2px] border-slate-200 body-strong text-sm text-slate-750 cursor-not-allowed"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                  <Label className="label-bold text-slate-800 uppercase text-sm">
                     Access Password
                   </Label>
                   <Input
                     type="password"
                     autoComplete="new-password"
                     placeholder="••••••••"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong text-sm text-slate-750"
                     required
                     value={formData.password}
                     onChange={(e) =>
@@ -317,25 +208,15 @@ const UserCreate = () => {
                   />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
-            <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-3 px-6">
-              <CardTitle className="caption-small !text-slate-500 flex items-center gap-2">
-                <Building2 className="icon-sm" /> Facility mapping
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
+                  <Label className="label-bold text-slate-800 uppercase text-sm">
                     Department
                   </Label>
                   <Input
                     placeholder="Operations"
                     autoComplete="off"
-                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900"
+                    className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong text-sm text-slate-750"
                     required
                     value={formData.department}
                     onChange={(e) =>
@@ -344,124 +225,64 @@ const UserCreate = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                    Warehouse Outlet
+                  <Label className="label-bold text-slate-800 uppercase text-sm">
+                    Status
                   </Label>
-                  <Select
-                    value={formData.outlet}
-                    onValueChange={(v) =>
-                      setFormData({ ...formData, outlet: v })
-                    }
-                  >
-                    <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-slate-200 shadow-xl">
-                      <SelectItem value="1">Main Warehouse (Global)</SelectItem>
-                      <SelectItem value="2">Central Hub - MUM01</SelectItem>
-                      <SelectItem value="3">North Hub - DEL01</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value="Active"
+                    disabled
+                    className="rounded-xl h-11 bg-slate-50 border-[2px] border-slate-200 body-strong text-sm text-slate-750 cursor-not-allowed"
+                  />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label className="label-bold !text-slate-400 uppercase text-[10px]">
-                  Assigned Device
-                </Label>
-                <Select
-                  value={formData.device}
-                  onValueChange={(v) => setFormData({ ...formData, device: v })}
-                >
-                  <SelectTrigger className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong !text-slate-900">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="0">Auto-Assign Later</SelectItem>
-                    <SelectItem value="1">Device 01 - Scanner</SelectItem>
-                    <SelectItem value="2">Device 02 - Tablet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                <p className="caption-small !text-slate-900">System Note</p>
-                <p className="body-main !text-sm !text-slate-500 leading-relaxed italic">
-                  New users are created with 'Active' status by default. Initial
-                  permissions must be audited after saving.
-                </p>
+            </CardContent>
+          </Card>
+          <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl bg-white">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-200 py-4 px-8">
+              <CardTitle className="text-2xl text-slate-500 flex items-center justify-between">
+                <span>USER PERMISSIONS</span>
+                <div className="flex items-center gap-3">
+                  <span className="body-strong text-sm text-slate-500 uppercase tracking-widest">
+                    Select All
+                  </span>
+                  <Checkbox
+                    className="h-7 w-7 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                    checked={readPages.length === permissionsList.length}
+                    onCheckedChange={() => toggleAll("read")}
+                  />
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+                {permissionsList.map((p: any) => (
+                  <label
+                    key={p.key}
+                    htmlFor={p.key}
+                    className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-blue-50/30 transition-colors cursor-pointer"
+                  >
+                    <span className="body-strong text-sm !text-slate-800 uppercase">
+                      {p.label}
+                    </span>
+                    <Checkbox
+                      id={p.key}
+                      className="h-5 w-5 border-slate-300 bg-white data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 transition-all rounded-md shadow-sm"
+                      checked={readPages.includes(p.key)}
+                      onCheckedChange={() => togglePermission(p.key, "read")}
+                    />
+                  </label>
+                ))}
               </div>
             </CardContent>
           </Card>
         </div>
-
-        <Card className="border-0 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden bg-white">
-          <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-8">
-            <CardTitle className="caption-small !text-slate-500 flex items-center justify-between">
-              <span>Module Access Matrix</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <div className="min-w-[1000px]">
-                  {/* Header Row: Module Names */}
-                  <div className="grid grid-cols-[180px_repeat(7,1fr)] bg-slate-50 border-b border-slate-100 items-center">
-                    <div className="p-4 border-r border-slate-100">
-                      <span className="body-strong !text-slate-500 uppercase tracking-widest !text-[11px] whitespace-nowrap">
-                        Modules \ Access
-                      </span>
-                    </div>
-                    {permissionsList.map((p: any) => (
-                      <div
-                        key={p.key}
-                        className="p-4 text-center border-r border-slate-100 last:border-r-0"
-                      >
-                        <span className="body-strong text-[14px] !text-slate-800 uppercase whitespace-nowrap">
-                          {p.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
- 
-                  <div className="grid grid-cols-[180px_repeat(7,1fr)] items-center border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
-                    <div className="p-4 bg-slate-50/50 border-r border-slate-100 flex items-center justify-between">
-                      <span className="body-strong text-[14px] !text-blue-600 uppercase">
-                        Access
-                      </span>
-                      <Checkbox
-                        className="h-4 w-4 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                        checked={readPages.length === permissionsList.length}
-                        onCheckedChange={() => toggleAll("read")}
-                      />
-                    </div>
-                    {permissionsList.map((p: any) => (
-                      <div
-                        key={p.key}
-                        className="p-4 flex justify-center border-r border-slate-50 last:border-r-0"
-                      >
-                        <Checkbox
-                          className="h-6 w-6 border-slate-200 bg-slate-50 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 transition-all rounded-lg"
-                          checked={readPages.includes(p.key)}
-                          onCheckedChange={() =>
-                            togglePermission(p.key, "read")
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         <div className="flex justify-end gap-3 pt-4">
           <Button
             type="button"
             variant="ghost"
             onClick={() => navigate("/masters/users")}
-            className="rounded-xl px-10 transition-all body-strong uppercase tracking-widest text-xs h-11 hover:bg-slate-100"
+            className="rounded-xl px-10 shadow-md shadow-slate-400 bg-white hover:bg-red-500 hover:text-white text-black transition-all body-strong uppercase tracking-widest text-xs h-11"
           >
             {strings.discardBtn}
           </Button>

@@ -8,6 +8,7 @@ import {
   CardHeader,
   Input,
 } from "@/components/ui";
+import { setFromDate, setToDate } from "@/app/store/ginSlice";
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,6 +16,8 @@ import {
   Loader2,
   RefreshCw,
   Search,
+  X,
+  Calendar,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +31,7 @@ const PAGE_SIZE = 10;
 const GinListPage = ({ type }: GinListPageProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { flowThroughItems, putawayItems, loading } = useAppSelector(
+  const { flowThroughItems, putawayItems, loading, fromDate, toDate } = useAppSelector(
     (state) => state.gin,
   );
   const items = type === "putaway" ? putawayItems : flowThroughItems;
@@ -93,18 +96,33 @@ const GinListPage = ({ type }: GinListPageProps) => {
           card_code: header.card_code || "N/A",
           status: header.status,
           id: header.id || item.id,
+          created_at: header.created_at || item.created_at,
         });
       }
     });
     return Array.from(gpMap.values());
   }, [items]);
 
-  const filteredGPs = uniqueGPs.filter(
-    (gp: any) =>
+  const filteredGPs = uniqueGPs.filter((gp: any) => {
+    const searchMatch =
       gp.gate_pass_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       gp.card_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      gp.card_code.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      gp.card_code.toLowerCase().includes(searchTerm.toLowerCase());
+
+    let dateMatch = true;
+    if ((fromDate || toDate) && gp.created_at) {
+      const rowDate = new Date(gp.created_at).toISOString().split("T")[0];
+      if (fromDate && toDate) {
+        dateMatch = rowDate >= fromDate && rowDate <= toDate;
+      } else if (fromDate) {
+        dateMatch = rowDate >= fromDate;
+      } else if (toDate) {
+        dateMatch = rowDate <= toDate;
+      }
+    }
+
+    return searchMatch && dateMatch;
+  });
 
   const paginatedGPs = filteredGPs.slice(
     (page - 1) * PAGE_SIZE,
@@ -115,15 +133,57 @@ const GinListPage = ({ type }: GinListPageProps) => {
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <Card className="border border-slate-100 p-4 shadow-[0_0_25px_rgba(0,0,0,0.06),0_10px_20px_rgba(0,0,0,0.04)] rounded-[32px] overflow-hidden bg-white">
         <CardHeader className="p-5 border-b border-slate-100/50">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div className="relative w-full lg:w-2/5 shrink-0">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
-              <Input
-                placeholder="Search by Gate Pass or Vendor..."
-                className="pl-12 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full shadow-lg shadow-slate-200"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          <div className="flex flex-col xl:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col lg:flex-row items-center gap-4 w-full xl:w-3/4 shrink-0">
+              <div className="relative w-full lg:w-1/3">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
+                <Input
+                  placeholder="Search by GP or Vendor..."
+                  className="pl-12 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all body-main !text-sm w-full shadow-lg shadow-slate-200"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2 w-full lg:w-2/3">
+                <div className="relative w-1/2">
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => {
+                      dispatch(setFromDate(e.target.value));
+                      setPage(1);
+                    }}
+                    className="pl-10 pr-4 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-xs font-bold shadow-lg shadow-slate-200 w-full"
+                  />
+                  <span className="absolute -top-2.5 left-4 px-1 bg-white text-[10px] font-black uppercase text-slate-400 tracking-wider">From</span>
+                </div>
+                <div className="relative w-1/2">
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => {
+                      dispatch(setToDate(e.target.value));
+                      setPage(1);
+                    }}
+                    className="pl-10 pr-10 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-xs font-bold shadow-lg shadow-slate-200 w-full"
+                  />
+                  <span className="absolute -top-2.5 left-4 px-1 bg-white text-[10px] font-black uppercase text-slate-400 tracking-wider">To</span>
+                  {(fromDate || toDate) && (
+                    <button
+                      onClick={() => {
+                        dispatch(setFromDate(""));
+                        dispatch(setToDate(""));
+                        setPage(1);
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-slate-200 hover:bg-rose-100 text-slate-500 hover:text-rose-600 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="flex items-center gap-3 justify-end w-full lg:w-auto">
               <Button

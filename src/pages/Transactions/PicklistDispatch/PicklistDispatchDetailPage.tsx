@@ -109,20 +109,12 @@ const PicklistDispatchDetailPage = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-4">
-            <div className="flex flex-col">
+            <div className="flex  items-center gap-2">
+              <Warehouse className="w-7 h-7 text-sky-500" />
               <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
                 {whsName}
               </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <Warehouse className="w-3.5 h-3.5 text-sky-500" />
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Storage Location Dispatch Detail
-                </span>
-              </div>
             </div>
-            <Badge className="bg-sky-600 text-white border-0 font-black text-sm px-3 py-1 rounded-lg shadow-lg shadow-sky-100">
-              {whsCode}
-            </Badge>
           </div>
         </div>
 
@@ -132,7 +124,7 @@ const PicklistDispatchDetailPage = () => {
               Items Count
             </span>
             <div className="flex items-center gap-2">
-              <Box className="w-4 h-4 text-sky-500" />
+              <Box className="w-4.5 h-4.5 text-sky-500" />
               <span className="text-2xl font-black text-slate-900 tabular-nums">
                 {uniqueItemCount}
               </span>
@@ -144,7 +136,7 @@ const PicklistDispatchDetailPage = () => {
               Total Dispatch Qty
             </span>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
+              <TrendingUp className="w-4.5 h-4.5 text-emerald-500" />
               <span className="text-2xl font-black text-slate-900 tabular-nums">
                 {totalQty}
               </span>
@@ -169,9 +161,7 @@ const PicklistDispatchDetailPage = () => {
                   <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     Item Code
                   </th>
-                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                    Outward ID
-                  </th>
+
                   <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
                     Quantity
                   </th>
@@ -194,9 +184,6 @@ const PicklistDispatchDetailPage = () => {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-                          <Package className="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors" />
-                        </div>
                         <span className="text-sm font-black text-slate-900 uppercase">
                           {detail.item_name}
                         </span>
@@ -210,16 +197,9 @@ const PicklistDispatchDetailPage = () => {
                         {detail.item_code}
                       </Badge>
                     </td>
-                    <td className="px-6 py-5">
-                      <Badge
-                        variant="outline"
-                        className="bg-sky-50 text-sky-600 border-sky-100 font-black text-sm px-3 py-1 rounded-lg"
-                      >
-                        #{detail.id}
-                      </Badge>
-                    </td>
+
                     <td className="px-6 py-5 text-center">
-                      <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-4 py-1.5 rounded-xl">
+                      <span className="text-sm font-black text-emerald-600 bg-emerald-100 px-4 py-1.5 rounded-xl">
                         {detail.qty || 1}
                       </span>
                     </td>

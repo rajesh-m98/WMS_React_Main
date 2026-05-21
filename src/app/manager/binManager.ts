@@ -126,16 +126,24 @@ export const handleExportBins = () => async (dispatch: AppDispatch, getState: ()
 /**
  * Process Import (Demo simulation for now, since it requires mass-creation API)
  */
-export const handleImportBins = (jsonData: any[]) => async (dispatch: AppDispatch) => {
-  if (!jsonData || jsonData.length === 0) return;
+export const handleImportBins = (file: File) => async (dispatch: AppDispatch) => {
+  if (!file) return;
   
-  toast.info(`Importing ${jsonData.length} bin records... This is a demo simulation.`);
+  toast.info(`Uploading file ${file.name}...`);
   
-  // Real implementation would either loop through handleCreateOrUpdateBin 
-  // or use a dedicated Bulk Upload API.
-  
-  setTimeout(() => {
-    toast.success("Import complete (simulation)");
-    dispatch(handleFetchBins());
-  }, 1000);
+  try {
+    const formData = new FormData();
+    formData.append("layerconfigdetails", file);
+
+    const response = await api.post(API_ENDPOINTS.MASTERS.BINS_BULK_IMPORT, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    toast.success("Import successful");
+    dispatch(handleFetchBins({ warehouseid: 1 }));
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || err.message || "Network error during import");
+  }
 };

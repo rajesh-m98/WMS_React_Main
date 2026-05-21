@@ -113,8 +113,8 @@ const HSTEdit = () => {
   }, [devices, id, isNew, loading, isInitialized, layerConfigs]);
 
   const handleSubmit = async () => {
-    if (!formData.device_id || !formData.device_serial_number) {
-      toast.error("Required fields: Device ID and Serial Number");
+    if (!formData.device_serial_number) {
+      toast.error("Required fields: Serial Number");
       return;
     }
 
@@ -188,20 +188,7 @@ const HSTEdit = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <div className="space-y-1">
-                  <Label className="pl-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Device ID
-                  </Label>
-                  <Input
-                    value={formData.device_id}
-                    onChange={(e) =>
-                      setFormData({ ...formData, device_id: e.target.value })
-                    }
-                    disabled={!isNew}
-                    className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
-                    placeholder="DEV-001"
-                  />
-                </div>
+
                 <div className="md:col-span-2 space-y-1">
                   <Label className="pl-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     Device Name

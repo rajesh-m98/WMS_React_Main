@@ -46,7 +46,11 @@ import config from "./HSTConfig.json";
 export const HSTMaster = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { data: devices, loading, totalCount } = useAppSelector((state) => state.hst);
+  const {
+    data: devices,
+    loading,
+    totalCount,
+  } = useAppSelector((state) => state.hst);
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -81,7 +85,6 @@ export const HSTMaster = () => {
 
   const filteredDevices = devices.filter(
     (d) =>
-      d.device_id.toLowerCase().includes(search.toLowerCase()) ||
       d.device_serial_number.toLowerCase().includes(search.toLowerCase()) ||
       (d.device_name &&
         d.device_name.toLowerCase().includes(search.toLowerCase())) ||
@@ -100,14 +103,14 @@ export const HSTMaster = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-[2rem] border-b-4 border-slate-200 shadow-xl shadow-slate-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border-1 border-slate-200 shadow-lg shadow-slate-300">
         <div className="relative group flex-1 max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
           <Input
-            placeholder="Search Device ID / Name / Serial..."
+            placeholder="Search By Device Name ..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-11 pr-6 h-14 w-full rounded-2xl bg-white border-2 border-slate-100 focus:border-blue-600 focus:ring-4 focus:ring-blue-50 transition-all text-sm font-black uppercase tracking-wider shadow-lg shadow-slate-50/50"
+            className="pl-11 pr-6 h-14 w-full rounded-2xl bg-white border-2 border-slate-200 shadow-md shadow-slate-200 text-slate-800"
           />
         </div>
 
@@ -118,7 +121,9 @@ export const HSTMaster = () => {
             disabled={loading}
             className="h-14 px-6 rounded-2xl bg-white border-2 border-slate-100 text-slate-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-md group flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${loading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
+            />
             {loading ? "Refreshing..." : "Refresh"}
           </Button>
           <Button
@@ -130,7 +135,7 @@ export const HSTMaster = () => {
         </div>
       </div>
 
-      <Card className="border-0 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative rounded-[2rem] overflow-hidden bg-white">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
         {loading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
             <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
@@ -139,12 +144,9 @@ export const HSTMaster = () => {
         <CardContent className="p-0 overflow-x-auto">
           <Table className="min-w-[1000px]">
             <TableHeader>
-              <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-300">
+              <TableRow className="bg-slate-100 hover:bg-slate-100 border-b border-slate-300">
                 <TableHead className="px-6 py-5 text-[10px] font-black text-slate-900 uppercase tracking-widest">
                   {config.strings.table.slNo}
-                </TableHead>
-                <TableHead className="px-6 py-5 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                  {config.strings.table.deviceId}
                 </TableHead>
                 <TableHead className="px-4 py-5 text-[10px] font-black text-slate-900 uppercase tracking-widest">
                   {config.strings.table.deviceName}
@@ -172,33 +174,30 @@ export const HSTMaster = () => {
                   key={d.id}
                   className="border-b border-slate-50 hover:bg-blue-50/30 transition-colors group"
                 >
-                  <TableCell className="px-6 py-4 font-mono text-xs font-black text-blue-600">
+                  <TableCell className="px-6 py-4 text-sm font-black text-slate-700">
                     {(page - 1) * PAGE_SIZE + index + 1}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 font-mono text-xs font-black text-blue-600">
-                    {d.device_id}
                   </TableCell>
                   <TableCell className="px-4 py-4 font-black text-slate-900 text-sm">
                     {d.device_name || "-"}
                   </TableCell>
-                  <TableCell className="px-4 py-4 text-xs font-bold text-slate-500 uppercase">
+                  <TableCell className="px-4 py-4 text-sm font-bold text-slate-500 uppercase">
                     {d.brand_name || "-"}
                   </TableCell>
                   <TableCell className="px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <Smartphone className="h-3 w-3 text-slate-400" />
-                      <span className="text-[11px] font-black text-slate-700 uppercase tracking-tighter">
+                      <Smartphone className="h-4 w-4 text-slate-500" />
+                      <span className="text-sm font-bold text-slate-700 uppercase">
                         {d.device_type}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-4 py-4 font-mono text-[11px] font-bold text-slate-500">
+                  <TableCell className="px-4 py-4 text-sm font-bold text-slate-700">
                     {d.device_serial_number || "-"}
                   </TableCell>
                   <TableCell className="px-4 py-4 text-center">
                     <Badge
                       variant="outline"
-                      className={`rounded-lg px-3 py-1 border-0 text-[10px] font-black uppercase ${d.device_status === 0 ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}
+                      className={`rounded-lg px-3 py-1 border-0 text-sm font-black uppercase ${d.device_status === 0 ? "bg-emerald-100 text-emerald-600" : "bg-amber-50 text-amber-600"}`}
                     >
                       {d.device_status === 0 ? "Available" : "Assigned"}
                     </Badge>
@@ -208,7 +207,7 @@ export const HSTMaster = () => {
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="h-9 w-9 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                        className="h-9 w-9 rounded-xl bg-slate-100 border-2 border-slate-100 shadow-md shadow-blue-300 text-slate-800 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                         onClick={() => handleView(d.id)}
                       >
                         <Eye className="h-4 w-4" />
@@ -216,7 +215,7 @@ export const HSTMaster = () => {
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="h-9 w-9 rounded-xl bg-slate-50 text-slate-400 hover:bg-orange-500 hover:text-white transition-all shadow-sm"
+                        className="h-9 w-9 rounded-xl bg-slate-100 border-2 border-slate-100 shadow-md shadow-blue-300 text-slate-800 hover:bg-orange-500 hover:text-white transition-all shadow-sm"
                         onClick={() => handleEdit(d)}
                       >
                         <Pencil className="h-4 w-4" />
@@ -226,7 +225,7 @@ export const HSTMaster = () => {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-9 w-9 rounded-xl bg-slate-50 text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                            className="h-9 w-9 rounded-xl bg-slate-100 border-2 border-slate-100 shadow-md shadow-blue-300 text-slate-800 hover:bg-red-600 hover:text-white transition-all shadow-sm"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

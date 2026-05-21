@@ -17,7 +17,6 @@
     },
     "editNode": {
       "title": "Edit Location Information",
-      "subtitlePrefix": "UID:",
       "valueLabel": "Update Value",
       "barcodeLabel": "Barcode (Non-Editable)",
       "cancelBtn": "Discard",
@@ -29,8 +28,7 @@
       "createBtn": "Create Root Location"
     },
     "levelCard": {
-      "prefix": "Level",
-      "suffix": "Location Sub-Unit",
+      "prefix": "Layer",
       "items": "Nodes"
     },
     "deleteAlert": {

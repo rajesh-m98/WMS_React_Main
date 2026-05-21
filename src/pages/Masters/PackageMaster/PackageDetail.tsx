@@ -36,12 +36,15 @@ const PackageDetail = () => {
   }, [dispatch]);
 
   const warehousePackages = packages.filter((pkg) => pkg.whscode === whsCode);
-  const warehouseName = warehousePackages[0]?.whsname || warehousePackages[0]?.package_type_name || "Warehouse Assets";
+  const warehouseName =
+    warehousePackages[0]?.whsname ||
+    warehousePackages[0]?.package_type_name ||
+    "Warehouse Assets";
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-[#f8fafc]/50 p-4 min-h-screen">
       {/* HEADER SECTION */}
-      <div className="shrink-0 flex items-center justify-between px-8 py-6 bg-white border-1 border-slate-50 shadow-lg shadow-slate-400 rounded-[32px] w-full">
+      <div className="shrink-0 flex items-center justify-between px-8 py-6 bg-white border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl w-full">
         <div className="flex items-center gap-6">
           <Button
             variant="ghost"
@@ -87,12 +90,12 @@ const PackageDetail = () => {
       </div>
 
       {/* BARCODE TABLE */}
-      <Card className="border-1 border-slate-50 shadow-lg shadow-slate-400 rounded-[40px] overflow-hidden bg-white">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-100 border-0">
+                <TableRow className="bg-slate-100 border-b border-slate-200 hover:bg-slate-100">
                   <TableHead className="px-8 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     SL No
                   </TableHead>

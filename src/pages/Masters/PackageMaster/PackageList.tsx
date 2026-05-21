@@ -301,7 +301,7 @@ export const PackageList = () => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-[#f8fafc]/50 p-4 min-h-screen">
       {/* HEADER SECTION */}
-      <div className="shrink-0 flex items-center justify-between px-8 py-6 bg-white border-1 border-slate-50 shadow-lg shadow-slate-400 rounded-[32px] w-full">
+      <div className="shrink-0 flex items-center justify-between px-8 py-6 bg-white border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl w-full">
         <div className="flex items-center gap-6">
           <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200 ring-4 ring-blue-50">
             <Box className="w-7 h-7 text-white" />
@@ -336,12 +336,12 @@ export const PackageList = () => {
         </div>
       </div>
 
-      <Card className="border-1 border-slate-50 shadow-lg shadow-slate-400 rounded-[40px] overflow-hidden bg-white">
+      <Card className="bborder-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-100 border-0">
+                <TableRow className="bg-slate-100 hover:bg-slate-100 border-b border-slate-200">
                   <TableHead className="px-8 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     SL No
                   </TableHead>
@@ -363,7 +363,7 @@ export const PackageList = () => {
                       <div className="flex flex-col items-center justify-center gap-4">
                         <Loader2 className="h-14 w-14 text-blue-600 animate-spin" />
                         <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">
-                          Syncing Master Assets...
+                          Fetching Packages List...
                         </p>
                       </div>
                     </TableCell>

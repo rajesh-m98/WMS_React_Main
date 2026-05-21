@@ -143,7 +143,7 @@ export const ItemMaster = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="relative w-full md:flex-1 group">
             <Search
@@ -183,12 +183,12 @@ export const ItemMaster = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white relative">
         <CardContent className="p-0">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
             <Table className="w-full">
               <TableHeader>
-                <TableRow className="bg-slate-50/80 border-b border-slate-200 hover:bg-slate-50/80">
+                <TableRow className="bg-slate-100 border-b border-slate-200 hover:bg-slate-100">
                   <TableHead className="px-5 py-4 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[50px]">
                     SL NO
                   </TableHead>
@@ -215,8 +215,8 @@ export const ItemMaster = () => {
                     <TableCell colSpan={6} className="h-40 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="icon-xl text-blue-600 animate-spin" />
-                        <p className="caption-small !text-slate-400">
-                          Searching Catalog...
+                        <p className="text-sm font-black text-slate-400 uppercase">
+                          Loading Item List ...
                         </p>
                       </div>
                     </TableCell>
@@ -238,22 +238,22 @@ export const ItemMaster = () => {
                       key={item.id}
                       className="group border-b border-slate-50 even:bg-slate-50/30 hover:bg-blue-50/50 transition-all font-bold"
                     >
-                      <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight whitespace-nowrap">
+                      <TableCell className="px-5 py-4 text-sm font-black text-slate-600 uppercase tracking-tight whitespace-nowrap">
                         {(page - 1) * PAGE_SIZE + idx + 1}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-[13px] font-black text-slate-950 uppercase tracking-tight whitespace-nowrap">
+                      <TableCell className="px-5 py-4 text-sm font-black text-slate-950 uppercase tracking-tight whitespace-nowrap">
                         {item.item_code}
                       </TableCell>
-                      <TableCell className="px-5 text-[13px] font-bold text-slate-800 py-4 leading-relaxed group-hover:text-slate-950 transition-colors">
+                      <TableCell className="px-5 text-sm font-bold text-slate-800 py-4 leading-relaxed group-hover:text-slate-950 transition-colors">
                         {item.item_description}
                       </TableCell>
-                      <TableCell className="px-5 py-4 font-mono text-[12px] font-bold text-slate-600 whitespace-nowrap">
+                      <TableCell className="px-5 py-4 text-sm font-bold text-slate-700 whitespace-nowrap">
                         {item.ean_barcode || "—"}
                       </TableCell>
                       <TableCell className="px-5 py-4 whitespace-nowrap">
                         <Badge
                           variant="outline"
-                          className="rounded-lg border border-blue-200 bg-blue-50/30 font-mono text-[11px] font-bold px-3 py-1 text-blue-700 shadow-sm whitespace-nowrap"
+                          className="rounded-lg border border-blue-200 bg-blue-50/30 text-sm font-bold px-3 py-1 text-blue-700 shadow-sm whitespace-nowrap"
                         >
                           {item.open_quantity ?? 0}
                         </Badge>
@@ -264,7 +264,7 @@ export const ItemMaster = () => {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-9 w-9 rounded-xl text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                            className="h-9 w-9 rounded-xl bg-slate-100 text-slate-800 border-1 border-slate-200 shadow-md shadow-slate-300 hover:bg-blue-600 hover:text-white transition-all"
                             onClick={() => handleView(item.id)}
                           >
                             <Eye className="h-4 w-4" />
@@ -272,7 +272,7 @@ export const ItemMaster = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 rounded-xl text-slate-400 hover:bg-orange-500 hover:text-white transition-all shadow-sm"
+                            className="h-9 w-9 rounded-xl bg-slate-100 text-slate-800 border-1 border-slate-200 shadow-md shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all"
                             onClick={() => handleOpenDialog(item)}
                           >
                             <Edit2 className="h-4 w-4" />
@@ -282,7 +282,7 @@ export const ItemMaster = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 rounded-xl text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                className="h-9 w-9 rounded-xl bg-slate-100 text-slate-800 border-1 border-slate-200 shadow-md shadow-slate-300 hover:bg-red-600 hover:text-white transition-all"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>

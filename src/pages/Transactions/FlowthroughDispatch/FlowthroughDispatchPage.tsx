@@ -26,6 +26,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import { handleFetchDispatchHistory } from "@/app/manager/dispatchManager";
+import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 
 const FlowthroughDispatchPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ const FlowthroughDispatchPage = () => {
   const { data: dispatchData, loading } = useAppSelector(
     (state) => state.dispatch,
   );
+  const { data: warehouses } = useAppSelector((state) => state.warehouse);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -41,7 +44,16 @@ const FlowthroughDispatchPage = () => {
 
   useEffect(() => {
     dispatch(handleFetchDispatchHistory({ page: 1, size: 100 }));
+    dispatch(handleFetchAllWarehouses({ page: 1, size: 100 }));
   }, [dispatch]);
+
+  const getWarehouseNameByCode = (code: string): string => {
+    if (!code) return "Unknown Warehouse";
+    const found = warehouses.find(
+      (w) => w.warehouse_code?.toLowerCase() === code.toLowerCase(),
+    );
+    return found ? found.warehouse_name : "Unknown Warehouse";
+  };
 
   // FILTER: Grpo Doc Entry must NOT be null and status must NOT be null for Flowthrough
   const flowthroughData = dispatchData.filter(
@@ -91,8 +103,7 @@ const FlowthroughDispatchPage = () => {
       if (!whsMap.has(key)) {
         whsMap.set(key, {
           whscode: key,
-          whsname:
-            row.whsname != null ? row.whsname : "Mylapore - Sannadhi Street",
+          whsname: row.whsname || getWarehouseNameByCode(key),
           total_items: new Set(), // To track unique item codes
           total_qty: 0,
           grpo_count: new Set(), // To track unique GRPOs

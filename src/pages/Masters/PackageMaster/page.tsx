@@ -351,7 +351,7 @@ export const PackageMaster = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="relative w-full md:flex-1">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
@@ -373,18 +373,11 @@ export const PackageMaster = () => {
               <Plus className="icon-sm mr-2" />
               {config.strings.dialog.generate}
             </Button>
-            {/* <Button
-              className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white body-strong transition-all shadow-lg shadow-blue-100 active:scale-95 flex-1 md:flex-none"
-              onClick={() => handleOpenDialog()}
-            >
-              <Plus className="icon-sm mr-2" />
-              {config.strings.dialog.create}
-            </Button> */}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl p-4 overflow-hidden bg-white">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>

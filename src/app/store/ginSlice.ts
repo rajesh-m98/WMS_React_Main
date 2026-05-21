@@ -14,6 +14,8 @@ interface GinState {
   totalFlowThrough: number;
   totalPutaway: number;
   page: number;
+  fromDate: string;
+  toDate: string;
 }
 
 const initialState: GinState = {
@@ -29,6 +31,8 @@ const initialState: GinState = {
   totalFlowThrough: 0,
   totalPutaway: 0,
   page: 1,
+  fromDate: "",
+  toDate: "",
 };
 
 const ginSlice = createSlice({
@@ -71,6 +75,12 @@ const ginSlice = createSlice({
     setGinFormLoading: (state, action: PayloadAction<boolean>) => {
       state.formLoading = action.payload;
     },
+    setFromDate: (state, action: PayloadAction<string>) => {
+      state.fromDate = action.payload;
+    },
+    setToDate: (state, action: PayloadAction<string>) => {
+      state.toDate = action.payload;
+    },
   },
 });
 
@@ -81,6 +91,8 @@ export const {
   setCurrentGinHeader,
   setCurrentGinLines,
   setGinFormLoading,
+  setFromDate,
+  setToDate,
 } = ginSlice.actions;
 
 export default ginSlice.reducer;

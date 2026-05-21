@@ -159,7 +159,7 @@ export const WarehouseMaster = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
-      <Card className="border-0 shadow-xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="relative w-full md:flex-1 group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400 group-focus-within:text-blue-600 transition-colors" />
@@ -213,12 +213,12 @@ export const WarehouseMaster = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-2xl p-4 rounded-[2.5rem] overflow-hidden bg-white relative">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white relative">
         <CardContent className="p-0">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
-            <Table className="w-full">
+            <Table className="min-w-full">
               <TableHeader>
-                <TableRow className="bg-slate-50/80 border-b border-slate-200 hover:bg-slate-50/80">
+                <TableRow className="bg-slate-100 border-b border-slate-200 hover:bg-slate-100">
                   <TableHead className="px-6 py-5 text-[11px] font-black text-slate-900 uppercase tracking-wider whitespace-nowrap w-[100px]">
                     SL NO
                   </TableHead>
@@ -243,7 +243,9 @@ export const WarehouseMaster = () => {
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="icon-xl text-blue-600 animate-spin" />
                         <p className="body-strong text-slate-400 uppercase tracking-[0.2em]">
-                          {isLoading ? "Processing File Data..." : "Fetching Master Data..."}
+                          {isLoading
+                            ? "Processing File Data..."
+                            : "Fetching Warehouse Data..."}
                         </p>
                       </div>
                     </TableCell>

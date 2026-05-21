@@ -83,9 +83,7 @@ export const LocationMaster: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    parseCSV(file).then((jsonResult) => {
-      dispatch(handleImportBins(jsonResult));
-    });
+    dispatch(handleImportBins(file) as any);
 
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -162,7 +160,7 @@ export const LocationMaster: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       {/* Header Bar */}
-      <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-1/2">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
@@ -232,7 +230,10 @@ export const LocationMaster: React.FC = () => {
                           className="rounded-xl h-11 border-slate-200 pl-10 font-mono"
                           value={formData.barcode}
                           onChange={(e) =>
-                            setFormData({ ...formData, barcode: e.target.value })
+                            setFormData({
+                              ...formData,
+                              barcode: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -292,7 +293,7 @@ export const LocationMaster: React.FC = () => {
       </Card>
 
       {/* Hierarchy Browser */}
-      <Card className="border-0 shadow-md rounded-2xl overflow-hidden bg-white relative min-h-[500px]">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white relative min-h-[500px]">
         {loading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20 backdrop-blur-[1px]">
             <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
@@ -308,14 +309,11 @@ export const LocationMaster: React.FC = () => {
               >
                 <div className="p-3 bg-white border-b border-slate-100 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="label-bold !text-slate-400">
+                    <span className="label-bold text-slate-800">
                       {config.strings.levelCard.prefix} {idx + 1}
                     </span>
-                    <span className="caption-small text-blue-600 !text-[10px] uppercase font-black">
-                      {config.strings.levelCard.suffix}
-                    </span>
                   </div>
-                  <Badge className="caption-small !text-[10px] bg-slate-100 text-slate-500 border-0 uppercase px-3 py-1 bg-white hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm font-black tracking-tighter cursor-default">
+                  <Badge className="text-sm bg-slate-100 text-slate-500 border-0 uppercase px-3 py-1 bg-white hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-md font-black cursor-default">
                     {column.length} {config.strings.levelCard.items}
                   </Badge>
                 </div>
@@ -325,9 +323,9 @@ export const LocationMaster: React.FC = () => {
                       <button
                         key={node.id}
                         onClick={() => handleNodeClick(node, idx)}
-                        className={`w-full flex items-center justify-between p-4 rounded-xl transition-all group border ${
+                        className={`w-3/4 flex items-center justify-between p-4 rounded-xl transition-all group border ${
                           isNodeSelected(node.id)
-                            ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200/50 ring-4 ring-blue-50"
+                            ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 ring-4 ring-blue-50"
                             : "bg-white border-slate-200 hover:border-blue-300 hover:shadow-md text-slate-700"
                         }`}
                       >
@@ -335,9 +333,12 @@ export const LocationMaster: React.FC = () => {
                           <span
                             className={`table-cell-bold leading-tight w-full ${isNodeSelected(node.id) ? "!text-white" : "text-slate-800"}`}
                           >
-                            {idx >= 4 ? (
+                            {idx >= 4 ||
+                            (idx === 3 &&
+                              (!node.children ||
+                                node.children.length === 0)) ? (
                               <div
-                                className={`p-2 bg-white rounded-lg shadow-sm border border-slate-100 flex flex-col items-center justify-center w-full min-h-[100px] ${isNodeSelected(node.id) ? "ring-2 ring-white/50" : ""}`}
+                                className={`p-2 bg-white rounded-lg shadow-md shadow-slate-400 border border-slate-100 flex flex-col items-center justify-center w-full min-h-[100px] ${isNodeSelected(node.id) ? "ring-2 ring-white/50" : ""}`}
                               >
                                 <div className="w-full h-full flex items-center justify-center overflow-hidden">
                                   <BarcodeDisplay
@@ -355,13 +356,6 @@ export const LocationMaster: React.FC = () => {
                               node.value
                             )}
                           </span>
-                          {node.barcode && idx < 4 && (
-                            <span
-                              className={`table-id-font mt-1 px-1.5 py-0.5 rounded !text-[10px] ${isNodeSelected(node.id) ? "bg-white/20 !text-blue-50" : "bg-slate-100 !text-slate-500"}`}
-                            >
-                              {node.barcode}
-                            </span>
-                          )}
                         </div>
                         <div className="flex items-center gap-3">
                           {node.children && node.children.length > 0 && (
@@ -412,14 +406,9 @@ export const LocationMaster: React.FC = () => {
           >
             <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
               <DialogHeader className="p-8 bg-blue-600 text-white relative overflow-hidden text-center">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                 <DialogTitle className="text-xl font-black mx-auto relative z-10 font-display">
                   {config.strings.editNode.title}
                 </DialogTitle>
-                <p className="label-bold !text-blue-100 pt-2 italic relative z-10">
-                  {config.strings.editNode.subtitlePrefix}{" "}
-                  {selectedPath[selectedPath.length - 1]?.id}
-                </p>
               </DialogHeader>
               <div className="p-6 space-y-4">
                 <div className="space-y-2">
@@ -434,18 +423,7 @@ export const LocationMaster: React.FC = () => {
                     }
                   />
                 </div>
-                {selectedPath.length >= 5 && (
-                  <div className="space-y-2">
-                    <Label className="text-xs font-black uppercase text-slate-400 tracking-wider font-sans">
-                      {config.strings.editNode.barcodeLabel}
-                    </Label>
-                    <Input
-                      className="rounded-xl h-11 border-slate-200 font-mono bg-slate-50 cursor-not-allowed opacity-70"
-                      value={formData.barcode}
-                      disabled={true}
-                    />
-                  </div>
-                )}
+
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
                     variant="ghost"

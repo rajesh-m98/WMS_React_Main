@@ -11,33 +11,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui";
+
 import {
   Eye,
   Pencil,
   Trash2,
   Search,
   UserPlus,
-  Upload,
   Loader2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
@@ -48,7 +39,6 @@ import {
   handleFetchUsers,
   handleDeleteUser,
 } from "@/app/manager/masterManager";
-import api from "@/lib/api";
 import config from "./UserConfig.json";
 
 const PAGE_SIZE = 10;
@@ -79,7 +69,6 @@ export const UserManagement = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     dispatch(
@@ -88,29 +77,17 @@ export const UserManagement = () => {
         search: debouncedSearch,
         page: page,
         size: PAGE_SIZE,
-        status: statusFilter,
       }),
     );
-  }, [dispatch, debouncedSearch, page, statusFilter]);
+  }, [dispatch, debouncedSearch, page]);
 
   const handleDelete = async (id: number) => {
     await dispatch(handleDeleteUser(id));
   };
 
-  const displayUsers = users.filter((user) => {
-    if (statusFilter === "all") return true;
-    
-    const isActive = user.status?.toLowerCase() === "active" || user.status === "Y";
-    
-    if (statusFilter === "active") return isActive;
-    if (statusFilter === "inactive") return !isActive;
-    
-    return true;
-  });
-
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
-      <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-3 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-2/5 shrink-0">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
@@ -122,25 +99,6 @@ export const UserManagement = () => {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3 justify-end w-full lg:w-auto">
-            <div className="flex items-center gap-2">
-              <span className="caption-small whitespace-nowrap hidden sm:block">
-                {config.strings.statusLabel}
-              </span>
-              <Select defaultValue="all" onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[130px] h-12 rounded-xl bg-slate-50/50 border-slate-200 body-strong !text-slate-700">
-                  <SelectValue placeholder={config.strings.allUsers} />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="all">{config.strings.allUsers}</SelectItem>
-                  <SelectItem value="active">
-                    {config.strings.active}
-                  </SelectItem>
-                  <SelectItem value="inactive">
-                    {config.strings.inactive}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <Button
               className="rounded-xl bg-blue-600 hover:bg-blue-700 h-12 px-6 body-strong text-white flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95"
               onClick={() => navigate("/masters/users/create")}
@@ -151,11 +109,11 @@ export const UserManagement = () => {
         </CardContent>
       </Card>
       {/* Table Section */}
-      <Card className="border-0 shadow-2xl rounded-[3rem] bg-white overflow-hidden relative">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl bg-white overflow-hidden relative">
         <CardContent className="p-0">
           <div className="overflow-x-auto scrollbar-premium scrollbar-thin scrollbar-thumb-slate-200">
             <Table className="min-w-full">
-              <TableHeader className="bg-slate-50/50">
+              <TableHeader className="bg-slate-100">
                 <TableRow className="border-b-2 border-slate-900/10">
                   <TableHead className="label-bold px-6 py-5 text-left whitespace-nowrap">
                     {config.strings.table.id}
@@ -165,12 +123,6 @@ export const UserManagement = () => {
                   </TableHead>
                   <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
                     {config.strings.table.employeeId}
-                  </TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
-                    {config.strings.table.fullName}
-                  </TableHead>
-                  <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
-                    {config.strings.table.username}
                   </TableHead>
                   <TableHead className="label-bold px-4 py-5 text-left whitespace-nowrap">
                     {config.strings.table.role}
@@ -198,7 +150,7 @@ export const UserManagement = () => {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : displayUsers.length === 0 ? (
+                ) : users.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="h-96 text-left">
                       <div className="flex flex-col items-center justify-center gap-4 opacity-20">
@@ -210,12 +162,12 @@ export const UserManagement = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  displayUsers.map((user, idx) => (
+                  users.map((user, idx) => (
                     <TableRow
                       key={user.id}
                       className="hover:bg-blue-50/40 transition-all duration-300 group cursor-default border-b border-slate-50 text-left"
                     >
-                      <td className="px-6 py-5 label-bold !text-slate-400 whitespace-nowrap text-left">
+                      <td className="px-6 py-5 text-slate-600 whitespace-nowrap text-left">
                         {(page - 1) * PAGE_SIZE + idx + 1}
                       </td>
                       <td className="px-4 py-2 text-sm font-black text-blue-600 rounded-lg whitespace-nowrap text-left">
@@ -223,12 +175,6 @@ export const UserManagement = () => {
                       </td>
                       <td className="px-4 py-5 text-sm font-bold text-slate-500 tabular-nums text-left whitespace-nowrap">
                         {user.employee_id}
-                      </td>
-                      <td className="px-4 py-5 text-sm font-black text-slate-800 whitespace-nowrap text-left">
-                        {user.firstname} {user.lastname}
-                      </td>
-                      <td className="px-4 py-5 text-sm font-black text-slate-500 text-left whitespace-nowrap">
-                        {user.username}
                       </td>
                       <td className="px-4 py-5 text-left">
                         {getRoleBadge(Number(user.role))}
@@ -240,12 +186,16 @@ export const UserManagement = () => {
                         <Badge
                           variant="outline"
                           className={`rounded-lg px-3 py-1 border-0 label-bold transition-colors uppercase tracking-widest text-[10px] ${
-                            user.status?.toLowerCase() === "active" || user.status === "Y"
+                            user.status?.toLowerCase() === "active" ||
+                            user.status === "Y"
                               ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                               : "bg-rose-100 text-rose-700 hover:bg-rose-200"
                           }`}
                         >
-                          {user.status === "Y" || user.status?.toLowerCase() === "active" ? "Active" : "Inactive"}
+                          {user.status === "Y" ||
+                          user.status?.toLowerCase() === "active"
+                            ? "Active"
+                            : "Inactive"}
                         </Badge>
                       </td>
                       <td className="px-10 py-5 text-right pr-6">

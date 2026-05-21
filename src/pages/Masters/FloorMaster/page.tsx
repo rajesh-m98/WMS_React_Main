@@ -91,7 +91,7 @@ export const FloorMaster = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
-      <Card className="border-0 shadow-sm rounded-2xl overflow-hidden bg-white">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-3 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="relative w-full lg:w-2/5 shrink-0">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 icon-sm text-slate-400" />
@@ -121,12 +121,12 @@ export const FloorMaster = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-2xl rounded-[3rem] bg-white overflow-hidden relative">
+      <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl bg-white overflow-hidden relative">
         <CardContent className="p-0">
           <div className="overflow-x-auto scrollbar-premium scrollbar-thin scrollbar-thumb-slate-200">
             <Table className="min-w-full">
-              <TableHeader className="bg-slate-50/50">
-                <TableRow className="border-b-2 border-slate-900/10">
+              <TableHeader>
+                <TableRow className="bg-slate-100 border-b border-slate-200 hover:bg-slate-100">
                   <TableHead className="label-bold px-6 py-5 text-left whitespace-nowrap">
                     {config.strings.table.id}
                   </TableHead>
@@ -251,12 +251,10 @@ export const FloorMaster = () => {
             </Table>
           </div>
 
-          <div className="p-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <Badge className="h-10 px-4 rounded-xl border border-slate-100 bg-slate-50/50 text-slate-400 label-bold uppercase tracking-widest text-[11px]">
+          <div className="p-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+            <Badge className="h-10 px-4 rounded-xl border-1 border-blue-600 bg-blue-600 text-white label-bold uppercase tracking-widest text-[11px]">
               Total Records:{" "}
-              <span className="text-blue-600 ml-2 font-black">
-                {totalCount}
-              </span>
+              <span className="ml-2 font-black text-white">{totalCount}</span>
             </Badge>
 
             <div className="flex items-center gap-2">
