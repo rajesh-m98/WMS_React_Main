@@ -42,7 +42,7 @@ const GinHeaderListPage = () => {
   const { flowThroughItems, putawayItems, loading } = useAppSelector(
     (state) => state.gin,
   );
-  const items = type === "putaway" ? putawayItems : flowThroughItems;
+  const items = type === "all" ? [...putawayItems, ...flowThroughItems] : type === "putaway" ? putawayItems : flowThroughItems;
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [deleteHeaderTarget, setDeleteHeaderTarget] = useState<number | null>(
@@ -62,16 +62,27 @@ const GinHeaderListPage = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      handleFetchGins({
-        gin_type: ginType,
-        page: 1,
-        size: 100,
-        is_paginate: true,
-        gate_pass_number: gpNumber,
-      }),
-    );
-  }, [dispatch, ginType, gpNumber]);
+    if (type === "all") {
+      dispatch(
+        handleFetchGins({
+          page: 1,
+          size: 100,
+          is_paginate: true,
+          gate_pass_number: gpNumber,
+        }),
+      );
+    } else {
+      dispatch(
+        handleFetchGins({
+          gin_type: ginType,
+          page: 1,
+          size: 100,
+          is_paginate: true,
+          gate_pass_number: gpNumber,
+        }),
+      );
+    }
+  }, [dispatch, ginType, gpNumber, type]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "---";
@@ -152,7 +163,7 @@ const GinHeaderListPage = () => {
                 onClick={() =>
                   dispatch(
                     handleFetchGins({
-                      gin_type: ginType,
+                      gin_type: type === "all" ? undefined : ginType,
                       is_paginate: true,
                       forceRefresh: true,
                     }),

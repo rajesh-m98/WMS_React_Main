@@ -23,7 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface GinListPageProps {
-  type: "putaway" | "flow-through";
+  type: "putaway" | "flow-through" | "all";
 }
 
 const PAGE_SIZE = 10;
@@ -31,25 +31,45 @@ const PAGE_SIZE = 10;
 const GinListPage = ({ type }: GinListPageProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { flowThroughItems, putawayItems, loading, fromDate, toDate } = useAppSelector(
-    (state) => state.gin,
-  );
-  const items = type === "putaway" ? putawayItems : flowThroughItems;
+  const {
+    items: allItems,
+    flowThroughItems,
+    putawayItems,
+    loading,
+    fromDate,
+    toDate,
+  } = useAppSelector((state) => state.gin);
+  const items =
+    type === "all"
+      ? allItems
+      : type === "putaway"
+        ? putawayItems
+        : flowThroughItems;
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
   const ginType = type === "putaway" ? 2 : 1;
 
   useEffect(() => {
-    dispatch(
-      handleFetchGins({
-        gin_type: ginType,
-        page: 1,
-        size: 100,
-        is_paginate: true,
-      }),
-    );
-  }, [dispatch, ginType]);
+    if (type === "all") {
+      dispatch(
+        handleFetchGins({
+          page: 1,
+          size: 100,
+          is_paginate: true,
+        }),
+      );
+    } else {
+      dispatch(
+        handleFetchGins({
+          gin_type: ginType,
+          page: 1,
+          size: 100,
+          is_paginate: true,
+        }),
+      );
+    }
+  }, [dispatch, ginType, type]);
 
   const getStatusBadge = (status: number) => {
     switch (status) {
@@ -83,29 +103,59 @@ const GinListPage = ({ type }: GinListPageProps) => {
     }
   };
 
-  // Group items by Gate Pass Number to show unique gate passes
+  // Group items by GRPO Doc Entry to show unique GRPOs
   const uniqueGPs = useMemo(() => {
     const gpMap = new Map();
     items.forEach((item: any) => {
       const header = item.header || {};
-      const gpNumber = header.gate_pass_number || "N/A";
-      if (!gpMap.has(gpNumber)) {
-        gpMap.set(gpNumber, {
-          gate_pass_number: gpNumber,
+      const grpoDocEntry = header.grpo_docentry || "N/A";
+      const poId = header.id || item.header_id;
+
+      if (!gpMap.has(grpoDocEntry)) {
+        gpMap.set(grpoDocEntry, {
+          grpo_docentry: grpoDocEntry,
+          gate_pass_number: header.gate_pass_number || "N/A",
           card_name: header.card_name || "Unknown",
           card_code: header.card_code || "N/A",
           status: header.status,
           id: header.id || item.id,
           created_at: header.created_at || item.created_at,
+          po_ids: new Set(poId ? [poId] : []),
+          line_items: [item],
         });
+      } else {
+        const gp = gpMap.get(grpoDocEntry);
+        if (poId) gp.po_ids.add(poId);
+        gp.line_items.push(item);
       }
     });
-    return Array.from(gpMap.values());
+
+    return Array.from(gpMap.values()).map((gp: any) => {
+      const putaway = gp.line_items.filter(
+        (l: any) =>
+          Number(l.line_type) !== 1 && Number(l.header?.gin_type) !== 1,
+      ).length;
+      const flowThrough = gp.line_items.filter(
+        (l: any) =>
+          Number(l.line_type) === 1 || Number(l.header?.gin_type) === 1,
+      ).length;
+
+      return {
+        ...gp,
+        po_count: gp.po_ids.size,
+        total_lines: gp.line_items.length,
+        type_counts: { putaway, flowThrough },
+      };
+    }).sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+      return dateB - dateA;
+    });
   }, [items]);
 
   const filteredGPs = uniqueGPs.filter((gp: any) => {
     const searchMatch =
-      gp.gate_pass_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      gp.grpo_docentry.toLowerCase().includes(searchTerm.toLowerCase()) ||
       gp.card_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       gp.card_code.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -156,7 +206,9 @@ const GinListPage = ({ type }: GinListPageProps) => {
                     }}
                     className="pl-10 pr-4 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-xs font-bold shadow-lg shadow-slate-200 w-full"
                   />
-                  <span className="absolute -top-2.5 left-4 px-1 bg-white text-[10px] font-black uppercase text-slate-400 tracking-wider">From</span>
+                  <span className="absolute -top-2.5 left-4 px-1 bg-white text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                    From
+                  </span>
                 </div>
                 <div className="relative w-1/2">
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -169,7 +221,9 @@ const GinListPage = ({ type }: GinListPageProps) => {
                     }}
                     className="pl-10 pr-10 h-12 rounded-xl bg-slate-50/50 border-1 border-slate-200 hover:bg-white focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all text-xs font-bold shadow-lg shadow-slate-200 w-full"
                   />
-                  <span className="absolute -top-2.5 left-4 px-1 bg-white text-[10px] font-black uppercase text-slate-400 tracking-wider">To</span>
+                  <span className="absolute -top-2.5 left-4 px-1 bg-white text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                    To
+                  </span>
                   {(fromDate || toDate) && (
                     <button
                       onClick={() => {
@@ -192,7 +246,7 @@ const GinListPage = ({ type }: GinListPageProps) => {
                 onClick={() =>
                   dispatch(
                     handleFetchGins({
-                      gin_type: ginType,
+                      gin_type: type === "all" ? undefined : ginType,
                       is_paginate: true,
                       forceRefresh: true,
                     }),
@@ -215,13 +269,16 @@ const GinListPage = ({ type }: GinListPageProps) => {
                   SL NO
                 </th>
                 <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
-                  Gate Pass No
+                  GRN No
                 </th>
                 <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
-                  Supplier / Vendor
+                  Vendor Name
+                </th>
+                <th className="px-6 py-6 text-center text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
+                  Items Count
                 </th>
                 <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap">
-                  Vendor Code
+                  Date
                 </th>
                 <th className="px-6 py-6 text-left text-[11px] font-black text-slate-600/80 uppercase tracking-widest border-b border-indigo-100 whitespace-nowrap text-right">
                   Actions
@@ -235,7 +292,7 @@ const GinListPage = ({ type }: GinListPageProps) => {
                     <div className="flex flex-col items-center justify-center gap-4">
                       <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
                       <p className="label-bold !text-slate-400">
-                        Loading Gate Passes...
+                        Loading GIN...
                       </p>
                     </div>
                   </td>
@@ -243,11 +300,11 @@ const GinListPage = ({ type }: GinListPageProps) => {
               ) : paginatedGPs.length > 0 ? (
                 paginatedGPs.map((gp, idx) => (
                   <tr
-                    key={gp.gate_pass_number}
+                    key={gp.grpo_docentry}
                     className="hover:bg-blue-50/50 transition-all duration-300 group cursor-pointer border-b border-slate-100 last:border-0"
                     onClick={() =>
                       navigate(
-                        `/transactions/gin/${type}/headers/${gp.gate_pass_number}`,
+                        `/transactions/gin/view/grpo/${gp.grpo_docentry}`,
                       )
                     }
                   >
@@ -256,19 +313,50 @@ const GinListPage = ({ type }: GinListPageProps) => {
                     </td>
                     <td className="px-6 py-6">
                       <span className="font-black text-slate-800 text-sm tracking-tight uppercase">
-                        GATE PASS: {gp.gate_pass_number}
+                        GRN: {gp.grpo_docentry}
                       </span>
                     </td>
-                    <td className="px-6 py-6 text-sm font-black text-slate-700">
-                      {gp.card_name}
+                    <td className="px-6 py-6">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-slate-700">
+                          {gp.card_name}
+                        </span>
+                        {gp.card_code && gp.card_code !== "N/A" && (
+                          <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
+                            {gp.card_code}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-6 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {gp.total_lines > 0 ? (
+                          <Badge className="bg-blue-100 text-blue-700 border-0 hover:bg-blue-200 text-[10px] shadow-sm shadow-blue-100/50 px-3 py-1">
+                            {gp.total_lines}{" "}
+                            {gp.total_lines === 1 ? "ITEM" : "ITEMS"}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-slate-400 font-bold">
+                            No lines
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-6">
-                      <Badge
-                        variant="outline"
-                        className="font-black text-indigo-600 bg-indigo-50/30 border-0 shadow-sm shadow-indigo-100/50"
-                      >
-                        {gp.card_code}
-                      </Badge>
+                      <div className="flex items-center gap-1.5 text-indigo-500">
+                        <Calendar className="w-3 h-3" />
+                        <span className="text-[11px] font-black uppercase tracking-tight">
+                          {gp.created_at
+                            ? new Date(gp.created_at)
+                                .toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                                .toUpperCase()
+                            : "---"}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-6 text-right">
                       <Button
@@ -277,7 +365,7 @@ const GinListPage = ({ type }: GinListPageProps) => {
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(
-                            `/transactions/gin/${type}/headers/${gp.gate_pass_number}`,
+                            `/transactions/gin/view/grpo/${gp.grpo_docentry}`,
                           );
                         }}
                       >

@@ -30,8 +30,7 @@ import { DispatchDetail } from "./pages/Transactions/Dispatch/Detail";
 import { InwardHistory } from "./pages/Transactions/InwardHistory";
 import { OutwardHistory } from "./pages/Transactions/OutwardHistory";
 import { Login } from "./pages/Login/page";
-import PutawayPage from "./pages/Transactions/GinManagement/PutawayPage";
-import FlowThroughPage from "./pages/Transactions/GinManagement/FlowThroughPage";
+import GinListPage from "./pages/Transactions/GinManagement/GinListPage";
 import GinHeaderListPage from "./pages/Transactions/GinManagement/GinHeaderListPage";
 import GinDetail from "./pages/Transactions/GinManagement/Detail";
 import GinEdit from "./pages/Transactions/GinManagement/Edit";
@@ -114,12 +113,8 @@ const App = () => (
                       element={<OutwardPicklistDetail />}
                     />
                     <Route
-                      path="/transactions/gin/putaway"
-                      element={<PutawayPage />}
-                    />
-                    <Route
-                      path="/transactions/gin/flow-through"
-                      element={<FlowThroughPage />}
+                      path="/transactions/gin/gatepasses"
+                      element={<GinListPage type="all" />}
                     />
                     <Route
                       path="/transactions/flow-through/transfer"
@@ -171,6 +166,10 @@ const App = () => (
                     />
                     <Route
                       path="/transactions/gin/view/:type/:headerId"
+                      element={<GinDetail />}
+                    />
+                    <Route
+                      path="/transactions/gin/view/grpo/:grpoDocEntry"
                       element={<GinDetail />}
                     />
                     <Route

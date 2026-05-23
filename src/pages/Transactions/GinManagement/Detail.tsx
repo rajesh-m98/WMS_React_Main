@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   handleSelectGin,
   handleSelectByGatePass,
+  handleSelectByGrpo,
   handleDeleteGinHeader,
   handleDeleteGinLine,
 } from "@/app/manager/ginManager";
@@ -36,7 +37,7 @@ import {
 } from "lucide-react";
 
 const GinDetail = () => {
-  const { type, headerId, lineId, gpNumber } = useParams();
+  const { type, headerId, lineId, gpNumber, grpoDocEntry } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentHeader, currentLines, loading } = useAppSelector(
@@ -48,7 +49,7 @@ const GinDetail = () => {
   } | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(currentLines.length / itemsPerPage);
   const paginatedLines = currentLines.slice(
     (currentPage - 1) * itemsPerPage,
@@ -74,14 +75,16 @@ const GinDetail = () => {
   };
 
   useEffect(() => {
-    if (gpNumber) {
+    if (grpoDocEntry) {
+      dispatch(handleSelectByGrpo(grpoDocEntry));
+    } else if (gpNumber) {
       dispatch(handleSelectByGatePass(gpNumber));
     } else if (headerId) {
       dispatch(
         handleSelectGin(Number(headerId), lineId ? Number(lineId) : undefined),
       );
     }
-  }, [dispatch, headerId, lineId, gpNumber]);
+  }, [dispatch, headerId, lineId, gpNumber, grpoDocEntry]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -103,7 +106,7 @@ const GinDetail = () => {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
-        <p className="label-bold !text-slate-400 uppercase tracking-widest">
+        <p className="label-bold !text-slate-400 uppercase ">
           Loading Transaction Details...
         </p>
       </div>
@@ -120,7 +123,7 @@ const GinDetail = () => {
           <h2 className="heading-section !text-2xl text-slate-900 uppercase">
             Transaction Not Found
           </h2>
-          <p className="body-main !text-slate-400 mt-2 uppercase tracking-widest text-sm">
+          <p className="body-main !text-slate-400 mt-2 uppercase  text-sm">
             We couldn't retrieve details for ID #{lineId || headerId}
           </p>
         </div>
@@ -138,7 +141,7 @@ const GinDetail = () => {
   return (
     <div className="flex flex-col gap-4 animate-in fade-in duration-500 bg-[#f8fafc]/50 p-4 min-h-screen">
       {/* NEW HEADER DESIGN */}
-      <div className="shrink-0 flex items-center justify-between px-6 py-4 bg-white shadow-xl shadow-slate-100 rounded-[32px] mb-2 w-full">
+      <div className="shrink-0 flex items-center justify-between px-6 py-4 bg-white border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl mb-2 w-full">
         <div className="flex items-center gap-6">
           <Button
             variant="ghost"
@@ -152,7 +155,7 @@ const GinDetail = () => {
             {currentHeader?.card_name}
             <span className="text-blue-600/30 font-black">|</span>
             <span className="text-slate-600">
-              Gate Pass: {currentHeader?.gate_pass_number}
+              GRN: {currentHeader?.grpo_docentry || "N/A"}
             </span>
           </h1>
         </div>
@@ -160,13 +163,13 @@ const GinDetail = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-xl">
             <User className="w-3 h-3 text-slate-600" />
-            <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-slate-600 uppercase ">
               Created by: {currentHeader?.created_by || "System"}
             </span>
           </div>
           <div className="flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-xl hover:bg-indigo-600 group transition-all cursor-default shadow-sm shadow-indigo-100">
             <Calendar className="w-3 h-3 text-indigo-500 group-hover:text-white transition-all" />
-            <span className="text-[10px] font-black text-indigo-600 group-hover:text-white uppercase tracking-widest transition-all">
+            <span className="text-[10px] font-black text-indigo-600 group-hover:text-white uppercase  transition-all">
               SYNCED: {formatDate(currentHeader?.sync_date)} |{" "}
               {formatTime(currentHeader?.sync_date)}
             </span>
@@ -175,7 +178,7 @@ const GinDetail = () => {
       </div>
 
       <div className="flex-1 space-y-6 min-h-0 items-start pb-10">
-        <Card className="border-0 shadow-2xl shadow-blue-50 rounded-[40px] overflow-hidden bg-white">
+        <Card className="border-1 border-slate-200 shadow-lg shadow-slate-300 rounded-2xl overflow-hidden bg-white">
           <CardHeader className="bg-white p-7">
             <div className="flex items-center gap-5">
               <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shadow-inner">
@@ -186,7 +189,7 @@ const GinDetail = () => {
                   Transaction Line Items
                 </CardTitle>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">
-                  Showing {currentLines.length} products in this gate pass
+                  Showing {currentLines.length} products for this GRN
                 </p>
               </div>
             </div>
@@ -200,14 +203,11 @@ const GinDetail = () => {
                       SL NO
                     </th>
                     <th className="px-5 py-5 text-left text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
-                      Item Description
-                    </th>
-                    <th className="px-5 py-5 text-center text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
-                      Doc Entry
+                      Item Name
                     </th>
 
-                    <th className="px-5 py-5 text-center text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
-                      Line
+                    <th className="px-1 py-4 text-center text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
+                      Type
                     </th>
                     <th className="px-5 py-5 text-center text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
                       MRP
@@ -215,16 +215,19 @@ const GinDetail = () => {
                     <th className="px-5 py-5 text-center text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
                       Quantity Breakup
                     </th>
-                    <th className="px-5 py-5 text-right pr-10 text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
-                      Actions
+                    <th className="px-5 py-5 text-center text-[11px] font-black text-black uppercase tracking-widest whitespace-nowrap">
+                      Status
                     </th>
+                    {/* <th className="px-5 py-5 text-right pr-10 text-[11px] font-black text-black uppercase whitespace-nowrap">
+                      Actions
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody className="bg-white">
                   {paginatedLines.map((line, idx) => (
                     <tr
                       key={line.id}
-                      className={`hover:bg-blue-600/5 transition-all duration-300 group cursor-default border-b border-slate-100 last:border-0 ${Number(lineId) === line.id ? "bg-blue-50" : ""}`}
+                      className={`hover:bg-blue-100/50 transition-all duration-300 group cursor-default border-b border-slate-100 last:border-0 ${Number(lineId) === line.id ? "bg-blue-50" : ""}`}
                     >
                       <td className="px-5 py-5 text-sm font-black text-black font-mono">
                         {(currentPage - 1) * itemsPerPage + idx + 1}
@@ -234,22 +237,26 @@ const GinDetail = () => {
                           <span className="text-sm font-black text-slate-800">
                             {line.item_desc}
                           </span>
-                          <span className="text-xs font-black text-blue-600 tracking-widest uppercase mt-0.5">
+                          {/* <span className="text-xs font-black text-blue-600  uppercase mt-0.5">
                             {line.item_code}
-                          </span>
+                          </span> */}
                         </div>
                       </td>
-                      <td className="px-5 py-5 text-center">
-                        <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg shadow-sm shadow-indigo-100/50">
-                          {(line as any).doc_number || "---"}
-                        </span>
-                      </td>
-                      <td className="px-5 py-5 text-center">
+
+                      <td className="px-1 py-4 text-center">
                         <Badge
                           variant="outline"
-                          className="text-[10px] font-black h-7 px-3 bg-blue-500 text-white border-0 shadow-sm shadow-blue-200"
+                          className={`text-[12px] font-black h-6 px-2 border-0 shadow-sm whitespace-nowrap ${
+                            Number((line as any).line_type) === 1 ||
+                            Number((line as any).header?.gin_type) === 1
+                              ? "bg-purple-100 text-purple-700 shadow-purple-100/50"
+                              : "bg-emerald-100 text-emerald-700 shadow-emerald-100/50"
+                          }`}
                         >
-                          {(line as any).line_no || "---"}
+                          {Number((line as any).line_type) === 1 ||
+                          Number((line as any).header?.gin_type) === 1
+                            ? "FLOW-THROUGH"
+                            : "PUTAWAY"}
                         </Badge>
                       </td>
                       <td className="px-5 py-5 text-center">
@@ -260,7 +267,7 @@ const GinDetail = () => {
                       <td className="px-5 py-5">
                         <div className="flex items-center justify-center gap-4">
                           <div className="flex flex-col items-center">
-                            <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">
+                            <span className="text-[9px] font-black text-black/40 uppercase ">
                               Open
                             </span>
                             <span className="text-sm font-black text-slate-700">
@@ -269,7 +276,7 @@ const GinDetail = () => {
                           </div>
                           <div className="w-px h-6 bg-slate-100" />
                           <div className="flex flex-col items-center">
-                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">
+                            <span className="text-[9px] font-black text-blue-500 uppercase ">
                               Recv
                             </span>
                             <span className="text-sm font-black text-blue-700">
@@ -278,7 +285,25 @@ const GinDetail = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-5 text-right pr-10">
+                      <td className="px-5 py-5 text-center">
+                        <Badge
+                          variant="outline"
+                          className={`text-[9px] font-black h-6 px-3 border-0 shadow-sm ${
+                            (line as any).status === 1
+                              ? "bg-emerald-100 text-emerald-700 shadow-emerald-100/50"
+                              : (line as any).status === 3
+                                ? "bg-blue-100 text-blue-700 shadow-blue-100/50"
+                                : "bg-amber-100 text-amber-700 shadow-amber-100/50"
+                          }`}
+                        >
+                          {(line as any).status === 1
+                            ? "COMPLETED"
+                            : (line as any).status === 3
+                              ? "ONGOING"
+                              : "PENDING"}
+                        </Badge>
+                      </td>
+                      {/* <td className="px-5 py-5 text-right pr-10">
                         <div className="flex items-center justify-end gap-2">
                           {type !== "flow-through" && (
                             <Button
@@ -320,7 +345,7 @@ const GinDetail = () => {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -330,7 +355,7 @@ const GinDetail = () => {
             {/* Pagination Footer */}
             {totalPages > 1 && (
               <div className="p-6 border-t border-slate-50 flex items-center justify-between bg-slate-50/30">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <p className="text-[10px] font-black text-slate-400 uppercase ">
                   Page {currentPage} of {totalPages}
                 </p>
                 <div className="flex items-center gap-2">
@@ -339,7 +364,7 @@ const GinDetail = () => {
                     size="sm"
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((prev) => prev - 1)}
-                    className="h-9 px-4 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-black uppercase text-[9px] tracking-widest gap-2 transition-all active:scale-95 disabled:opacity-30"
+                    className="h-9 px-4 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-black uppercase text-[9px]  gap-2 transition-all active:scale-95 disabled:opacity-30"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                     Prev
@@ -362,7 +387,7 @@ const GinDetail = () => {
                     size="sm"
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage((prev) => prev + 1)}
-                    className="h-9 px-4 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-black uppercase text-[9px] tracking-widest gap-2 transition-all active:scale-95 disabled:opacity-30"
+                    className="h-9 px-4 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-black uppercase text-[9px]  gap-2 transition-all active:scale-95 disabled:opacity-30"
                   >
                     Next
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -384,7 +409,7 @@ const GinDetail = () => {
             <AlertDialogTitle className="heading-section text-center text-slate-900 uppercase text-lg">
               Confirm Delete
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center body-main text-rose-500 font-bold uppercase tracking-widest text-[10px] mt-2">
+            <AlertDialogDescription className="text-center body-main text-rose-500 font-bold uppercase  text-[10px] mt-2">
               {deleteTarget?.type === "header"
                 ? "Are you sure you want to delete the entire Gate Pass Header? This will remove all associated line items and cannot be undone."
                 : "Are you sure you want to delete this specific line item from the Gate Pass? This action cannot be undone."}
@@ -392,12 +417,12 @@ const GinDetail = () => {
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-col gap-2 mt-4">
             <Button
-              className="h-12 rounded-2xl bg-rose-600 hover:bg-rose-700 font-black text-xs shadow-lg shadow-rose-100 uppercase tracking-widest w-full"
+              className="h-12 rounded-2xl bg-rose-600 hover:bg-rose-700 font-black text-xs shadow-lg shadow-rose-100 uppercase  w-full"
               onClick={handleDelete}
             >
               Confirm Delete
             </Button>
-            <AlertDialogCancel className="h-12 rounded-2xl border-slate-200 text-slate-400 uppercase font-black text-[10px] tracking-widest w-full mt-0 hover:bg-slate-50 transition-all">
+            <AlertDialogCancel className="h-12 rounded-2xl border-slate-200 text-slate-400 uppercase font-black text-[10px]  w-full mt-0 hover:bg-slate-50 transition-all">
               Cancel
             </AlertDialogCancel>
           </AlertDialogFooter>

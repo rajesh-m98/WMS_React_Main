@@ -221,6 +221,59 @@ export const handleSelectByGatePass = (gatePassNumber: string, ginType?: number)
 };
 
 /**
+ * Aggregates all lines for a specific GRPO
+ */
+export const handleSelectByGrpo = (grpoDocEntry: string) => async (dispatch: AppDispatch, getState: () => any) => {
+  const { items, putawayItems, flowThroughItems } = getState().gin;
+  const allAvailable = [...items, ...putawayItems, ...flowThroughItems];
+
+  // Try local filter first from existing items in store
+  const matchLines = allAvailable.filter((l: any) =>
+    (String(l.grpo_docentry) === String(grpoDocEntry)) || (String(l.header?.grpo_docentry) === String(grpoDocEntry))
+  );
+
+  if (matchLines.length > 0) {
+    const uniqueLines = Array.from(new Map(matchLines.map((item: any) => [item.id, item])).values()) as any[];
+    dispatch(setCurrentGinHeader(uniqueLines[0].header || uniqueLines[0]));
+    dispatch(setCurrentGinLines(uniqueLines));
+    return true;
+  }
+
+  // Fallback: Fetch from server
+  try {
+    dispatch(ginFetchStart());
+    const response = await api.get<{ status: boolean; data: { items: any[] } }>(
+      API_ENDPOINTS.TRANSACTIONS.GIN.ALL,
+      {
+        params: {
+          is_paginate: true,
+          size: 100
+        }
+      }
+    );
+
+    if (response.data.status) {
+      const allItems = response.data.data.items || [];
+      const filteredLines = allItems.filter((l: any) =>
+        (String(l.grpo_docentry) === String(grpoDocEntry)) || (String(l.header?.grpo_docentry) === String(grpoDocEntry))
+      );
+
+      if (filteredLines.length > 0) {
+        const uniqueLines = Array.from(new Map(filteredLines.map((item: any) => [item.id, item])).values()) as any[];
+        dispatch(setCurrentGinHeader(uniqueLines[0].header || uniqueLines[0]));
+        dispatch(setCurrentGinLines(uniqueLines));
+        return true;
+      }
+      dispatch(ginFetchFailure("GRPO not found"));
+      return false;
+    }
+  } catch (err) {
+    dispatch(ginFetchFailure("Network error"));
+    return false;
+  }
+};
+
+/**
  * Robust fetcher that gets the latest list and matches the specific line
  */
 export const handleFetchGinLine = (headerId: number, lineId: number, ginType?: number) => async (dispatch: AppDispatch) => {

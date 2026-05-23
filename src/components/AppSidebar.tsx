@@ -107,11 +107,8 @@ export function AppSidebar() {
       case "/transactions/outward-history":
         dispatch(handleFetchPutawayHistory("outward", { page: 1, size: 15 }));
         break;
-      case "/transactions/gin/putaway":
-        dispatch(handleFetchGins({ gin_type: 2 }));
-        break;
-      case "/transactions/gin/flow-through":
-        dispatch(handleFetchGins({ gin_type: 1 }));
+      case "/transactions/gin/gatepasses":
+        dispatch(handleFetchGins({}));
         break;
       case "/transactions/flow-through/transfer":
         dispatch(handleFetchOutwardRequests({ page: 1, size: 15 }));
@@ -285,14 +282,9 @@ export function AppSidebar() {
             <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
               <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
                 <SubMenuItem
-                  title="GRN Putaway"
-                  url="/transactions/gin/putaway"
+                  title="GRN Gatepasses"
+                  url="/transactions/gin/gatepasses"
                   icon={PackagePlus}
-                />
-                <SubMenuItem
-                  title="GRN Flow-Through"
-                  url="/transactions/gin/flow-through"
-                  icon={ArrowLeftRight}
                 />
                 <SubMenuItem
                   title="Flowthrough Transfer"
