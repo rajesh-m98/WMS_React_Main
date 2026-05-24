@@ -18,23 +18,23 @@ api.interceptors.request.use(
 
     // If it's a POST/PUT/PATCH and data is a regular object or missing
     if (['post', 'put', 'patch'].includes(config.method || '')) {
-      if (config.data instanceof FormData) {
-        if (!config.data.has('companyid')) {
-          config.data.append('companyid', companyId.toString());
-        }
-      } else if (config.data && typeof config.data === 'object' && !(config.data instanceof URLSearchParams)) {
-        config.data.companyid = config.data.companyid || Number(companyId);
-      } else if (!config.data) {
-        config.data = { companyid: Number(companyId) };
-      }
+      // if (config.data instanceof FormData) {
+      //   if (!config.data.has('companyid')) {
+      //     config.data.append('companyid', companyId.toString());
+      //   }
+      // } else if (config.data && typeof config.data === 'object' && !(config.data instanceof URLSearchParams)) {
+      //   config.data.companyid = config.data.companyid || Number(companyId);
+      // } else if (!config.data) {
+      //   config.data = { companyid: Number(companyId) };
+      // }
     }
 
     // If it's a GET/DELETE request
     if (['get', 'delete'].includes(config.method || '')) {
       config.params = config.params || {};
-      if (!config.params.companyid) {
-        config.params.companyid = Number(companyId);
-      }
+      // if (!config.params.companyid) {
+      //   config.params.companyid = Number(companyId);
+      // }
     }
 
     return config;

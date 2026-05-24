@@ -2,7 +2,7 @@ export interface UserPermissionDTO {
   id: number;
   userid: number;
   operation_type: string;
-  operation_pages: string[];
+  OperationPages: string[];
   created_at?: string | null;
   updated_at?: string | null;
   deleted_at?: string | null;
@@ -10,36 +10,37 @@ export interface UserPermissionDTO {
 }
 
 export interface UserDTO {
-  id: number;
-  warehouse_id: number;
-  userid: string;
-  employee_id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  username: string;
-  mobile_number: string;
-  department: string;
-  role: number | string;
-  otp?: string;
-  reportingmanager?: string;
-  outlet?: number;
-  mobile_token?: string;
-  status: string;
-  db_warehouse?: {
-    id: number;
-    warehouse_name: string;
-    warehouse_code: string;
-    gstnumber?: string;
-    street?: string;
-    block?: string;
-    bplid?: string;
-    bplname?: string;
-    location?: string;
-    city?: string;
-    state?: string;
-    zipcode?: string;
-    country?: string;
+  ID: number;
+  WAREHOUSE_ID: number;
+  USERID: string;
+  EMPLOYEE_ID: string;
+  FIRSTNAME: string;
+  LASTNAME: string;
+  EMAIL: string;
+  USERNAME: string;
+  MOBILE_NUMBER: string;
+  PASSWORD: string;
+  DEPARTMENT: string;
+  ROLE: number | string;
+  OTP?: string;
+  REPORTINGMANAGER?: string;
+  OUTLET?: number;
+  MOBILE_TOKEN?: string;
+  STATUS: string;
+  DB_WAREHOUSE?: {
+    ID: number;
+    WAREHOUSE_NAME: string;
+    WAREHOUSE_CODE: string;
+    GSTNUMBER?: string;
+    STREET?: string;
+    BLOCK?: string;
+    BPLID?: string;
+    BPLNAME?: string;
+    LOCATION?: string;
+    CITY?: string;
+    STATE?: string;
+    ZIPCODE?: string;
+    COUNTRY?: string;
   };
   permission?: UserPermissionDTO[];
   created_at?: string | null;
@@ -76,8 +77,8 @@ export interface ItemDTO {
 
 export interface WarehouseDTO {
   id: number;
-  warehouse_code: string;
-  warehouse_name: string;
+  warehouse_Code: string;
+  warehouse_Name: string;
   location?: string;
 }
 
@@ -128,14 +129,13 @@ export interface CreatePackagePayload {
 export interface FloorDTO {
   id: number;
   warehouse_id: number;
-  floor_name: string;
+  floor_Name: string;
   barcode: string;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreateFloorPayload {
-  warehouse_id: number;
-  floor_name: string;
-  barcode: string;
+  warehouse_Id: number;
+  floor_Name: string;
 }

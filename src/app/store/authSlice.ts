@@ -70,15 +70,15 @@ const authSlice = createSlice({
       state.error = action.payload;
     },
 
-    setSignIn: (state, action: PayloadAction<{ token: string; refresh_token?: string; userData: UserData }>) => {
+    setSignIn: (state, action: PayloadAction<{ accessToken: string; refreshToken?: string; userData: UserData }>) => {
       state.loading = false;
-      state.token = action.payload.token;
-      state.refresh_token = action.payload.refresh_token || null;
+      state.token = action.payload.accessToken;
+      state.refresh_token = action.payload.refreshToken || null;
       state.userData = action.payload.userData;
       state.isAuthenticated = true;
       state.isTokenExpired = false;
-      localStorage.setItem('token', action.payload.token);
-      if (action.payload.refresh_token) localStorage.setItem('refresh_token', action.payload.refresh_token);
+      localStorage.setItem('token', action.payload.accessToken);
+      if (action.payload.refreshToken) localStorage.setItem('refresh_token', action.payload.refreshToken);
       localStorage.setItem('userData', JSON.stringify(action.payload.userData));
     },
     setSignOut: (state) => {
@@ -100,16 +100,16 @@ const authSlice = createSlice({
   },
 });
 
-export const { 
-  updateLoginForm, 
-  togglePasswordVisibility, 
+export const {
+  updateLoginForm,
+  togglePasswordVisibility,
   clearLoginForm,
   loginStart,
   loginSuccess,
   loginFailure,
-  setSignIn, 
-  setSignOut, 
-  setTokenExpired 
+  setSignIn,
+  setSignOut,
+  setTokenExpired
 } = authSlice.actions;
 
 export default authSlice.reducer;

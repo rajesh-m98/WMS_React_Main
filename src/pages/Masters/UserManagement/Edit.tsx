@@ -16,7 +16,10 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft, Save, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { handleFetchUserById } from "@/app/manager/masterManager";
+import {
+  handleFetchUserById,
+  handleUpdateUser,
+} from "@/app/manager/masterManager";
 import config from "./UserConfig.json";
 
 const permissionsList = config.strings.permissions;
@@ -32,6 +35,7 @@ const UserEdit = () => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
+    id: 0,
     userid: "",
     employee_id: "",
     firstname: "",
@@ -39,6 +43,7 @@ const UserEdit = () => {
     username: "",
     email_id: "",
     mobile_number: "",
+    password: "",
     role: "3",
     warehouse: "1",
     department: "",
@@ -57,28 +62,31 @@ const UserEdit = () => {
   useEffect(() => {
     if (currentUser) {
       setFormData({
-        userid: currentUser.userid || "",
-        employee_id: currentUser.employee_id || "",
-        firstname: currentUser.firstname || "",
-        lastname: currentUser.lastname || "",
-        username: currentUser.username || "",
-        email_id: currentUser.email || "",
-        mobile_number: currentUser.mobile_number?.toString() || "",
-        role: currentUser.role?.toString() || "3",
-        warehouse: currentUser.warehouse_id?.toString() || "1",
-        department: currentUser.department || "",
-        status: currentUser.status === "Y" || currentUser.status?.toLowerCase() === "active" ? "Active" : "Inactive",
+        id: currentUser.ID || 0,
+        userid: currentUser.USERID || "",
+        employee_id: currentUser.EMPLOYEE_ID || "",
+        firstname: currentUser.FIRSTNAME || "",
+        lastname: currentUser.LASTNAME || "",
+        username: currentUser.USERNAME || "",
+        email_id: currentUser.EMAIL || "",
+        mobile_number: currentUser.MOBILE_NUMBER?.toString() || "",
+        password: currentUser.PASSWORD || "",
+        role: currentUser.ROLE?.toString() || "3",
+        warehouse: currentUser.WAREHOUSE_ID?.toString() || "1",
+        department: currentUser.DEPARTMENT || "",
+        status:
+          currentUser.STATUS === "Y" ||
+          currentUser.STATUS?.toLowerCase() === "active"
+            ? "Active"
+            : "Inactive",
       });
 
       if (currentUser.permission && Array.isArray(currentUser.permission)) {
-        const read =
-          currentUser.permission.find((p) => p.operation_type === "read")
-            ?.operation_pages || [];
-        const write =
-          currentUser.permission.find((p) => p.operation_type === "write")
-            ?.operation_pages || [];
-        setReadPages(read);
-        setWritePages(write);
+        const permissions = currentUser.permission.flatMap(
+          (perm) => perm.OperationPages || [],
+        );
+        setReadPages(permissions.filter((p) => p.endsWith("_read")));
+        setWritePages(permissions.filter((p) => p.endsWith("_write")));
       }
     }
   }, [currentUser]);
@@ -114,22 +122,37 @@ const UserEdit = () => {
     if (readPages.length > 0) {
       permission.push({
         operation_type: "read",
-        operation_pages: readPages,
+        OperationPages: readPages,
       });
     }
     if (writePages.length > 0) {
       permission.push({
         operation_type: "write",
-        operation_pages: writePages,
+        OperationPages: writePages,
       });
     }
 
     // In a real implementation this would call an update API
     setTimeout(() => {
       setLoading(false);
-      toast.success("User updated successfully");
-      console.log("Updated permissions:", permission);
-      navigate(`/masters/users/${id}`);
+      const payload = {
+        id: Number(formData.id),
+        userid: formData.userid,
+        username: formData.username,
+        firstname: formData.firstname,
+        employee_id: formData.employee_id,
+        lastname: formData.lastname,
+        email_id: formData.email_id,
+        mobile_number: formData.mobile_number,
+        password: formData.password,
+        role: Number(formData.role),
+        warehouse: Number(formData.warehouse),
+        department: formData.department,
+        status: formData.status === "Active",
+        permissions: permission,
+      };
+      dispatch(handleUpdateUser(payload));
+      navigate("/masters/users");
     }, 800);
   };
 
@@ -217,6 +240,10 @@ const UserEdit = () => {
                   </Label>
                   <Input
                     type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     autoComplete="new-password"
                     placeholder="Leave blank to keep same"
                     className="rounded-xl h-11 bg-slate-50/50 border-slate-200 body-strong text-sm text-slate-750"
@@ -246,7 +273,9 @@ const UserEdit = () => {
                   <div className="flex bg-slate-100 p-1 rounded-xl h-11 border border-slate-200">
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, status: "Active" })}
+                      onClick={() =>
+                        setFormData({ ...formData, status: "Active" })
+                      }
                       className={`flex-1 rounded-lg body-strong text-sm transition-all ${
                         formData.status === "Active"
                           ? "bg-white text-emerald-600 shadow-sm border border-slate-200/50"
@@ -257,7 +286,9 @@ const UserEdit = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, status: "Inactive" })}
+                      onClick={() =>
+                        setFormData({ ...formData, status: "Inactive" })
+                      }
                       className={`flex-1 rounded-lg body-strong text-sm transition-all ${
                         formData.status === "Inactive"
                           ? "bg-white text-rose-600 shadow-sm border border-slate-200/50"
@@ -324,6 +355,7 @@ const UserEdit = () => {
             type="submit"
             className="px-12 bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 body-strong text-white uppercase text-xs h-11 transition-all active:scale-95"
             disabled={loading}
+            onClick={handleSubmit}
           >
             {loading ? (
               <Loader2 className="animate-spin icon-sm" />

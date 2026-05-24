@@ -111,16 +111,8 @@ export const WarehouseMaster = () => {
           };
 
           return {
-            warehouse_code:
-              getValue("warehouseCode") ||
-              getValue("warehouse_code") ||
-              getValue("code") ||
-              String(Object.values(row)[0] || ""),
-            warehouse_name:
-              getValue("warehouseName") ||
-              getValue("warehouse_name") ||
-              getValue("name") ||
-              String(Object.values(row)[1] || ""),
+            warehouse_Code: getValue("warehouse_Code") || "",
+            warehouse_Name: getValue("warehouse_Name") || "",
             city: getValue("city") || "",
             state: getValue("state") || "",
           };
@@ -187,7 +179,7 @@ export const WarehouseMaster = () => {
               accept=".csv, .xlsx, .xls"
               className="hidden"
             />
-            <Button
+            {/* <Button
               className="h-12 px-6 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95 flex items-center gap-2 group shadow-sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
@@ -196,7 +188,7 @@ export const WarehouseMaster = () => {
               <span className="uppercase tracking-widest text-[10px] font-bold">
                 Import File
               </span>
-            </Button>
+            </Button> */}
 
             <Button
               className="h-12 px-6 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 hover:border-indigo-200 transition-all active:scale-95 flex items-center gap-2 group shadow-sm"
@@ -283,12 +275,12 @@ export const WarehouseMaster = () => {
                             <Building2 className="icon-sm text-blue-600" />
                           </div>
                           <span className="text-sm font-bold text-slate-900">
-                            {wh.warehouse_name}
+                            {wh.warehouse_Name}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-5 font-mono text-[12px] font-black text-blue-600 tracking-wider">
-                        {wh.warehouse_code}
+                        {wh.warehouse_Code}
                       </TableCell>
                       <TableCell className="px-6 py-5">
                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">

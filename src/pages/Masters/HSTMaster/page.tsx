@@ -85,10 +85,10 @@ export const HSTMaster = () => {
 
   const filteredDevices = devices.filter(
     (d) =>
-      d.device_serial_number.toLowerCase().includes(search.toLowerCase()) ||
-      (d.device_name &&
-        d.device_name.toLowerCase().includes(search.toLowerCase())) ||
-      d.device_type.toLowerCase().includes(search.toLowerCase()),
+      d.deviceSerialNumber.toLowerCase().includes(search.toLowerCase()) ||
+      (d.deviceName &&
+        d.deviceName.toLowerCase().includes(search.toLowerCase())) ||
+      d.deviceType.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleRefresh = async () => {
@@ -178,28 +178,28 @@ export const HSTMaster = () => {
                     {(page - 1) * PAGE_SIZE + index + 1}
                   </TableCell>
                   <TableCell className="px-4 py-4 font-black text-slate-900 text-sm">
-                    {d.device_name || "-"}
+                    {d.deviceName || "-"}
                   </TableCell>
                   <TableCell className="px-4 py-4 text-sm font-bold text-slate-500 uppercase">
-                    {d.brand_name || "-"}
+                    {d.brandName || "-"}
                   </TableCell>
                   <TableCell className="px-4 py-4">
                     <div className="flex items-center gap-2">
                       <Smartphone className="h-4 w-4 text-slate-500" />
                       <span className="text-sm font-bold text-slate-700 uppercase">
-                        {d.device_type}
+                        {d.deviceType}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-4 text-sm font-bold text-slate-700">
-                    {d.device_serial_number || "-"}
+                    {d.deviceSerialNumber || "-"}
                   </TableCell>
                   <TableCell className="px-4 py-4 text-center">
                     <Badge
                       variant="outline"
-                      className={`rounded-lg px-3 py-1 border-0 text-sm font-black uppercase ${d.device_status === 0 ? "bg-emerald-100 text-emerald-600" : "bg-amber-50 text-amber-600"}`}
+                      className={`rounded-lg px-3 py-1 border-0 text-sm font-black uppercase ${d.deviceStatus === 0 ? "bg-emerald-100 text-emerald-600" : "bg-amber-50 text-amber-600"}`}
                     >
-                      {d.device_status === 0 ? "Available" : "Assigned"}
+                      {d.deviceStatus === 0 ? "Available" : "Assigned"}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
@@ -241,7 +241,7 @@ export const HSTMaster = () => {
                             <AlertDialogDescription className="text-center font-black text-slate-500 text-sm leading-relaxed">
                               Are you sure you want to remove{" "}
                               <span className="text-slate-900 underline">
-                                {d.device_id}
+                                {d.deviceId}
                               </span>{" "}
                               from the network? This action cannot be undone.
                             </AlertDialogDescription>

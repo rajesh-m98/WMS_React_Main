@@ -32,14 +32,14 @@ export const API_ENDPOINTS = {
       DELETE: 'items/delete_item/',
     },
     WAREHOUSE: {
-      ALL: 'warehouse/get_all_warehouse/',
+      ALL: 'warehouse/get_all_warehouse',
       CREATE: 'warehouse/warehouse_create/',
       GET_BY_ID: 'warehouse/get_warehouse/',
       REFRESH: 'warehouse/refresh_warehouse/',
       DELETE: 'warehouse/delete_warehouse/',
     },
     PACKAGING: {
-      ALL: 'packaging/get_all_packagings/',
+      ALL: 'packaging/get_all_packagings',
       CREATE: 'packaging/packaging_create/',
       GET_BY_ID: 'packaging/get_packaging/',
       DELETE: 'packaging/delete_package/',

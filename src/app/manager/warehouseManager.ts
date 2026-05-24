@@ -1,11 +1,11 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
-import { 
-  warehouseLoadStart, 
-  warehouseLoadSuccess, 
-  warehouseDetailSuccess, 
+import {
+  warehouseLoadStart,
+  warehouseLoadSuccess,
+  warehouseDetailSuccess,
   warehouseLoadFailure,
-  clearCurrentWarehouse 
+  clearCurrentWarehouse
 } from '../store/warehouseSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
 
@@ -19,18 +19,19 @@ export const handleFetchAllWarehouses = (params?: { page?: number; size?: number
       size: (params?.size ?? 10).toString(),
     }).toString();
 
-    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.WAREHOUSE.ALL}?${queryParams}`);
+    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.WAREHOUSE.ALL}`);
+    console.log(response.data);
     if (response.data.status) {
-      if (params?.is_paginate !== false) {
-        dispatch(warehouseLoadSuccess({ 
-          data: response.data.data.items || [], 
-          total: response.data.data.totalCount || response.data.data.total || 0 
-        }));
-      } else {
-        dispatch(warehouseLoadSuccess({ 
-          data: Array.isArray(response.data.data) ? response.data.data : response.data.data.items || [] 
-        }));
-      }
+      // if (params?.is_paginate !== false) {
+      dispatch(warehouseLoadSuccess({
+        data: response.data.data.items || [],
+        // total: response.data.data.totalCount || response.data.data.total || 0 
+      }));
+      // } else {
+      //   dispatch(warehouseLoadSuccess({ 
+      //     data: Array.isArray(response.data.data) ? response.data.data : response.data.data.items || [] 
+      //   }));
+      // }
       return true;
     } else {
       dispatch(warehouseLoadFailure("Failed to retrieve warehouses"));
@@ -61,7 +62,7 @@ export const handleGetWarehouseById = (warehouse_id: number) => async (dispatch:
 export const handleCreateWarehouse = (data: any, editId?: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(warehouseLoadStart());
-    const url = editId 
+    const url = editId
       ? `${API_ENDPOINTS.MASTERS.WAREHOUSE.CREATE}?warehouse_id=${editId}`
       : API_ENDPOINTS.MASTERS.WAREHOUSE.CREATE;
 

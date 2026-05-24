@@ -113,9 +113,9 @@ export const PackageList = () => {
   const getWarehouseNameByCode = (code: string): string => {
     if (!code) return "Warehouse";
     const found = warehouses.find(
-      (w) => w.warehouse_code?.toLowerCase() === code.toLowerCase(),
+      (w) => w.warehouse_Code?.toLowerCase() === code.toLowerCase(),
     );
-    return found ? found.warehouse_name : "Warehouse";
+    return found ? found.warehouse_Name : "Warehouse";
   };
 
   const [search, setSearch] = useState("");

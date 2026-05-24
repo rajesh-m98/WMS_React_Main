@@ -28,7 +28,8 @@ export const handleFetchAllPackages = (params?: FetchParams) => async (dispatch:
       queryParams.append('search', params.search);
     }
 
-    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.PACKAGING.ALL}?${queryParams.toString()}`);
+    const response = await api.get<{ status: boolean; data: any }>(API_ENDPOINTS.MASTERS.PACKAGING.ALL);
+    console.log("response", response);
     if (response.data.status) {
       const rawData = isPaginated
         ? response.data.data.items

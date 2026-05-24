@@ -1,6 +1,6 @@
 import api from '@/lib/api';
 import { AppDispatch } from '../store';
-import { 
+import {
   userLoadStart, userLoadSuccess, userDetailSuccess, userLoadFailure,
   clearCurrentUser
 } from '../store/masterSlice';
@@ -27,11 +27,11 @@ interface PaginatedResponse<T> {
 export const handleFetchUsers = (params?: FetchParams) => async (dispatch: AppDispatch) => {
   try {
     dispatch(userLoadStart());
-    
+
     const queryParams = new URLSearchParams({
       companyid: (params?.companyid || 1).toString(),
     });
-    
+
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.size) queryParams.append('size', params.size.toString());
     if (params?.search) queryParams.append('search', params.search);
@@ -41,7 +41,7 @@ export const handleFetchUsers = (params?: FetchParams) => async (dispatch: AppDi
       queryParams.append('status', serverStatus);
       // Note: If this doesn't work, we can switch to queryParams.append('status', params.status);
     }
-    
+
     // Some endpoints use is_paginate for totalCount and items structure
     queryParams.append('is_paginate', 'true');
 
@@ -53,9 +53,9 @@ export const handleFetchUsers = (params?: FetchParams) => async (dispatch: AppDi
       if (Array.isArray(response.data.data)) {
         dispatch(userLoadSuccess({ data: response.data.data }));
       } else {
-        dispatch(userLoadSuccess({ 
-          data: response.data.data.items, 
-          total: response.data.data.total 
+        dispatch(userLoadSuccess({
+          data: response.data.data.items,
+          total: response.data.data.total
         }));
       }
     } else {
@@ -96,6 +96,28 @@ export const handleCreateUser = (userData: any) => async (dispatch: AppDispatch)
     }
   } catch (err: any) {
     const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || "Error creating user";
+    dispatch(userLoadFailure(errorMsg));
+    return false;
+  }
+};
+
+
+
+export const handleUpdateUser = (userData: any) => async (dispatch: AppDispatch) => {
+  try {
+    dispatch(userLoadStart());
+    const response = await api.post(`${API_ENDPOINTS.MASTERS.CREATE_USER}`, userData);
+    if (response.data.status) {
+      toast.success("User updated successfully");
+      // Refresh user list
+      dispatch(handleFetchUsers({ companyid: 1 }));
+      return true;
+    } else {
+      dispatch(userLoadFailure(response.data.message || "Failed to update user"));
+      return false;
+    }
+  } catch (err: any) {
+    const errorMsg = err.response?.data?.detail?.[0]?.msg || err.message || "Error updating user";
     dispatch(userLoadFailure(errorMsg));
     return false;
   }

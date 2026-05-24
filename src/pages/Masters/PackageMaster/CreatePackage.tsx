@@ -228,7 +228,7 @@ export const CreatePackage = () => {
                       const id = Number(e.target.value);
                       const whs = warehouses.find((w) => w.id === id);
                       setSelectedWarehouseId(id);
-                      setSelectedWhsCode(whs?.warehouse_code || "");
+                      setSelectedWhsCode(whs?.warehouse_Code || "");
                     }}
                   >
                     <option value="0" disabled>
@@ -236,7 +236,7 @@ export const CreatePackage = () => {
                     </option>
                     {warehouses.map((wh) => (
                       <option key={wh.id} value={wh.id}>
-                        {wh.warehouse_code} - {wh.warehouse_name}
+                        {wh.warehouse_Code} - {wh.warehouse_Name}
                       </option>
                     ))}
                   </select>

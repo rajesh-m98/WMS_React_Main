@@ -108,7 +108,7 @@ const UserDetail = () => {
                 User Name
               </p>
               <p className="body-strong !text-slate-800 uppercase leading-tight">
-                {user.userid}
+                {user.USERID}
               </p>
             </div>
             <div className="space-y-1.5">
@@ -117,7 +117,7 @@ const UserDetail = () => {
               </p>
               <p className="body-strong !text-slate-800 flex items-center gap-3 uppercase">
                 <ShieldCheck className="icon-sm text-slate-400" />{" "}
-                {user.employee_id || "-"}
+                {user.EMPLOYEE_ID || "-"}
               </p>
             </div>
             <div className="space-y-1.5">
@@ -126,7 +126,7 @@ const UserDetail = () => {
               </p>
               <p className="body-strong !text-slate-800 flex items-center gap-3 uppercase">
                 <Building2 className="icon-sm text-slate-400" />{" "}
-                {user.department || "-"}
+                {user.DEPARTMENT || "-"}
               </p>
             </div>
             <div className="space-y-1.5">
@@ -134,15 +134,15 @@ const UserDetail = () => {
                 System Role
               </p>
               <div className="flex pt-1">
-                {Number(user.role) === 1 ? (
+                {Number(user.ROLE) === 1 ? (
                   <Badge className="bg-slate-100 text-slate-700 px-4 py-1 rounded-lg text-xs font-black uppercase tracking-tight border-0">
                     Admin
                   </Badge>
-                ) : Number(user.role) === 2 ? (
+                ) : Number(user.ROLE) === 2 ? (
                   <Badge className="bg-purple-100 text-purple-700 px-4 py-1 rounded-lg text-xs font-black uppercase tracking-tight border-0">
                     Super User
                   </Badge>
-                ) : Number(user.role) === 4 ? (
+                ) : Number(user.ROLE) === 4 ? (
                   <Badge className="bg-orange-100 text-orange-700 px-4 py-1 rounded-lg text-xs font-black uppercase tracking-tight border-0">
                     Warehouse User
                   </Badge>
@@ -160,14 +160,14 @@ const UserDetail = () => {
               <div className="flex pt-1">
                 <Badge
                   className={`px-4 py-1 rounded-lg border-0 text-[11px] font-black uppercase tracking-tight ${
-                    user.status === "Y" ||
-                    user.status?.toLowerCase() === "active"
+                    user.STATUS === "Y" ||
+                    user.STATUS?.toLowerCase() === "active"
                       ? "bg-emerald-100 text-emerald-700"
                       : "bg-rose-100 text-rose-700"
                   }`}
                 >
-                  {user.status === "Y" ||
-                  user.status?.toLowerCase() === "active"
+                  {user.STATUS === "Y" ||
+                  user.STATUS?.toLowerCase() === "active"
                     ? "Active"
                     : "Inactive"}
                 </Badge>
@@ -189,28 +189,22 @@ const UserDetail = () => {
                   <div key={perm.id || index} className="space-y-4">
                     <div className="flex items-center gap-3">
                       <Badge
-                        className={`px-4 py-1.5 rounded-full border-0 label-bold !tracking-widest capitalize ${
-                          perm.operation_type?.toLowerCase() === "write"
-                            ? "bg-rose-100 text-rose-600"
-                            : "bg-emerald-100 text-emerald-600"
-                        }`}
+                        className={`px-4 py-1.5 rounded-full border-0 label-bold !tracking-widest capitalize `}
                       >
-                        {perm.operation_type} Access
+                        {perm.OperationPages} Access
                       </Badge>
                       <div className="h-[2px] flex-1 bg-slate-50" />
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {perm.operation_pages.map((page, pIdx) => (
+                      {perm.OperationPages.map((page, pIdx) => (
                         <div
                           key={pIdx}
                           className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50/50 border border-slate-200 group hover:border-blue-200 hover:bg-white hover:shadow-md transition-all duration-300"
                         >
                           <div
-                            className={`h-2 w-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] ${
-                              perm.operation_type?.toLowerCase() === "write"
-                                ? "bg-rose-500 shadow-rose-200"
-                                : "bg-blue-500 shadow-blue-200"
-                            }`}
+                            className={`h-2 w-2 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]
+                              
+                            `}
                           />
                           <span className="text-xs font-black text-slate-700 uppercase tracking-tight">
                             {getPermissionLabel(page)}
