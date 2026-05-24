@@ -73,11 +73,26 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         description:
           "View handheld terminal specifications and location assignments",
       };
+      if (normalizedPath.includes("/History/GRNGatePass/GRNGatePassHis"))
+      return { title: "GRN GatePass Management", description: "View handheld terminal specifications and location assignments" };
+      if (normalizedPath.includes("/History/FlowThroughDispatch/FlowThroughDispatch"))
+      return { title: "Flow Through Dispatch Management", description: "View handheld terminal specifications and location assignments" };
+      if (normalizedPath.includes("/History/FlowThroughPicking/FlowThroughPicking"))
+      return { title: "Flow Through Picking Management", description: "View handheld terminal specifications and location assignments" };
+      if (normalizedPath.includes("/History/PutawayDispatch/PutawayDispatch"))
+      return { title: "Putaway Dispatch Management", description: "View handheld terminal specifications and location assignments" };
+      if (normalizedPath.includes("/History/PutawayCollection/PutawayCollection"))
+      return { title: "Putaway Collection Management", description: "View handheld terminal specifications and location assignments" };
+      if (normalizedPath.includes("/History/PutawaySorting/PutawaySorting"))
+      return { title: "Putaway Sorting Management", description: "View handheld terminal specifications and location assignments" };
+      if (normalizedPath.includes("/History/PutawayAllocation/PutawayAllocation"))
+      return { title: "Putaway Allocation Management", description: "View handheld terminal specifications and location assignments" };
     if (normalizedPath.includes("/transactions/tasks/"))
       return {
         title: "Task Details",
         description: "Comprehensive View of Execution and Item Audit",
       };
+      
 
     const pageData: { [key: string]: { title: string; description: string } } =
       {

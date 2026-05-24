@@ -20,6 +20,12 @@ import {
   Shuffle,
   Truck,
   ArrowRightLeft,
+  PackageSearch,
+  Boxes,
+  PackageCheck,
+  ArrowUpFromLine,
+  ScanLine,
+  
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -318,6 +324,69 @@ export function AppSidebar() {
                   title="Picklist Dispatch"
                   url="/transactions/picklist/dispatch"
                   icon={Truck}
+                />
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </Collapsible>
+        </SidebarGroup>
+
+        <SidebarGroup className="p-0">
+          <Collapsible defaultOpen={true} className="group/collapsible">
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-slate-50/80 rounded-2xl transition-all group/btn">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-1.5 rounded-xl bg-slate-100 group-hover/btn:bg-blue-100/50 transition-colors">
+                    <ClipboardCheck className="icon-base text-slate-500 group-hover/btn:text-blue-600" />
+                  </div>
+                  <span className="body-strong !text-slate-800">
+                    History
+                  </span>
+                </div>
+                <ChevronDown className="icon-sm text-slate-400 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300">
+              <SidebarMenuSub className="mt-2 space-y-1 ml-3 border-l-2 border-slate-100 pb-2">
+                <SubMenuItem
+                  title="GRN GatePass"
+                  url="/History/GRNGatePass/GRNGatePassHis"
+                  icon={ClipboardCheck}
+                />
+
+                <SubMenuItem
+                  title="FlowThrough Picking"
+                  url="/History/FlowThroughPicking/FlowThroughPicking"
+                  icon={PackageSearch}
+                />
+
+                <SubMenuItem
+                  title="FlowThrough Dispatch"
+                  url="/History/FlowThroughDispatch/FlowThroughDispatch"
+                  icon={Truck}
+                />
+
+                <SubMenuItem
+                  title="Putaway Allocation"
+                  url="/History/PutawayAllocation/PutawayAllocation"
+                  icon={Boxes}
+                />
+
+                <SubMenuItem
+                  title="Putaway Collection"
+                  url="/History/PutawayCollection/PutawayCollection"
+                  icon={PackageCheck}
+                />
+
+                <SubMenuItem
+                  title="Putaway Sorting"
+                  url="/History/PutawaySorting/PutawaySorting"
+                  icon={ScanLine}
+                />
+
+                <SubMenuItem
+                  title="Putaway Dispatch"
+                  url="/History/PutawayDispatch/PutawayDispatch"
+                  icon={ArrowUpFromLine}
                 />
               </SidebarMenuSub>
             </CollapsibleContent>

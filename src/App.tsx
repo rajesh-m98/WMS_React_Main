@@ -48,12 +48,20 @@ import OnwardPicklistPage from "./pages/Transactions/PicklistSorting/OnwardPickl
 import OnwardPicklistDetailPage from "./pages/Transactions/PicklistSorting/OnwardPicklistDetailPage";
 import PicklistDispatchPage from "./pages/Transactions/PicklistDispatch/PicklistDispatchPage";
 import PicklistDispatchDetailPage from "./pages/Transactions/PicklistDispatch/PicklistDispatchDetailPage";
-import NotFound from "./pages/NotFound";
+// import NotFound from "./pages/NotFound";
 import PutawayLocationDetail from "./pages/Transactions/GinManagement/PutawayLocationDetail";
 import PicklistGenerationDetailPage from "./pages/Transactions/PicklistGeneration/PicklistGenerationDetailPage";
 import FlowthroughTransferDetailPage from "./pages/Transactions/FlowthroughTransfer/FlowthroughTransferDetailPage";
 import FlowthroughDispatchPage from "./pages/Transactions/FlowthroughDispatch/FlowthroughDispatchPage";
 import ManualPicklistResultPage from "./pages/Transactions/PicklistGeneration/ManualPicklistResultPage";
+import GRNGatePass from "./pages/History/GRNGatePassHis/GRNGatePassHis";
+import NotFound from "./pages/NotFound";
+import FlowThroughDispatch from "./pages/History/FlowThroughDispatch/FlowThroughDispatch";
+import FlowThroughPicking from "./pages/History/FlowThroughPicking/FlowThroughPicking";
+import PutawayAllocation from "./pages/History/PutawayAllocation/PutawayAllocation";
+import PutawayCollection from "./pages/History/PutawayCollection/PutawayCollection";
+import PutawaySorting from "./pages/History/PutawaySorting/PutawaySorting";
+import PutawayDispatch from "./pages/History/PutawayDispatch/PutawayDispatch";
 
 const queryClient = new QueryClient();
 
@@ -257,6 +265,34 @@ const App = () => (
                     />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="*" element={<NotFound />} />
+                     <Route
+                      path="/history/GRNGatePass/GRNGatePassHis"
+                      element={<GRNGatePass type={"putaway"} />}
+                    />
+                     <Route
+                      path="/history/FlowThroughDispatch/FlowThroughDispatch"
+                      element={<FlowThroughDispatch type={"putaway"} />}
+                    />
+                     <Route
+                     path="/history/FlowThroughPicking/FlowThroughPicking"
+                      element={<FlowThroughPicking type={"putaway"} />}
+                    />
+                     <Route
+                      path="/history/PutawayAllocation/PutawayAllocation"
+                      element={<PutawayAllocation type={"putaway"} />}
+                    />
+                     <Route
+                      path="/history/PutawayCollection/PutawayCollection"
+                      element={<PutawayCollection type={"putaway"} />}
+                    />
+                     <Route
+                      path="/history/putawaySorting/PutawaySorting"
+                      element={<PutawaySorting type={"putaway"} />}
+                    />
+                     <Route
+                      path="/history/PutawayDispatch/PutawayDispatch"
+                      element={<PutawayDispatch type={"putaway"} />}
+                    />
                   </Routes>
                 </AppLayout>
               </ProtectedRoute>

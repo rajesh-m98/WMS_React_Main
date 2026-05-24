@@ -2,6 +2,9 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: 'users/login/',
   },
+  Common:{
+    GET_HISTORY_DETAILS:'user/get_history_details/',
+  },
   DASHBOARD: {
     GET_STATS: 'dashboard/get_dashboard_stats',
   },
