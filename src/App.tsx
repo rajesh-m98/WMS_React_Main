@@ -20,6 +20,7 @@ import { WarehouseMaster } from "./pages/Masters/WarehouseMaster/page";
 import MasterDetail from "./pages/Masters/MasterDetail";
 import { PackageList } from "./pages/Masters/PackageMaster/PackageList";
 import { CreatePackage } from "./pages/Masters/PackageMaster/CreatePackage";
+import { PrintPackage } from "./pages/Masters/PackageMaster/PrintPackage";
 import PackageDetail from "./pages/Masters/PackageMaster/PackageDetail";
 import { FloorMaster } from "./pages/Masters/FloorMaster/page";
 import FloorCreate from "./pages/Masters/FloorMaster/Create";
@@ -236,6 +237,10 @@ const App = () => (
                     <Route
                       path="/masters/packages/create"
                       element={<CreatePackage />}
+                    />
+                    <Route
+                      path="/masters/packages/print"
+                      element={<PrintPackage />}
                     />
                     <Route
                       path="/masters/packages/detail/:whsCode"

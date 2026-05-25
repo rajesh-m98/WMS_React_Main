@@ -1,15 +1,14 @@
-import { useState, useRef, forwardRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Input, Button, Label } from "@/components/ui";
 import {
-  Box,
   RefreshCw,
   Loader2,
-  Download,
-  ImageIcon,
   X,
   ChevronDown,
-  Save,
+  Search,
+  Check,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
@@ -18,60 +17,125 @@ import {
   handleGenerateBarcodes,
 } from "@/app/manager/packageManager";
 import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
-import Barcode from "react-barcode";
-import { toPng } from "html-to-image";
-import jsPDF from "jspdf";
 
-// Printable component for high-quality capture
-const PrintableBarcodes = forwardRef<
-  HTMLDivElement,
-  { codes: string[]; typeName: string }
->(({ codes, typeName }, ref) => (
-  <div ref={ref} className="p-10 bg-white grid grid-cols-2 gap-8 w-[210mm]">
-    {codes.map((code, idx) => (
-      <div
-        key={idx}
-        className="label-item border-2 border-slate-900 p-8 flex flex-col items-center justify-center gap-4 rounded-xl overflow-hidden w-full h-[80mm] bg-white box-border"
+// ─── Local Searchable Dropdown Component ────────────────────────────────────
+interface SearchableDropdownProps {
+  options: { value: string | number; label: string; code?: string }[];
+  placeholder: string;
+  value: string | number;
+  onChange: (value: string | number, code: string) => void;
+  disabled?: boolean;
+}
+
+const SearchableDropdown = ({
+  options,
+  placeholder,
+  value,
+  onChange,
+  disabled = false,
+}: SearchableDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  const filteredOptions = options.filter((opt) =>
+    opt.label.toLowerCase().includes(search.toLowerCase()) ||
+    (opt.code && opt.code.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  return (
+    <div className="relative w-full" ref={containerRef}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          setSearch("");
+        }}
+        className="h-11 w-full px-4 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all bg-white text-sm font-bold flex items-center justify-between cursor-pointer disabled:opacity-50 text-slate-900 text-left outline-none hover:border-blue-300"
       >
-        <div className="bg-white p-2 w-full flex justify-center overflow-hidden">
-          <Barcode
-            value={code}
-            width={2.2}
-            height={140}
-            fontSize={0}
-            displayValue={false}
-            background="#ffffff"
-            lineColor="#000000"
-            margin={0}
-          />
+        <span className={selectedOption ? "text-slate-900" : "text-slate-400"}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 mt-1.5 w-full bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="p-2 border-b border-slate-100 flex items-center gap-2 bg-slate-50">
+            <Search className="h-4 w-4 text-slate-400 shrink-0 ml-1" />
+            <input
+              type="text"
+              autoFocus
+              placeholder="Search warehouse..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent text-sm font-semibold outline-none py-1.5 text-slate-900 placeholder:text-slate-400"
+            />
+          </div>
+          <div className="max-h-48 overflow-y-auto py-1 scrollbar-thin">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((opt) => {
+                const isSelected = opt.value === value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      onChange(opt.value, opt.code || "");
+                      setIsOpen(false);
+                    }}
+                    className={`w-full px-4 py-2.5 text-sm font-bold text-left flex items-center justify-between transition-colors ${
+                      isSelected
+                        ? "bg-blue-50 text-blue-600"
+                        : "hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {isSelected && <Check className="h-4 w-4 text-blue-600 shrink-0" />}
+                  </button>
+                );
+              })
+            ) : (
+              <div className="px-4 py-3 text-xs text-slate-400 text-center font-semibold">
+                No matching warehouses found
+              </div>
+            )}
+          </div>
         </div>
-        <div className="text-center font-bold text-xl uppercase text-slate-900 border-t-2 border-slate-900 pt-4 w-full">
-          {typeName}
-        </div>
-      </div>
-    ))}
-  </div>
-));
+      )}
+    </div>
+  );
+};
 
 export const CreatePackage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data: warehouses } = useAppSelector((state) => state.warehouse);
+  
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<number>(0);
   const [selectedWhsCode, setSelectedWhsCode] = useState<string>("");
-  const [batchName, setBatchName] = useState("Warehouse Asset");
-  const [packageType] = useState(2); // Type 2 = Warehouse
   const [batchCount, setBatchCount] = useState(10);
-  const [generatedBarcodes, setGeneratedBarcodes] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     dispatch(handleFetchAllWarehouses({ is_paginate: false }));
   }, [dispatch]);
 
-  const printRef = useRef<HTMLDivElement>(null);
-
-  const handleGenerateBatch = async () => {
+  const handleGenerateAndSave = async () => {
     if (!selectedWarehouseId) {
       toast.error("Please select a target warehouse");
       return;
@@ -82,306 +146,152 @@ export const CreatePackage = () => {
     }
 
     setIsGenerating(true);
-    const result = await dispatch(
+    toast.info("Generating sequences from SAP...");
+
+    // 1. Generate barcodes
+    const generated = await dispatch(
       handleGenerateBarcodes({
-        package_type: packageType,
+        package_type: 2, // Type 2 = Warehouse Asset
         warehouse_id: selectedWarehouseId,
         whscode: selectedWhsCode,
         quntity: batchCount,
       }),
     );
 
-    if (result && Array.isArray(result)) {
-      setGeneratedBarcodes(result);
-      toast.success(`${result.length} sequences generated from server`);
+    if (generated && Array.isArray(generated) && generated.length > 0) {
+      toast.info(`Registering ${generated.length} packages to database...`);
+      let successCount = 0;
+
+      // 2. Loop and save each package
+      for (const code of generated) {
+        const success = await dispatch(
+          handleCreatePackage({
+            package_type_name: "Warehouse Asset",
+            package_code: code,
+            package_type: 2,
+            warehouse_id: selectedWarehouseId,
+            whscode: selectedWhsCode,
+            status: "Active",
+          }),
+        );
+        if (success) successCount++;
+      }
+
+      if (successCount > 0) {
+        toast.success(`🎉 Successfully created and registered ${successCount} packages!`);
+        navigate("/masters/packages");
+      } else {
+        toast.error("Failed to register generated packages");
+      }
+    } else {
+      toast.error("Failed to generate barcodes from SAP API");
     }
     setIsGenerating(false);
   };
 
-  const handleSaveBatch = async () => {
-    if (generatedBarcodes.length === 0) {
-      toast.error("Please generate barcodes first");
-      return;
-    }
-
-    toast.info("Saving packages...");
-    let successCount = 0;
-
-    for (const code of generatedBarcodes) {
-      const success = await dispatch(
-        handleCreatePackage({
-          package_type_name: batchName,
-          package_code: code,
-          package_type: packageType,
-          warehouse_id: selectedWarehouseId,
-          whscode: selectedWhsCode,
-          status: "Active",
-        }),
-      );
-      if (success) successCount++;
-    }
-
-    if (successCount > 0) {
-      toast.success(`${successCount} packages registered`);
-      navigate("/masters/packages");
-    } else {
-      toast.error("Failed to register packages");
-    }
-  };
-
-  const downloadAsImage = async () => {
-    if (!printRef.current || generatedBarcodes.length === 0) return;
-    try {
-      toast.info("Preparing image...");
-      const dataUrl = await toPng(printRef.current, {
-        quality: 1,
-        backgroundColor: "#fff",
-        pixelRatio: 2,
-      });
-      const link = document.createElement("a");
-      link.download = `Labels_Warehouse.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      toast.error("Failed to download image");
-    }
-  };
-
-  const downloadAsPDF = async () => {
-    if (!printRef.current || generatedBarcodes.length === 0) return;
-    try {
-      toast.info("Generating PDF...");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const margin = 10;
-
-      const items = printRef.current.querySelectorAll(".label-item");
-
-      const imgDatas = await Promise.all(
-        Array.from(items).map((item) =>
-          toPng(item as HTMLElement, {
-            pixelRatio: 2,
-            backgroundColor: "#fff",
-          }),
-        ),
-      );
-
-      let currentHeight = margin;
-
-      for (let i = 0; i < imgDatas.length; i++) {
-        const imgData = imgDatas[i];
-        const imgProps = pdf.getImageProperties(imgData);
-        const targetWidth = (pageWidth - margin * 3) / 2;
-        const targetHeight = (imgProps.height * targetWidth) / imgProps.width;
-
-        if (currentHeight + targetHeight > pageHeight - margin) {
-          pdf.addPage();
-          currentHeight = margin;
-        }
-
-        let xPos = margin;
-        if (i % 2 !== 0) xPos = pageWidth / 2 + margin / 2;
-
-        pdf.addImage(
-          imgData,
-          "PNG",
-          xPos,
-          currentHeight,
-          targetWidth,
-          targetHeight,
-        );
-        if (i % 2 !== 0 || i === imgDatas.length - 1) {
-          currentHeight += targetHeight + 10;
-        }
-      }
-
-      pdf.save(`Labels_Warehouse.pdf`);
-      toast.success("PDF Downloaded");
-    } catch (err) {
-      toast.error("Failed to generate PDF");
-    }
-  };
+  // Map warehouses for SearchableDropdown
+  const warehouseOptions = warehouses.map((wh) => ({
+    value: wh.id,
+    label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
+    code: wh.warehouse_code,
+  }));
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto pb-10">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-1 border border-slate-200 shadow-sm rounded-2xl bg-white overflow-hidden">
-          <CardContent className="p-6 space-y-6">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-              <RefreshCw className="h-5 w-5 text-blue-600" />
-              <h3 className="text-sm font-bold text-slate-900">
+    <div className="flex items-center justify-center min-h-[70vh] p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <Card className="w-full max-w-2xl border border-slate-200 shadow-xl rounded-3xl bg-white overflow-hidden">
+        <CardContent className="p-10 space-y-8">
+          <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
+            <button
+              onClick={() => navigate("/masters/packages")}
+              disabled={isGenerating}
+              className="w-11 h-11 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer group disabled:opacity-50 shrink-0"
+              title="Back to Packages"
+            >
+              <ArrowLeft className="h-5 w-5 text-slate-600 group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+            <div>
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
                 Configuration
               </h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                Generate & Register Barcode Assets
+              </p>
             </div>
+          </div>
 
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-600">
-                  Select Warehouse
-                </Label>
-                <div className="relative group">
-                  <select
-                    className="h-11 w-full pl-4 pr-12 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all bg-white text-sm font-bold outline-none appearance-none cursor-pointer hover:border-blue-300 group-hover:bg-slate-50/50"
-                    value={selectedWarehouseId}
-                    onChange={(e) => {
-                      const id = Number(e.target.value);
-                      const whs = warehouses.find((w) => w.id === id);
-                      setSelectedWarehouseId(id);
-                      setSelectedWhsCode(whs?.warehouse_code || "");
-                    }}
-                  >
-                    <option value="0" disabled>
-                      Select Warehouse Node
-                    </option>
-                    {warehouses.map((wh) => (
-                      <option key={wh.id} value={wh.id}>
-                        {wh.warehouse_code} - {wh.warehouse_name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
-                    <ChevronDown className="h-4 w-4" />
-                  </div>
-                </div>
-                {selectedWhsCode && (
-                  <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest pl-1 mt-1">
-                    Active Node: {selectedWhsCode}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-600">
-                  Quantity (Number of Packages)
-                </Label>
-                <Input
-                  type="number"
-                  value={batchCount === 0 ? "" : batchCount}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setBatchCount(val === "" ? 0 : parseInt(val, 10));
-                  }}
-                  className="h-11 rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all text-sm font-bold"
-                  min={1}
-                  placeholder="0"
-                />
-              </div>
-
-              <Button
-                className="w-full h-11 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs shadow-md shadow-blue-100 transition-all active:scale-95"
-                onClick={handleGenerateBatch}
+          <div className="space-y-6">
+            {/* Warehouse Dropdown */}
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-600">
+                Select Warehouse
+              </Label>
+              <SearchableDropdown
+                options={warehouseOptions}
+                placeholder="Select Warehouse Node"
+                value={selectedWarehouseId}
+                onChange={(val, code) => {
+                  setSelectedWarehouseId(Number(val));
+                  setSelectedWhsCode(code);
+                }}
                 disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <Loader2 className="animate-spin mr-2" />
-                ) : (
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                )}
-                Generate Sequence
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2 border border-slate-200 shadow-sm rounded-2xl bg-blue-50/30 text-slate-900 overflow-hidden">
-          <CardContent className="p-8 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-6 border-b border-blue-100 pb-4">
-              <div>
-                <h3 className="text-lg font-bold text-blue-600">
-                  Sequence Preview
-                </h3>
-                <p className="text-[11px] text-blue-400 font-semibold">
-                  {generatedBarcodes.length} Barcodes prepared
+              />
+              {selectedWhsCode && (
+                <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest pl-1 mt-1">
+                  Active Node: {selectedWhsCode}
                 </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="h-9 px-4 rounded-lg bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 font-bold text-[10px] uppercase tracking-wider transition-all shadow-sm"
-                  disabled={generatedBarcodes.length === 0}
-                  onClick={downloadAsImage}
-                >
-                  <ImageIcon className="mr-2 h-3.5 w-3.5" /> PNG
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-9 px-4 rounded-lg bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 font-bold text-[10px] uppercase tracking-wider transition-all shadow-sm"
-                  disabled={generatedBarcodes.length === 0}
-                  onClick={downloadAsPDF}
-                >
-                  <Download className="mr-2 h-3.5 w-3.5" /> PDF
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-[400px] pr-2 scrollbar-thin scrollbar-thumb-blue-100">
-              {generatedBarcodes.length > 0 ? (
-                generatedBarcodes.map((code, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white border border-blue-50 rounded-xl p-4 flex flex-col items-center gap-3 shadow-sm hover:border-blue-300 transition-all"
-                  >
-                    <div className="bg-slate-50 w-full p-2 rounded-lg flex items-center justify-center border border-slate-100">
-                      <Barcode
-                        value={code}
-                        width={1}
-                        height={35}
-                        fontSize={10}
-                        background="transparent"
-                      />
-                    </div>
-                    <span className="font-bold text-[10px] text-slate-500">
-                      {code}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full h-60 flex flex-col items-center justify-center opacity-40 border-2 border-dashed border-blue-100 rounded-2xl bg-white">
-                  <Box className="h-12 w-12 mb-4 text-blue-200" />
-                  <span className="text-xs font-semibold text-blue-300">
-                    Generate barcodes to see preview
-                  </span>
-                </div>
               )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Action Footer */}
-      <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
-        <Button
-          variant="outline"
-          className="h-11 px-8 rounded-xl border border-slate-200 font-bold text-xs text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all"
-          onClick={() => navigate("/masters/packages")}
-        >
-          <X className="mr-2 h-4 w-4" /> Discard
-        </Button>
-        <Button
-          className="h-11 px-10 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
-          onClick={handleSaveBatch}
-          disabled={isGenerating || generatedBarcodes.length === 0}
-        >
-          {isGenerating ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="mr-2 h-4 w-4" />
-          )}
-          Save & Register Barcodes
-        </Button>
-      </div>
+            {/* Quantity Input */}
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-600">
+                Quantity (Number of Packages)
+              </Label>
+              <Input
+                type="number"
+                disabled={isGenerating}
+                value={batchCount === 0 ? "" : batchCount}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setBatchCount(val === "" ? 0 : parseInt(val, 10));
+                }}
+                className="h-11 rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all text-sm font-bold"
+                min={1}
+                placeholder="0"
+              />
+            </div>
 
-      <div
-        className="fixed -top-[10000px] -left-[10000px] bg-white pointer-events-none"
-        style={{ width: "210mm" }}
-      >
-        <PrintableBarcodes
-          ref={printRef}
-          codes={generatedBarcodes}
-          typeName={batchName}
-        />
-      </div>
+            {/* Action Buttons */}
+            <div className="pt-4 flex flex-col sm:flex-row gap-3">
+              <Button
+                className="flex-1 h-12 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 order-1 sm:order-2"
+                onClick={handleGenerateAndSave}
+                disabled={isGenerating || !selectedWarehouseId || batchCount <= 0}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="animate-spin h-5 w-5" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    <span>Generate Sequence</span>
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-12 rounded-xl border border-slate-200 font-bold text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all order-2 sm:order-1"
+                onClick={() => navigate("/masters/packages")}
+                disabled={isGenerating}
+              >
+                <X className="mr-1.5 h-4 w-4" /> Cancel
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -68,6 +68,7 @@ import Barcode from "react-barcode";
 import { useReactToPrint } from "react-to-print";
 import { toPng } from "html-to-image";
 import jsPDF from "jspdf";
+import { QRPrintPopup } from "./QRPrintPopup";
 
 const PAGE_SIZE = 10;
 
@@ -117,6 +118,20 @@ export const PackageMaster = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<PackageDTO | null>(null);
+  
+  // Printing states
+  const [isPrintOpen, setIsPrintOpen] = useState(false);
+  const [selectedDocEntry, setSelectedDocEntry] = useState("");
+
+  const handleOpenCommonPrint = () => {
+    setSelectedDocEntry("");
+    setIsPrintOpen(true);
+  };
+
+  const handleOpenRowPrint = (id: number) => {
+    setSelectedDocEntry(String(id));
+    setIsPrintOpen(true);
+  };
 
   // Generation state
   const [generateCount, setGenerateCount] = useState<number>(4);
@@ -165,16 +180,12 @@ export const PackageMaster = () => {
     if (!printRef.current) return;
     try {
       toast.info("Generating high-speed PDF...");
-      console.log("PDF Speed Engine: Initializing parallel capture...");
-
       const pdf = new jsPDF("p", "mm", "a4");
       const pageHeight = pdf.internal.pageSize.getHeight();
       const pageWidth = pdf.internal.pageSize.getWidth();
       const margin = 10;
-
       const items = printRef.current.querySelectorAll(".label-item");
 
-      // PARALLEL CAPTURE - Much faster!
       const imgDatas = await Promise.all(
         Array.from(items).map((item) =>
           toPng(item as HTMLElement, {
@@ -185,16 +196,12 @@ export const PackageMaster = () => {
       );
 
       let currentHeight = margin;
-
       for (let i = 0; i < imgDatas.length; i++) {
         const imgData = imgDatas[i];
         const imgProps = pdf.getImageProperties(imgData);
-
-        // Split into 2 columns
         const targetWidth = (pageWidth - margin * 3) / 2;
         const targetHeight = (imgProps.height * targetWidth) / imgProps.width;
 
-        // Smart page break
         if (currentHeight + targetHeight > pageHeight - margin) {
           pdf.addPage();
           currentHeight = margin;
@@ -214,7 +221,6 @@ export const PackageMaster = () => {
           targetHeight,
         );
 
-        // Move currentHeight only after the second item in the row
         if (i % 2 !== 0 || i === imgDatas.length - 1) {
           currentHeight += targetHeight + 10;
         }
@@ -222,7 +228,6 @@ export const PackageMaster = () => {
 
       pdf.save(`Labels_${typeNameForBatch}_${Date.now()}.pdf`);
       toast.success("PDF Downloaded!");
-      console.log("PDF Sync Complete.");
     } catch (err) {
       console.error("PDF Generate Error:", err);
       toast.error("Process failed. Try a smaller batch.");
@@ -366,10 +371,17 @@ export const PackageMaster = () => {
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Button
               variant="outline"
+              className="h-12 px-8 rounded-xl bg-emerald-600 hover:bg-emerald-800 hover:text-white text-white body-strong transition-all shadow-lg shadow-emerald-100 active:scale-95 flex-1 md:flex-none flex items-center gap-2"
+              onClick={handleOpenCommonPrint}
+            >
+              <Printer className="icon-sm" />
+              Print Label
+            </Button>
+            <Button
+              variant="outline"
               className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-800 hover:text-white text-white body-strong transition-all shadow-lg shadow-blue-100 active:scale-95 flex-1 md:flex-none"
               onClick={() => setIsGenerateOpen(true)}
             >
-              {/* <Hash className="icon-sm mr-2" /> */}
               <Plus className="icon-sm mr-2" />
               {config.strings.dialog.generate}
             </Button>
@@ -441,6 +453,14 @@ export const PackageMaster = () => {
                       </TableCell>
                       <TableCell className="text-right px-6 py-4">
                         <div className="flex items-center justify-end gap-2 text-left transition-all">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-xl bg-slate-50/80 text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-slate-100/50"
+                            onClick={() => handleOpenRowPrint(pkg.id)}
+                          >
+                            <Printer className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -798,20 +818,27 @@ export const PackageMaster = () => {
               disabled={generatedBarcodes.length === 0}
               onClick={saveGeneratedBarcodes}
             >
-              Save
+              Commit to Master
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Off-screen printable barcodes component (Optimized for High-Speed PDF) */}
-      <div className="opacity-0 pointer-events-none absolute -bottom-[300%] left-0">
+      {/* Hidden printing target */}
+      <div className="hidden">
         <PrintableBarcodes
           ref={printRef}
           codes={generatedBarcodes}
           typeName={typeNameForBatch}
         />
       </div>
+
+      {/* QR Print Dialog */}
+      <QRPrintPopup
+        open={isPrintOpen}
+        onOpenChange={setIsPrintOpen}
+        docEntry={selectedDocEntry}
+      />
     </div>
   );
 };

@@ -20,15 +20,25 @@ import {
   XCircle,
   Tag,
   Warehouse,
+  Printer,
 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/app/store";
 import { handleFetchAllPackages } from "@/app/manager/packageManager";
+import { QRPrintPopup } from "./QRPrintPopup";
 
 const PackageDetail = () => {
   const { whsCode } = useParams<{ whsCode: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data: packages, loading } = useAppSelector((state) => state.package);
+
+  const [isPrintOpen, setIsPrintOpen] = useState(false);
+  const [selectedDocEntry, setSelectedDocEntry] = useState("");
+
+  const handleOpenPrint = (id: number) => {
+    setSelectedDocEntry(String(id));
+    setIsPrintOpen(true);
+  };
 
   useEffect(() => {
     // Fetch all packages for this warehouse (non-paginated for detail view)
@@ -105,19 +115,22 @@ const PackageDetail = () => {
                   <TableHead className="px-6 py-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     Status
                   </TableHead>
+                  <TableHead className="px-6 py-5 text-right text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="py-20 text-center">
+                    <TableCell colSpan={4} className="py-20 text-center">
                       <Loader2 className="h-10 w-10 text-blue-600 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
                 ) : warehousePackages.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={3}
+                      colSpan={4}
                       className="py-20 text-center text-slate-400 font-black uppercase tracking-widest"
                     >
                       No Barcodes Found
@@ -162,6 +175,16 @@ const PackageDetail = () => {
                           )}
                         </Badge>
                       </TableCell>
+                      <TableCell className="px-6 py-5 text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenPrint(pkg.id)}
+                          className="h-9 w-9 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all active:scale-95 shadow-sm"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -170,6 +193,14 @@ const PackageDetail = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* QR Print Dialog */}
+      <QRPrintPopup
+        open={isPrintOpen}
+        onOpenChange={setIsPrintOpen}
+        docEntry={selectedDocEntry}
+        whscode={whsCode}
+      />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import axios from 'axios';
 import { AppDispatch } from '../store';
 import {
   packageLoadStart, packageLoadSuccess, packageLoadFailure
@@ -12,6 +13,8 @@ interface FetchParams {
   search?: string;
   is_paginate?: boolean;
 }
+
+
 
 export const handleFetchAllPackages = (params?: FetchParams) => async (dispatch: AppDispatch) => {
   try {
@@ -28,7 +31,11 @@ export const handleFetchAllPackages = (params?: FetchParams) => async (dispatch:
       queryParams.append('search', params.search);
     }
 
-    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.PACKAGING.ALL}?${queryParams.toString()}`);
+    // Call the SAP URL directly for all packagings
+    const response = await axios.get<{ status: boolean; data: any }>(
+      `${SAP_BASE_URL}/packaging/get_all_packagings?${queryParams.toString()}`
+    );
+
     if (response.data.status) {
       const rawData = isPaginated
         ? response.data.data.items
@@ -104,10 +111,19 @@ export const handleDeletePackage = (id: number) => async (dispatch: AppDispatch)
   }
 };
 
+const SAP_BASE_URL = 'http://115.244.101.29:9096/api/v1';
+
 export const handleGenerateBarcodes = (data: { package_type: number; warehouse_id: number; whscode: string; quntity: number }) => async (dispatch: AppDispatch) => {
   try {
     dispatch(packageLoadStart());
-    const response = await api.post(API_ENDPOINTS.MASTERS.PACKAGING.GENERATE, data);
+
+    // Use SAP URL directly for barcode generation
+    const response = await axios.post(`${SAP_BASE_URL}/packaging/generate-barcode`, {
+      packageType: data.package_type,
+      warehouseId: data.warehouse_id,
+      whscode: data.whscode,
+      quntity: data.quntity,
+    });
 
     if (response.data.status || response.status === 200) {
       // The API returns an array of barcodes in response.data.data
@@ -122,3 +138,4 @@ export const handleGenerateBarcodes = (data: { package_type: number; warehouse_i
     return null;
   }
 };
+

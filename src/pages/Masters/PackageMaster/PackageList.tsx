@@ -45,6 +45,7 @@ import {
   Download,
   ImageIcon,
   Warehouse,
+  Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector, useAppDispatch } from "@/app/store";
@@ -122,6 +123,7 @@ export const PackageList = () => {
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(1);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
+  const [isPrintOpen, setIsPrintOpen] = useState(false);
 
   // Generation state
   const [generateCount, setGenerateCount] = useState<number>(4);
@@ -326,6 +328,13 @@ export const PackageList = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <Button
+            className="h-12 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100 flex gap-2 active:scale-95 transition-all"
+            onClick={() => navigate("/masters/packages/print")}
+          >
+            <Printer className="w-4 h-4" />
+            Print Label
+          </Button>
           <Button
             className="h-12 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-100 flex gap-2 active:scale-95 transition-all"
             onClick={() => navigate("/masters/packages/create")}
@@ -636,6 +645,7 @@ export const PackageList = () => {
           typeName={typeNameForBatch}
         />
       </div>
+
     </div>
   );
 };
