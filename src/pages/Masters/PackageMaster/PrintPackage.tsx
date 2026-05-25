@@ -48,7 +48,10 @@ const SearchableDropdown = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -58,9 +61,10 @@ const SearchableDropdown = ({
 
   const selectedOption = options.find((opt) => opt.value === value);
 
-  const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.toLowerCase()) ||
-    (opt.code && opt.code.toLowerCase().includes(search.toLowerCase()))
+  const filteredOptions = options.filter(
+    (opt) =>
+      opt.label.toLowerCase().includes(search.toLowerCase()) ||
+      (opt.code && opt.code.toLowerCase().includes(search.toLowerCase())),
   );
 
   return (
@@ -74,7 +78,13 @@ const SearchableDropdown = ({
         }}
         className="h-11 w-full px-4 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all bg-white text-sm font-bold flex items-center justify-between cursor-pointer disabled:opacity-50 text-slate-900 text-left outline-none hover:border-blue-300"
       >
-        <span className={selectedOption ? "text-slate-900 text-ellipsis overflow-hidden whitespace-nowrap" : "text-slate-400"}>
+        <span
+          className={
+            selectedOption
+              ? "text-slate-900 text-ellipsis overflow-hidden whitespace-nowrap"
+              : "text-slate-400"
+          }
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
@@ -111,8 +121,12 @@ const SearchableDropdown = ({
                         : "hover:bg-slate-50 text-slate-700"
                     }`}
                   >
-                    <span className="text-ellipsis overflow-hidden whitespace-nowrap">{opt.label}</span>
-                    {isSelected && <Check className="h-4 w-4 text-blue-600 shrink-0" />}
+                    <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+                      {opt.label}
+                    </span>
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-blue-600 shrink-0" />
+                    )}
                   </button>
                 );
               })
@@ -164,7 +178,9 @@ const PrintSheet = React.forwardRef<
     >
       {packages.map((pkg, idx) => {
         const wh = warehouses.find(
-          (w) => w.warehouse_code?.trim().toLowerCase() === pkg.whscode?.trim().toLowerCase()
+          (w) =>
+            w.warehouse_code?.trim().toLowerCase() ===
+            pkg.whscode?.trim().toLowerCase(),
         );
         const displayName = wh ? wh.warehouse_name : pkg.whscode;
 
@@ -202,7 +218,14 @@ const PrintSheet = React.forwardRef<
               {displayName}
             </p>
 
-            <div style={{ width: "100%", display: "flex", justifyContent: "center", overflow: "hidden" }}>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
               <Barcode
                 value={pkg.barcode || `ID-${pkg.id}`}
                 width={1.8}
@@ -251,7 +274,9 @@ export const PrintPackage = () => {
     contentRef: printRef,
     documentTitle: `Labels_${selectedWhscode}`,
     onAfterPrint: () => {
-      toast.success(`✅ ${packagesForWarehouse.length} label(s) sent to printer`);
+      toast.success(
+        `✅ ${packagesForWarehouse.length} label(s) sent to printer`,
+      );
       navigate("/masters/packages");
     },
   });
@@ -268,11 +293,15 @@ export const PrintPackage = () => {
     try {
       const res = await axios.get(
         "http://115.244.101.29:9096/api/v1/packaging/get_all_packagings",
-        { params: { is_paginate: false, page: 1, size: 1000 } }
+        { params: { is_paginate: false, page: 1, size: 1000 } },
       );
       const raw: any[] = res.data?.data?.items || res.data?.data || [];
       setAllPackages(
-        raw.map((p) => ({ id: p.id, barcode: p.barcode, whscode: p.whscode || "" }))
+        raw.map((p) => ({
+          id: p.id,
+          barcode: p.barcode,
+          whscode: p.whscode || "",
+        })),
       );
     } catch {
       toast.error("Failed to load packaging list.");
@@ -282,23 +311,25 @@ export const PrintPackage = () => {
   };
 
   const warehouseCodes = useMemo(
-    () => Array.from(new Set(allPackages.map((p) => p.whscode).filter(Boolean))),
-    [allPackages]
+    () =>
+      Array.from(new Set(allPackages.map((p) => p.whscode).filter(Boolean))),
+    [allPackages],
   );
 
   const packagesForWarehouse = useMemo(
     () => allPackages.filter((p) => p.whscode === selectedWhscode),
-    [allPackages, selectedWhscode]
+    [allPackages, selectedWhscode],
   );
 
   // Map distinct warehouses for SearchableDropdown
   const warehouseDropdownOptions = useMemo(() => {
     return warehouseCodes.map((code) => {
       const wh = warehouses.find(
-        (w) => w.warehouse_code?.trim().toLowerCase() === code.trim().toLowerCase()
+        (w) =>
+          w.warehouse_Code?.trim().toLowerCase() === code.trim().toLowerCase(),
       );
       const count = allPackages.filter((p) => p.whscode === code).length;
-      const whName = wh ? wh.warehouse_name : "Warehouse";
+      const whName = wh ? wh.warehouse_Name : "Warehouse";
       return {
         value: code,
         label: `${code} - ${whName} (${count})`,
@@ -371,7 +402,8 @@ export const PrintPackage = () => {
 
                 {/* Tip */}
                 <p className="text-[10px] text-slate-400 font-bold text-center leading-relaxed pt-2">
-                  💡 Browser print dialog will open — select your <strong>TSC</strong> printer
+                  💡 Browser print dialog will open — select your{" "}
+                  <strong>TSC</strong> printer
                 </p>
               </>
             )}
@@ -381,10 +413,19 @@ export const PrintPackage = () => {
               <Button
                 className="flex-1 h-12 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 order-1 sm:order-2"
                 onClick={() => handlePrint()}
-                disabled={!selectedWhscode || packagesForWarehouse.length === 0 || loadingPackages}
+                disabled={
+                  !selectedWhscode ||
+                  packagesForWarehouse.length === 0 ||
+                  loadingPackages
+                }
               >
                 <Printer className="h-4 w-4" />
-                <span>Print {packagesForWarehouse.length > 0 ? `(${packagesForWarehouse.length})` : ""}</span>
+                <span>
+                  Print{" "}
+                  {packagesForWarehouse.length > 0
+                    ? `(${packagesForWarehouse.length})`
+                    : ""}
+                </span>
               </Button>
               <Button
                 variant="outline"

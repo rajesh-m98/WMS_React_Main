@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,10 @@ import {
   Search,
   Check,
 } from "lucide-react";
-import { useReactToPrint } from 'react-to-print';
-import Barcode from 'react-barcode';
-import axios from 'axios';
-import { toast } from 'sonner';
+import { useReactToPrint } from "react-to-print";
+import Barcode from "react-barcode";
+import axios from "axios";
+import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import { handleFetchAllWarehouses } from "@/app/manager/warehouseManager";
 
@@ -60,7 +60,10 @@ const SearchableDropdown = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -70,9 +73,10 @@ const SearchableDropdown = ({
 
   const selectedOption = options.find((opt) => opt.value === value);
 
-  const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.toLowerCase()) ||
-    (opt.code && opt.code.toLowerCase().includes(search.toLowerCase()))
+  const filteredOptions = options.filter(
+    (opt) =>
+      opt.label.toLowerCase().includes(search.toLowerCase()) ||
+      (opt.code && opt.code.toLowerCase().includes(search.toLowerCase())),
   );
 
   return (
@@ -86,7 +90,13 @@ const SearchableDropdown = ({
         }}
         className="h-11 w-full px-4 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-50 transition-all bg-white text-sm font-bold flex items-center justify-between cursor-pointer disabled:opacity-50 text-slate-900 text-left outline-none hover:border-blue-300"
       >
-        <span className={selectedOption ? "text-slate-900 text-ellipsis overflow-hidden whitespace-nowrap" : "text-slate-400"}>
+        <span
+          className={
+            selectedOption
+              ? "text-slate-900 text-ellipsis overflow-hidden whitespace-nowrap"
+              : "text-slate-400"
+          }
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
@@ -123,8 +133,12 @@ const SearchableDropdown = ({
                         : "hover:bg-slate-50 text-slate-700"
                     }`}
                   >
-                    <span className="text-ellipsis overflow-hidden whitespace-nowrap">{opt.label}</span>
-                    {isSelected && <Check className="h-4 w-4 text-blue-600 shrink-0" />}
+                    <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+                      {opt.label}
+                    </span>
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-blue-600 shrink-0" />
+                    )}
                   </button>
                 );
               })
@@ -148,9 +162,9 @@ const PrintSheet = React.forwardRef<
   <div
     ref={ref}
     style={{
-      backgroundColor: '#fff',
-      boxSizing: 'border-box',
-      width: '100%',
+      backgroundColor: "#fff",
+      boxSizing: "border-box",
+      width: "100%",
     }}
   >
     <style>{`
@@ -167,16 +181,18 @@ const PrintSheet = React.forwardRef<
 
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '0',
-        paddingTop: '15mm',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "0",
+        paddingTop: "15mm",
       }}
     >
       {packages.map((pkg, idx) => {
         const wh = warehouses.find(
-          (w) => w.warehouse_code?.trim().toLowerCase() === pkg.whscode?.trim().toLowerCase()
+          (w) =>
+            w.warehouse_code?.trim().toLowerCase() ===
+            pkg.whscode?.trim().toLowerCase(),
         );
         const displayName = wh ? wh.warehouse_name : pkg.whscode;
 
@@ -184,37 +200,44 @@ const PrintSheet = React.forwardRef<
           <div
             key={`${pkg.id}-${idx}`}
             style={{
-              border: '1.5px solid #222',
+              border: "1.5px solid #222",
               borderRadius: 8,
-              padding: '6mm 4mm',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              width: '90mm',
-              height: '45mm',
-              boxSizing: 'border-box',
-              margin: '0 auto 8mm auto',
+              padding: "6mm 4mm",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#fff",
+              width: "90mm",
+              height: "45mm",
+              boxSizing: "border-box",
+              margin: "0 auto 8mm auto",
             }}
           >
             <p
               style={{
                 fontSize: 10,
-                color: '#111',
-                margin: '0 0 3mm 0',
-                textAlign: 'center',
-                fontWeight: 'black',
-                textTransform: 'uppercase',
+                color: "#111",
+                margin: "0 0 3mm 0",
+                textAlign: "center",
+                fontWeight: "black",
+                textTransform: "uppercase",
                 letterSpacing: 0.5,
-                wordBreak: 'break-all',
-                fontFamily: 'sans-serif',
+                wordBreak: "break-all",
+                fontFamily: "sans-serif",
               }}
             >
               {displayName}
             </p>
 
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
               <Barcode
                 value={pkg.barcode || `ID-${pkg.id}`}
                 width={1.8}
@@ -230,13 +253,13 @@ const PrintSheet = React.forwardRef<
             <p
               style={{
                 fontSize: 10,
-                color: '#222',
-                margin: '2mm 0 0 0',
-                textAlign: 'center',
-                fontFamily: 'monospace',
+                color: "#222",
+                margin: "2mm 0 0 0",
+                textAlign: "center",
+                fontFamily: "monospace",
                 letterSpacing: 0.5,
-                wordBreak: 'break-all',
-                fontWeight: 'bold',
+                wordBreak: "break-all",
+                fontWeight: "bold",
               }}
             >
               {pkg.barcode}
@@ -260,7 +283,7 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
 
   const [allPackages, setAllPackages] = useState<PackagingItem[]>([]);
   const [loadingPackages, setLoadingPackages] = useState(false);
-  const [selectedWhscode, setSelectedWhscode] = useState('');
+  const [selectedWhscode, setSelectedWhscode] = useState("");
 
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -268,7 +291,9 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
     contentRef: printRef,
     documentTitle: `Labels_${selectedWhscode}`,
     onAfterPrint: () => {
-      toast.success(`✅ ${packagesForWarehouse.length} label(s) sent to printer`);
+      toast.success(
+        `✅ ${packagesForWarehouse.length} label(s) sent to printer`,
+      );
       onOpenChange(false);
     },
   });
@@ -287,9 +312,9 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
       setSelectedWhscode(whscode);
     } else if (docEntry) {
       const found = allPackages.find((p) => String(p.id) === docEntry);
-      setSelectedWhscode(found?.whscode || allPackages[0]?.whscode || '');
+      setSelectedWhscode(found?.whscode || allPackages[0]?.whscode || "");
     } else {
-      setSelectedWhscode(allPackages[0]?.whscode || '');
+      setSelectedWhscode(allPackages[0]?.whscode || "");
     }
   }, [allPackages, open]);
 
@@ -297,38 +322,44 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
     setLoadingPackages(true);
     try {
       const res = await axios.get(
-        'http://115.244.101.29:9096/api/v1/packaging/get_all_packagings',
-        { params: { is_paginate: false, page: 1, size: 1000 } }
+        "http://115.244.101.29:9096/api/v1/packaging/get_all_packagings",
+        { params: { is_paginate: false, page: 1, size: 1000 } },
       );
       const raw: any[] = res.data?.data?.items || res.data?.data || [];
       setAllPackages(
-        raw.map((p) => ({ id: p.id, barcode: p.barcode, whscode: p.whscode || '' }))
+        raw.map((p) => ({
+          id: p.id,
+          barcode: p.barcode,
+          whscode: p.whscode || "",
+        })),
       );
     } catch {
-      toast.error('Failed to load packaging list.');
+      toast.error("Failed to load packaging list.");
     } finally {
       setLoadingPackages(false);
     }
   };
 
   const warehouseCodes = useMemo(
-    () => Array.from(new Set(allPackages.map((p) => p.whscode).filter(Boolean))),
-    [allPackages]
+    () =>
+      Array.from(new Set(allPackages.map((p) => p.whscode).filter(Boolean))),
+    [allPackages],
   );
 
   const packagesForWarehouse = useMemo(
     () => allPackages.filter((p) => p.whscode === selectedWhscode),
-    [allPackages, selectedWhscode]
+    [allPackages, selectedWhscode],
   );
 
   // Map distinct warehouses for SearchableDropdown
   const warehouseDropdownOptions = useMemo(() => {
     return warehouseCodes.map((code) => {
       const wh = warehouses.find(
-        (w) => w.warehouse_code?.trim().toLowerCase() === code.trim().toLowerCase()
+        (w) =>
+          w.warehouse_Code?.trim().toLowerCase() === code.trim().toLowerCase(),
       );
       const count = allPackages.filter((p) => p.whscode === code).length;
-      const whName = wh ? wh.warehouse_name : 'Warehouse';
+      const whName = wh ? wh.warehouse_Name : "Warehouse";
       return {
         value: code,
         label: `${code} - ${whName} (${count})`,
@@ -340,7 +371,6 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 overflow-hidden border-0 shadow-2xl bg-white rounded-[2rem] flex flex-col">
-
         {/* Header */}
         <DialogHeader className="px-7 py-5 shrink-0 bg-slate-950 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 to-blue-950" />
@@ -399,7 +429,8 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
 
               {/* Tip */}
               <p className="text-[10px] text-slate-400 font-bold text-center leading-relaxed pt-1">
-                💡 Browser print dialog will open — select your <strong>TSC</strong> printer
+                💡 Browser print dialog will open — select your{" "}
+                <strong>TSC</strong> printer
               </p>
             </>
           )}
@@ -416,11 +447,18 @@ export const QRPrintPopup: React.FC<QRPrintPopupProps> = ({
           </Button>
           <Button
             className="h-12 px-8 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-100 active:scale-95 disabled:opacity-40 transition-all"
-            disabled={!selectedWhscode || packagesForWarehouse.length === 0 || loadingPackages}
+            disabled={
+              !selectedWhscode ||
+              packagesForWarehouse.length === 0 ||
+              loadingPackages
+            }
             onClick={() => handlePrint()}
           >
             <Printer className="mr-2 h-4 w-4" />
-            Print {packagesForWarehouse.length > 0 ? `(${packagesForWarehouse.length})` : ''}
+            Print{" "}
+            {packagesForWarehouse.length > 0
+              ? `(${packagesForWarehouse.length})`
+              : ""}
           </Button>
         </div>
       </DialogContent>
