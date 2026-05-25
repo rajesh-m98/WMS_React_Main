@@ -42,13 +42,13 @@ const HSTEdit = () => {
   );
 
   const [formData, setFormData] = useState({
-    device_id: "",
-    device_name: "",
-    brand_name: "",
-    device_serial_number: "",
-    device_type: "",
-    device_status: 0,
-    warehouse_id: 1,
+    deviceId: "",
+    deviceName: "",
+    brandName: "",
+    deviceSerialNumber: "",
+    deviceType: "HandHeld",
+    deviceStatus: 0,
+    warehouseId: 1,
   });
 
   const [mappingType, setMappingType] = useState<"single" | "multiple">(
@@ -68,52 +68,54 @@ const HSTEdit = () => {
   useEffect(() => {
     if (isInitialized || isNew || loading || devices.length === 0) return;
 
-    const device = devices.find((d) => d.id === Number(id));
+    const device = devices.find(
+      (d) => d.id?.toString() === id || d.deviceId === id,
+    );
     if (device) {
       setFormData({
-        device_id: device.device_id,
-        device_name: device.device_name || "",
-        brand_name: device.brand_name || "",
-        device_serial_number: device.device_serial_number,
-        device_type: device.device_type,
-        device_status: device.device_status,
-        warehouse_id: device.warehouse_id || 1,
+        deviceId: device.deviceId,
+        deviceName: device.deviceName,
+        brandName: device.brandName,
+        deviceSerialNumber: device.deviceSerialNumber,
+        deviceType: "HandHeld",
+        deviceStatus: device.deviceStatus,
+        warehouseId: device.warehouseId,
       });
 
-        // Deduplicate by locationId and map to path
-        if (device.locations && device.locations.length > 0) {
-          const seen = new Set<number>();
-          const initialAssignments = device.locations
-            .filter((locId: number) => {
-              if (seen.has(locId)) return false;
-              seen.add(locId);
-              return true;
-            })
-            .map((locId: number) => {
-              const config = layerConfigs.find((lc) => lc.id === locId);
-              return {
-                locationId: locId,
-                path: config
-                  ? [
-                      config.layer1,
-                      config.layer2,
-                      config.layer3,
-                      config.layer4,
-                      config.layer5,
-                    ]
-                      .filter(Boolean)
-                      .join(" > ")
-                  : "Direct Assignment",
-              };
-            });
-          setAssignments(initialAssignments);
-        }
-        setIsInitialized(true);
+      // Deduplicate by locationId and map to path
+      if (device.locations && device.locations.length > 0) {
+        const seen = new Set<number>();
+        const initialAssignments = device.locations
+          .filter((locId: number) => {
+            if (seen.has(locId)) return false;
+            seen.add(locId);
+            return true;
+          })
+          .map((locId: number) => {
+            const config = layerConfigs.find((lc) => lc.id === locId);
+            return {
+              locationId: locId,
+              path: config
+                ? [
+                    config.layer1,
+                    config.layer2,
+                    config.layer3,
+                    config.layer4,
+                    config.layer5,
+                  ]
+                    .filter(Boolean)
+                    .join(" > ")
+                : "Direct Assignment",
+            };
+          });
+        setAssignments(initialAssignments);
       }
+      setIsInitialized(true);
+    }
   }, [devices, id, isNew, loading, isInitialized, layerConfigs]);
 
   const handleSubmit = async () => {
-    if (!formData.device_serial_number) {
+    if (!formData.deviceSerialNumber) {
       toast.error("Required fields: Serial Number");
       return;
     }
@@ -164,6 +166,15 @@ const HSTEdit = () => {
                     Device Identity & Status
                   </h3>
                 </div>
+                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
+                  Device Type:{" "}
+                  <Badge
+                    variant={"default"}
+                    className="text-white text-sm font-semibold bg-blue-600"
+                  >
+                    {formData.deviceType}{" "}
+                  </Badge>
+                </div>
                 <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
                   <div className="flex items-center gap-2">
                     <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
@@ -171,16 +182,14 @@ const HSTEdit = () => {
                     </Label>
                     <div
                       className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border ${
-                        formData.device_status === 0
+                        formData.deviceStatus === 0
                           ? "bg-emerald-50 text-emerald-600 border-emerald-100"
                           : "bg-amber-50 text-amber-600 border-amber-100"
                       }`}
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       <span className="text-[10px] font-black uppercase">
-                        {formData.device_status === 0
-                          ? "Available"
-                          : "Assigned"}
+                        {formData.deviceStatus === 0 ? "Available" : "Assigned"}
                       </span>
                     </div>
                   </div>
@@ -188,19 +197,17 @@ const HSTEdit = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
-
                 <div className="md:col-span-2 space-y-1">
                   <Label className="pl-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     Device Name
                   </Label>
                   <Input
-                    value={formData.device_name}
+                    value={formData.deviceName}
                     onChange={(e) =>
-                      setFormData({ ...formData, device_name: e.target.value })
+                      setFormData({ ...formData, deviceName: e.target.value })
                     }
                     disabled={!isNew}
                     className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
-                    placeholder="Scanner Unit Name"
                   />
                 </div>
                 <div className="space-y-1">
@@ -208,9 +215,9 @@ const HSTEdit = () => {
                     Brand
                   </Label>
                   <Input
-                    value={formData.brand_name}
+                    value={formData.brandName}
                     onChange={(e) =>
-                      setFormData({ ...formData, brand_name: e.target.value })
+                      setFormData({ ...formData, brandName: e.target.value })
                     }
                     disabled={!isNew}
                     className="h-11 rounded-xl bg-white border-slate-200 text-slate-900 font-black shadow-sm disabled:opacity-100 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
@@ -222,11 +229,11 @@ const HSTEdit = () => {
                     Serial Number
                   </Label>
                   <Input
-                    value={formData.device_serial_number}
+                    value={formData.deviceSerialNumber}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        device_serial_number: e.target.value,
+                        deviceSerialNumber: e.target.value,
                       })
                     }
                     disabled={!isNew}
@@ -290,7 +297,9 @@ const HSTEdit = () => {
                           );
                           return;
                         }
-                        if (assignments.some((a) => a.locationId === locationId)) {
+                        if (
+                          assignments.some((a) => a.locationId === locationId)
+                        ) {
                           toast.error("This location is already assigned.");
                           return;
                         }

@@ -3,8 +3,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface WarehouseItem {
   id: number;
   companyid: number;
-  warehouse_name: string;
-  warehouse_code: string;
+  warehouse_Name: string;
+  warehouse_Code: string;
   gstnumber: string;
   bplid: string;
   bplname: string;
@@ -70,10 +70,10 @@ const warehouseSlice = createSlice({
   },
 });
 
-export const { 
-  warehouseLoadStart, 
-  warehouseLoadSuccess, 
-  warehouseDetailSuccess, 
+export const {
+  warehouseLoadStart,
+  warehouseLoadSuccess,
+  warehouseDetailSuccess,
   warehouseLoadFailure,
   clearCurrentWarehouse,
   clearAllWarehouses

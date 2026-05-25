@@ -41,7 +41,10 @@ const SearchableDropdown = ({
   // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -51,9 +54,10 @@ const SearchableDropdown = ({
 
   const selectedOption = options.find((opt) => opt.value === value);
 
-  const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.toLowerCase()) ||
-    (opt.code && opt.code.toLowerCase().includes(search.toLowerCase()))
+  const filteredOptions = options.filter(
+    (opt) =>
+      opt.label.toLowerCase().includes(search.toLowerCase()) ||
+      (opt.code && opt.code.toLowerCase().includes(search.toLowerCase())),
   );
 
   return (
@@ -105,7 +109,9 @@ const SearchableDropdown = ({
                     }`}
                   >
                     <span>{opt.label}</span>
-                    {isSelected && <Check className="h-4 w-4 text-blue-600 shrink-0" />}
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-blue-600 shrink-0" />
+                    )}
                   </button>
                 );
               })
@@ -125,7 +131,7 @@ export const CreatePackage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data: warehouses } = useAppSelector((state) => state.warehouse);
-  
+
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<number>(0);
   const [selectedWhsCode, setSelectedWhsCode] = useState<string>("");
   const [batchCount, setBatchCount] = useState(10);
@@ -178,7 +184,9 @@ export const CreatePackage = () => {
       }
 
       if (successCount > 0) {
-        toast.success(`🎉 Successfully created and registered ${successCount} packages!`);
+        toast.success(
+          `🎉 Successfully created and registered ${successCount} packages!`,
+        );
         navigate("/masters/packages");
       } else {
         toast.error("Failed to register generated packages");
@@ -266,7 +274,9 @@ export const CreatePackage = () => {
               <Button
                 className="flex-1 h-12 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 order-1 sm:order-2"
                 onClick={handleGenerateAndSave}
-                disabled={isGenerating || !selectedWarehouseId || batchCount <= 0}
+                disabled={
+                  isGenerating || !selectedWarehouseId || batchCount <= 0
+                }
               >
                 {isGenerating ? (
                   <>

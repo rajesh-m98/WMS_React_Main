@@ -1,9 +1,9 @@
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { AppDispatch } from '../store';
-import { 
-  floorFetchStart, 
-  floorFetchSuccess, 
+import {
+  floorFetchStart,
+  floorFetchSuccess,
   floorFetchFailure,
   setFormLoading,
   setCurrentFloor
@@ -18,11 +18,15 @@ export const handleFetchFloors = (warehouseId: number = 1) => async (dispatch: A
   try {
     dispatch(floorFetchStart());
     const response = await api.get<{ status: boolean; data: FloorDTO[] }>(API_ENDPOINTS.MASTERS.FLOOR.ALL, {
-      params: { warehouseid: warehouseId }
+      params: { warehouseId: warehouseId }
     });
-    
+
     if (response.data.status) {
-      dispatch(floorFetchSuccess(response.data.data || []));
+      const floors = (response.data.data || []).map((f: any) => ({
+        ...f,
+        floor_Name: f.floor_Name || f.floor_Name
+      }));
+      dispatch(floorFetchSuccess(floors));
     } else {
       dispatch(floorFetchFailure("Failed to retrieve Floor data"));
     }
@@ -37,12 +41,17 @@ export const handleFetchFloors = (warehouseId: number = 1) => async (dispatch: A
 export const handleCreateOrUpdateFloor = (payload: CreateFloorPayload, floorId?: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(setFormLoading(true));
-    const url = floorId 
-      ? `${API_ENDPOINTS.MASTERS.FLOOR.CREATE}?floor_id=${floorId}`
+    const url = floorId
+      ? `${API_ENDPOINTS.MASTERS.FLOOR.CREATE}?floorId=${floorId}`
       : API_ENDPOINTS.MASTERS.FLOOR.CREATE;
 
-    const response = await api.post(url, payload);
-    
+    const backendPayload = {
+      ...payload,
+      floor_Name: payload.floor_Name
+    };
+
+    const response = await api.post(url, backendPayload);
+
     if (response.data.status) {
       toast.success(response.data.message || 'Floor configuration saved successfully');
       dispatch(handleFetchFloors());
@@ -66,12 +75,16 @@ export const handleFetchFloorById = (floorId: number) => async (dispatch: AppDis
   try {
     dispatch(floorFetchStart());
     const response = await api.get<{ status: boolean; data: FloorDTO }>(API_ENDPOINTS.MASTERS.FLOOR.GET_BY_ID, {
-      params: { floor_id: floorId }
+      params: { floorId: floorId }
     });
-    
+
     if (response.data.status) {
-      dispatch(setCurrentFloor(response.data.data));
-      dispatch(floorFetchFailure("")); 
+      const floorData = response.data.data as any;
+      dispatch(setCurrentFloor({
+        ...floorData,
+        floor_Name: floorData.floor_Name || floorData.floor_Name
+      }));
+      dispatch(floorFetchFailure(""));
     } else {
       toast.error("Failed to fetch floor details");
     }
@@ -88,7 +101,7 @@ export const handleFetchFloorById = (floorId: number) => async (dispatch: AppDis
 export const handleDeleteFloor = (floorId: number) => async (dispatch: AppDispatch) => {
   try {
     const response = await api.delete(API_ENDPOINTS.MASTERS.FLOOR.DELETE, {
-      params: { floor_id: floorId }
+      params: { floorId: floorId }
     });
 
     if (response.data.status) {

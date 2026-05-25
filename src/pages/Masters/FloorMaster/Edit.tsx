@@ -43,9 +43,8 @@ const FloorEdit = () => {
   );
 
   const [formData, setFormData] = useState({
-    warehouse_id: 1,
-    floor_name: "",
-    barcode: "",
+    warehouse_Id: 1,
+    floor_Name: "",
   });
 
   useEffect(() => {
@@ -57,9 +56,8 @@ const FloorEdit = () => {
   useEffect(() => {
     if (currentFloor) {
       setFormData({
-        warehouse_id: currentFloor.warehouse_id,
-        floor_name: currentFloor.floor_name || "",
-        barcode: currentFloor.barcode || "",
+        warehouse_Id: currentFloor.warehouse_id,
+        floor_Name: currentFloor.floor_Name || "",
       });
     }
   }, [currentFloor]);
@@ -67,8 +65,8 @@ const FloorEdit = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.floor_name || !formData.barcode) {
-      toast.error("Please fill in Floor Name and Barcode");
+    if (!formData.floor_Name) {
+      toast.error("Please fill in Floor Name");
       return;
     }
 
@@ -126,46 +124,15 @@ const FloorEdit = () => {
                   <Input
                     placeholder="e.g. Ground Floor Main"
                     className="rounded-xl h-12 bg-slate-50/50 border-slate-200 body-strong !text-slate-900 transition-all focus:bg-white focus:ring-4 focus:ring-blue-50"
-                    value={formData.floor_name}
+                    value={formData.floor_Name}
                     onChange={(e) =>
-                      setFormData({ ...formData, floor_name: e.target.value })
+                      setFormData({ ...formData, floor_Name: e.target.value })
                     }
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          <div className="space-y-6">
-            <Card className="border-0 shadow-lg shadow-blue-500/50 rounded-3xl overflow-hidden bg-white">
-              <CardHeader className="bg-blue-50/50 border-b border-blue-100/30 py-4 px-8">
-                <CardTitle className="caption-small !text-blue-600 flex items-center gap-2">
-                  <BarcodeIcon className="icon-sm" /> Identification
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-8 space-y-6">
-                <div className="space-y-2">
-                  <Label className="label-bold !text-blue-600 uppercase text-[10px]">
-                    Unique Barcode
-                  </Label>
-                  <Input
-                    required
-                    placeholder="FLR-G-001"
-                    className="rounded-xl h-12 bg-blue-50/20 border-blue-100 body-strong !text-blue-900 font-mono focus:ring-4 focus:ring-blue-100 transition-all"
-                    value={formData.barcode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, barcode: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="body-main !text-xs !text-slate-500 leading-relaxed italic">
-                    System ID: <span className="font-bold">{id}</span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4">

@@ -152,8 +152,8 @@ const MasterDetail = () => {
     );
   } else if (type === "warehouse") {
     auditEntries.push(
-      { label: "Warehouse Code", value: activeData.warehouse_code },
-      { label: "Warehouse Name", value: activeData.warehouse_name },
+      { label: "Warehouse Code", value: activeData.warehouse_Code },
+      { label: "Warehouse Name", value: activeData.warehouse_Name },
       { label: "GST Number", value: activeData.gstnumber },
       { label: "BPL Name", value: activeData.bplname },
       { label: "BPL ID", value: activeData.bplid },
@@ -171,16 +171,16 @@ const MasterDetail = () => {
     );
   } else if (type === "hst") {
     auditEntries.push(
-      { label: "Device ID", value: activeData.device_id },
-      { label: "Device Name", value: activeData.device_name },
-      { label: "Device Type", value: activeData.device_type },
-      { label: "Brand", value: activeData.brand_name },
-      { label: "Serial Number", value: activeData.device_serial_number },
+      { label: "Device ID", value: activeData.id },
+      { label: "Device Name", value: activeData.deviceName },
+      { label: "Device Type", value: activeData.deviceType },
+      { label: "Brand", value: activeData.brandName },
+      { label: "Serial Number", value: activeData.deviceSerialNumber },
       {
         label: "Status",
-        value: activeData.device_status === 0 ? "Available" : "Assigned",
+        value: activeData.deviceStatus === 0 ? "Available" : "Assigned",
       },
-      { label: "Warehouse ID", value: activeData.warehouse_id },
+      { label: "Warehouse ID", value: activeData.warehouseId },
     );
   }
 

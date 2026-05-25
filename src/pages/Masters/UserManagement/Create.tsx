@@ -84,13 +84,13 @@ const UserCreate = () => {
     if (readPages.length > 0) {
       permission.push({
         operation_type: "read",
-        operation_pages: readPages,
+        OperationPages: readPages,
       });
     }
     if (writePages.length > 0) {
       permission.push({
         operation_type: "write",
-        operation_pages: writePages,
+        OperationPages: writePages,
       });
     }
 

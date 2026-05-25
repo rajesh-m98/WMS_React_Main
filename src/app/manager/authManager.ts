@@ -18,22 +18,26 @@ export const handleLoginSubmit = () => async (dispatch: AppDispatch, getState: (
   try {
     dispatch(loginStart());
 
-    const params = new URLSearchParams();
-    params.append('username', username);
-    params.append('password', password);
+    // const params = new URLSearchParams();
+    // params.append('username', username);
+    // params.append('password', password);
 
-    const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, params, {
+    const payload = {
+      username: username,
+      password: password,
+    }
+    const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, payload, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
     });
 
     if (response.data.status) {
-      const { access_token, refresh_token, data: userData } = response.data;
+      const { accessToken, refreshToken, data: userData } = response.data;
 
       dispatch(setSignIn({
-        token: access_token,
-        refresh_token: refresh_token,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
         userData: userData || {}
       }));
 

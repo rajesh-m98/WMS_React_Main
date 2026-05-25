@@ -67,8 +67,8 @@ export const FloorMaster = () => {
 
   const filteredFloors = floors.filter(
     (f) =>
-      f.barcode?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      f.floor_name?.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      f.floor_Name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      f.barcode?.toLowerCase().includes(debouncedSearch.toLowerCase()),
   );
 
   const totalCount = filteredFloors.length;
@@ -80,8 +80,7 @@ export const FloorMaster = () => {
   const handleExport = () => {
     const exportData = filteredFloors.map((f) => ({
       ID: f.id,
-      "Floor Name": f.floor_name,
-      Barcode: f.barcode,
+      "Floor Name": f.floor_Name,
     }));
     downloadCSV(
       exportData,
@@ -174,25 +173,14 @@ export const FloorMaster = () => {
                         {(page - 1) * PAGE_SIZE + idx + 1}
                       </td>
                       <td className="px-4 py-5 text-sm font-black text-slate-800 whitespace-nowrap text-left">
-                        {floor.floor_name || "-"}
+                        {floor.floor_Name || "-"}
                       </td>
-                      <td className="px-4 py-5 text-sm font-black text-blue-600 rounded-lg whitespace-nowrap text-left">
-                        {floor.barcode}
+                      <td className="px-4 py-5 text-sm font-black text-slate-800 whitespace-nowrap text-left">
+                        {floor.barcode || "-"}
                       </td>
                       <td className="px-10 py-5 text-right pr-6">
                         <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-10 w-10 rounded-2xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
-                            onClick={() => {
-                              setSelectedFloor(floor);
-                              setIsDetailOpen(true);
-                            }}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          {/* <Button
                             variant="ghost"
                             size="icon"
                             className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
@@ -201,7 +189,7 @@ export const FloorMaster = () => {
                             }
                           >
                             <Pencil className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
@@ -224,7 +212,7 @@ export const FloorMaster = () => {
                                   <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
                                     {config.strings.deleteAlert.descriptionTemplate.replace(
                                       "{value}",
-                                      floor.floor_name || floor.barcode,
+                                      floor.floor_Name,
                                     )}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>

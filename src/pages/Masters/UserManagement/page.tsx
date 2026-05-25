@@ -164,36 +164,36 @@ export const UserManagement = () => {
                 ) : (
                   users.map((user, idx) => (
                     <TableRow
-                      key={user.id}
+                      key={user.ID}
                       className="hover:bg-blue-50/40 transition-all duration-300 group cursor-default border-b border-slate-50 text-left"
                     >
                       <td className="px-6 py-5 text-slate-600 whitespace-nowrap text-left">
                         {(page - 1) * PAGE_SIZE + idx + 1}
                       </td>
                       <td className="px-4 py-2 text-sm font-black text-blue-600 rounded-lg whitespace-nowrap text-left">
-                        <span className="rounded-lg">{user.userid}</span>
+                        <span className="rounded-lg">{user.USERID}</span>
                       </td>
                       <td className="px-4 py-5 text-sm font-bold text-slate-500 tabular-nums text-left whitespace-nowrap">
-                        {user.employee_id}
+                        {user.EMPLOYEE_ID}
                       </td>
                       <td className="px-4 py-5 text-left">
-                        {getRoleBadge(Number(user.role))}
+                        {getRoleBadge(Number(user.ROLE))}
                       </td>
                       <td className="px-4 py-5 text-sm font-bold text-slate-600 text-left whitespace-nowrap">
-                        {user.department}
+                        {user.DEPARTMENT}
                       </td>
                       <td className="px-4 py-5 text-left whitespace-nowrap">
                         <Badge
                           variant="outline"
                           className={`rounded-lg px-3 py-1 border-0 label-bold transition-colors uppercase tracking-widest text-[10px] ${
-                            user.status?.toLowerCase() === "active" ||
-                            user.status === "Y"
+                            user.STATUS?.toLowerCase() === "active" ||
+                            user.STATUS === "Y"
                               ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                               : "bg-rose-100 text-rose-700 hover:bg-rose-200"
                           }`}
                         >
-                          {user.status === "Y" ||
-                          user.status?.toLowerCase() === "active"
+                          {user.STATUS === "Y" ||
+                          user.STATUS?.toLowerCase() === "active"
                             ? "Active"
                             : "Inactive"}
                         </Badge>
@@ -205,7 +205,7 @@ export const UserManagement = () => {
                             size="icon"
                             className="h-10 w-10 rounded-2xl bg-slate-50/80 shadow-lg shadow-slate-300 text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             onClick={() =>
-                              navigate(`/masters/users/${user.id}`)
+                              navigate(`/masters/users/${user.ID}`)
                             }
                           >
                             <Eye className="h-4 w-4" />
@@ -215,7 +215,7 @@ export const UserManagement = () => {
                             size="icon"
                             className="h-10 w-10 rounded-2xl bg-slate-50/80 text-slate-400 shadow-lg shadow-slate-300 hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-sm border border-slate-100/50"
                             onClick={() =>
-                              navigate(`/masters/users/${user.id}/edit`)
+                              navigate(`/masters/users/${user.ID}/edit`)
                             }
                           >
                             <Pencil className="h-4 w-4" />
@@ -242,7 +242,7 @@ export const UserManagement = () => {
                                   <AlertDialogDescription className="body-strong text-slate-500 pt-2 text-[15px] leading-relaxed  mx-auto">
                                     {config.strings.deleteDialog.descriptionTemplate.replace(
                                       "{username}",
-                                      user.username,
+                                      user.USERNAME,
                                     )}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
@@ -252,7 +252,7 @@ export const UserManagement = () => {
                                   </AlertDialogCancel>
                                   <AlertDialogAction
                                     className="bg-rose-600 hover:bg-rose-700 body-strong rounded-xl px-10 flex-1 h-12 text-white shadow-lg shadow-rose-100 transition-all active:scale-95"
-                                    onClick={() => handleDelete(user.id)}
+                                    onClick={() => handleDelete(user.ID)}
                                   >
                                     {config.strings.deleteDialog.confirmBtn}
                                   </AlertDialogAction>

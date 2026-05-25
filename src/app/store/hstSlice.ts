@@ -2,15 +2,15 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface HSTDevice {
   id: number;
-  device_id: string;
-  device_name?: string;
-  brand_name?: string;
-  device_serial_number: string;
-  device_type: string;
-  aisle_mapping?: string;
-  device_status: number;
-  companyid: number;
-  warehouse_id: number;
+  deviceId: string;
+  deviceName?: string;
+  brandName?: string;
+  deviceSerialNumber: string;
+  deviceType: string;
+  aisleMapping?: string;
+  deviceStatus: number;
+  companyid?: number;
+  warehouseId: number;
   locations?: number[];
 }
 
@@ -79,7 +79,7 @@ const hstSlice = createSlice({
   },
 });
 
-export const { 
+export const {
   hstLoadStart, hstLoadSuccess, hstUnassignedSuccess, hstTypesSuccess, hstLoadFailure, hstDetailSuccess, clearCurrentHST, clearAllHST
 } = hstSlice.actions;
 
