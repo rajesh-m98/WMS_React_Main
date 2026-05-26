@@ -50,9 +50,9 @@ const PicklistDispatchPage = () => {
   const getWarehouseNameByCode = (code: string): string => {
     if (!code) return "Unknown Warehouse";
     const found = warehouses.find(
-      (w) => w.warehouse_code?.toLowerCase() === code.toLowerCase(),
+      (w) => w.warehouse_Code?.toLowerCase() === code.toLowerCase(),
     );
-    return found ? found.warehouse_name : "Unknown Warehouse";
+    return found ? found.warehouse_Name : "Unknown Warehouse";
   };
 
   // FILTER: Grpo Doc Entry must BE NULL for Picklist Dispatch
@@ -123,7 +123,7 @@ const PicklistDispatchPage = () => {
         existing.last_updated = row.created_at;
       }
     });
-    
+
     return Array.from(whsMap.values()).map((whs: any) => ({
       ...whs,
       doc_entry: Array.from(whs.doc_entries).join(", ") || "----",

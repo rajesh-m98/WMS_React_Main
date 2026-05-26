@@ -645,7 +645,6 @@ export const PackageList = () => {
           typeName={typeNameForBatch}
         />
       </div>
-
     </div>
   );
 };

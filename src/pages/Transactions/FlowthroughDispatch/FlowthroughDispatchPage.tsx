@@ -50,9 +50,9 @@ const FlowthroughDispatchPage = () => {
   const getWarehouseNameByCode = (code: string): string => {
     if (!code) return "Unknown Warehouse";
     const found = warehouses.find(
-      (w) => w.warehouse_code?.toLowerCase() === code.toLowerCase(),
+      (w) => w.warehouse_Code?.toLowerCase() === code.toLowerCase(),
     );
-    return found ? found.warehouse_name : "Unknown Warehouse";
+    return found ? found.warehouse_Name : "Unknown Warehouse";
   };
 
   // FILTER: Grpo Doc Entry must NOT be null and status must NOT be null for Flowthrough

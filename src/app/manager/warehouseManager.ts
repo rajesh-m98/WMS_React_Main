@@ -8,30 +8,37 @@ import {
   clearCurrentWarehouse
 } from '../store/warehouseSlice';
 import { API_ENDPOINTS } from '@/core/config/endpoints';
+import { count } from 'node:console';
 
 export const handleFetchAllWarehouses = (params?: { page?: number; size?: number; companyid?: number; is_paginate?: boolean }) => async (dispatch: AppDispatch) => {
   try {
     dispatch(warehouseLoadStart());
+    const isPaginated = params?.is_paginate !== false;
     const queryParams = new URLSearchParams({
-      is_paginate: (params?.is_paginate !== false).toString(),
+      is_paginate: isPaginated.toString(),
       companyid: (params?.companyid ?? 1).toString(),
       page: (params?.page ?? 1).toString(),
       size: (params?.size ?? 10).toString(),
     }).toString();
 
-    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.WAREHOUSE.ALL}`);
+    const response = await api.get<{ status: boolean; data: any }>(`${API_ENDPOINTS.MASTERS.WAREHOUSE.ALL}?${queryParams}`);
     console.log(response.data);
     if (response.data.status) {
-      // if (params?.is_paginate !== false) {
+      const rawData = isPaginated
+        ? (response.data.data?.items || [])
+        : (Array.isArray(response.data.data) ? response.data.data : response.data.data?.items || []);
+
+      // Extract the total count returned by the paginated FastAPI backend (checking all common key variations)
+      const totalCount =
+        response.data.data?.total ??
+        response.data.data?.totalCount ??
+        response.data.data?.total_count ??
+        response.data.data?.count;
+
       dispatch(warehouseLoadSuccess({
-        data: response.data.data.items || [],
-        // total: response.data.data.totalCount || response.data.data.total || 0 
+        data: rawData,
+        total: isPaginated ? (response.data.data.count ?? rawData.length) : rawData.length,
       }));
-      // } else {
-      //   dispatch(warehouseLoadSuccess({ 
-      //     data: Array.isArray(response.data.data) ? response.data.data : response.data.data.items || [] 
-      //   }));
-      // }
       return true;
     } else {
       dispatch(warehouseLoadFailure("Failed to retrieve warehouses"));

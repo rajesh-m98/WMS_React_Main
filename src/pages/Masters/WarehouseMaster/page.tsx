@@ -261,7 +261,7 @@ export const WarehouseMaster = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  warehouses.map((wh, index) => (
+                  warehouses.map((wh: any, index) => (
                     <TableRow
                       key={wh.id}
                       className="group border-b border-slate-50 even:bg-slate-50/20 hover:bg-blue-50/50 transition-all font-semibold text-slate-700"
@@ -275,12 +275,12 @@ export const WarehouseMaster = () => {
                             <Building2 className="icon-sm text-blue-600" />
                           </div>
                           <span className="text-sm font-bold text-slate-900">
-                            {wh.warehouse_Name}
+                            {wh.warehouse_name || wh.warehouse_Name}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-5 font-mono text-[12px] font-black text-blue-600 tracking-wider">
-                        {wh.warehouse_Code}
+                        {wh.warehouse_code || wh.warehouse_Code}
                       </TableCell>
                       <TableCell className="px-6 py-5">
                         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">

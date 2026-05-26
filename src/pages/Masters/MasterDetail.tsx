@@ -152,8 +152,8 @@ const MasterDetail = () => {
     );
   } else if (type === "warehouse") {
     auditEntries.push(
-      { label: "Warehouse Code", value: activeData.warehouse_Code },
-      { label: "Warehouse Name", value: activeData.warehouse_Name },
+      { label: "Warehouse Code", value: activeData.warehouse_code || activeData.warehouse_Code },
+      { label: "Warehouse Name", value: activeData.warehouse_name || activeData.warehouse_Name },
       { label: "GST Number", value: activeData.gstnumber },
       { label: "BPL Name", value: activeData.bplname },
       { label: "BPL ID", value: activeData.bplid },

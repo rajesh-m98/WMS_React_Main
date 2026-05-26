@@ -18,39 +18,65 @@ export const handleLoginSubmit = () => async (dispatch: AppDispatch, getState: (
   try {
     dispatch(loginStart());
 
-    // const params = new URLSearchParams();
-    // params.append('username', username);
-    // params.append('password', password);
+    let response;
+    try {
+      // 1. Try sending as JSON (expected by the .NET backend)
+      const payload = {
+        username: username,
+        password: password,
+      };
+      response = await api.post(API_ENDPOINTS.AUTH.LOGIN, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (jsonErr: any) {
+      // 2. If it fails with 422 Unprocessable Entity (FastAPI validation error), retry as URL encoded form
+      if (jsonErr.response?.status === 422) {
+        const params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
 
-    const payload = {
-      username: username,
-      password: password,
+        response = await api.post(API_ENDPOINTS.AUTH.LOGIN, params, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+      } else {
+        throw jsonErr;
+      }
     }
-    const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
 
-    if (response.data.status) {
-      const { accessToken, refreshToken, data: userData } = response.data;
+    if (response && response.data) {
+      // Standardize the response status and token structure to support both backend types
+      const status = response.data.status ?? (response.status === 200);
 
-      dispatch(setSignIn({
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        userData: userData || {}
-      }));
+      if (status) {
+        const accessToken = response.data.accessToken || response.data.access_token || response.data.token;
+        const refreshToken = response.data.refreshToken || response.data.refresh_token;
+        const userData = response.data.data || response.data.userData || {};
 
-      toast.success(response.data.message || 'Authentication successful');
-      return true;
-    } else {
-      const errorMsg = response.data.message || 'Login failed';
-      dispatch(loginFailure(errorMsg));
-      toast.error(errorMsg);
-      return false;
+        if (!accessToken) {
+          throw new Error("No token received from backend");
+        }
+
+        dispatch(setSignIn({
+          accessToken: accessToken,
+          refreshToken: refreshToken || undefined,
+          userData: userData
+        }));
+
+        toast.success(response.data.message || 'Authentication successful');
+        return true;
+      } else {
+        const errorMsg = response.data.message || 'Login failed';
+        dispatch(loginFailure(errorMsg));
+        toast.error(errorMsg);
+        return false;
+      }
     }
   } catch (err: any) {
-    const errorMsg = err.response?.data?.message || 'Server error during login';
+    const errorMsg = err.response?.data?.message || err.response?.data?.detail?.[0]?.msg || err.message || 'Server error during login';
     dispatch(loginFailure(errorMsg));
     toast.error(errorMsg);
     return false;

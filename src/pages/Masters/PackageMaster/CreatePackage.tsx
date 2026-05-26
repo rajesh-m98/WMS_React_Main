@@ -198,10 +198,10 @@ export const CreatePackage = () => {
   };
 
   // Map warehouses for SearchableDropdown
-  const warehouseOptions = warehouses.map((wh) => ({
+  const warehouseOptions = warehouses.map((wh: any) => ({
     value: wh.id,
-    label: `${wh.warehouse_Code} - ${wh.warehouse_Name}`,
-    code: wh.warehouse_Code,
+    label: `${wh.warehouse_code || wh.warehouse_Code} - ${wh.warehouse_name || wh.warehouse_Name}`,
+    code: wh.warehouse_code || wh.warehouse_Code,
   }));
 
   return (
